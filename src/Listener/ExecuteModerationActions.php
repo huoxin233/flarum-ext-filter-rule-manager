@@ -37,7 +37,13 @@ class ExecuteModerationActions
         }
 
         $post = $event->post;
-        
+
+        // Only evaluate if this is a new post or the content was edited.
+        // This prevents re-evaluating during delete, recover, or approval actions.
+        if ($post->exists && ! $post->isDirty('content')) {
+            return;
+        }
+
         $content = (string) $post->content;
 
         /** @var Ruleset[] $rulesets */

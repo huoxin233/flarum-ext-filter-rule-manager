@@ -34,10 +34,9 @@ class EvaluateBlockRulesets
     {
         $post = $event->post;
 
-        // Only run on new post creation. The plan's submit flow only covers
-        // first-time submission; blocking on edits would surprise moderators
-        // fixing typos in old content under newer rules.
-        if ($post->exists) {
+        // Evaluate new posts, and existing posts only if their content was modified.
+        // This closes the edit loophole while preventing blocking on delete/recover actions.
+        if ($post->exists && ! $post->isDirty('content')) {
             return;
         }
 
