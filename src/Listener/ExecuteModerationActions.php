@@ -24,58 +24,27 @@ class ExecuteModerationActions
 
     public function subscribe(Dispatcher $events): void
     {
-        $events->listen(Saving::class, [$this, 'requireApproval']);
-        $events->listen(Saved::class, [$this, 'autoFlag']);
+        $events->listen(Saving::class, [$this, 'moderatePost']);
     }
 
-    public function requireApproval(Saving $event): void
+    public function moderatePost(Saving $event): void
     {
-        if (! $this->extensions->isEnabled('flarum-approval')) {
+        $hasApproval = $this->extensions->isEnabled('flarum-approval');
+        $hasFlags    = $this->extensions->isEnabled('flarum-flags');
+
+        if (! $hasApproval && ! $hasFlags) {
             return;
         }
 
         $post = $event->post;
-        if ($post->exists) {
-            return;
-        }
-
+        
         $content = (string) $post->content;
 
         /** @var Ruleset[] $rulesets */
         $rulesets = Ruleset::active()->where('auto_flag', true)->ordered()->with('rules')->get();
-        if ($rulesets->isEmpty()) {
-            return;
-        }
 
-        $providers = $this->evaluator->getProviders();
-
-        foreach ($rulesets as $ruleset) {
-            if (! $this->evaluator->scopeMatches($ruleset, $post->discussion)) {
-                continue;
-            }
-
-            $tokens = $this->evaluator->evaluateRuleset($ruleset, $content, $providers);
-            if ($tokens !== null) {
-                $post->is_approved = false;
-                break;
-            }
-        }
-    }
-
-    public function autoFlag(Saved $event): void
-    {
-        if (! $this->extensions->isEnabled('flarum-flags')) {
-            return;
-        }
-
-        $post = $event->post;
-        $content = (string) $post->content;
-
-        $providers = $this->evaluator->getProviders();
         $triggeredRulesetNames = [];
-
-        /** @var Ruleset[] $rulesets */
-        $rulesets = Ruleset::active()->where('auto_flag', true)->ordered()->with('rules')->get();
+        $providers = $this->evaluator->getProviders();
 
         foreach ($rulesets as $ruleset) {
             if (! $this->evaluator->scopeMatches($ruleset, $post->discussion)) {
@@ -110,6 +79,23 @@ class ExecuteModerationActions
             return;
         }
 
+        $flagType = $hasApproval ? 'approval' : 'autoMod';
+
+        // Prevent duplicate moderation actions on edits
+        if ($post->exists) {
+            // If the post is already held for approval, no need to re-flag
+            if ($hasApproval && $post->is_approved === false) {
+                return;
+            }
+            
+            // If the post is already flagged with our target flag type, skip creating another
+            if ($hasFlags && class_exists(\Flarum\Flags\Flag::class)) {
+                if (\Flarum\Flags\Flag::where('post_id', $post->id)->where('type', $flagType)->exists()) {
+                    return;
+                }
+            }
+        }
+
         $messages = [];
 
         if (! empty($triggeredRulesetNames)) {
@@ -124,13 +110,24 @@ class ExecuteModerationActions
 
         $reasonDetail = implode("\n\n", $messages);
 
-        if (class_exists(\Flarum\Flags\Flag::class)) {
-            $flag = new \Flarum\Flags\Flag();
-            $flag->post_id = $post->id;
-            $flag->type = 'autoMod';
-            $flag->reason_detail = $reasonDetail;
-            $flag->created_at = Carbon::now();
-            $flag->save();
+        if ($hasApproval) {
+            $post->is_approved = false;
         }
+
+        $post->afterSave(function ($post) use ($hasApproval, $hasFlags, $reasonDetail, $flagType) {
+            if ($hasApproval && $post->number == 1 && $post->discussion) {
+                $post->discussion->is_approved = false;
+                $post->discussion->save();
+            }
+
+            if ($hasFlags && class_exists(\Flarum\Flags\Flag::class)) {
+                $flag = new \Flarum\Flags\Flag();
+                $flag->post_id = $post->id;
+                $flag->type = $flagType;
+                $flag->reason_detail = $reasonDetail;
+                $flag->created_at = Carbon::now();
+                $flag->save();
+            }
+        });
     }
 }
