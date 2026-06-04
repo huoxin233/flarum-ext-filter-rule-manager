@@ -18,6 +18,7 @@ use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Exception\RuleBlockExceptionHandler;
 use Huoxin\FilterRuleManager\Listener\EvaluateBlockRulesets;
 use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
+use Huoxin\FilterRuleManager\Listener\ExecuteModerationActions;
 use Huoxin\FilterRuleManager\Provider\FilterRuleManagerServiceProvider;
 
 return [
@@ -49,7 +50,8 @@ return [
 
     // ── Block evaluation: fires on post save ──────────────────────────────────
     (new Extend\Event())
-        ->listen(Saving::class, EvaluateBlockRulesets::class),
+        ->listen(Saving::class, EvaluateBlockRulesets::class)
+        ->subscribe(ExecuteModerationActions::class),
 
     // ── Custom exception → structured 422 response ────────────────────────────
     (new Extend\ErrorHandling())

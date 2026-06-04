@@ -55,6 +55,7 @@ huoxin-filter-rule-manager:
     section_basics: "Basics"
     section_scope: "Scope"
     section_display: "Display"
+    section_moderation: "Moderation Actions"
     section_rules: "Rules"
 
     # ── Form labels ────────────────────────────────────────────────────────
@@ -70,6 +71,10 @@ huoxin-filter-rule-manager:
     ruleset_message: "Message"
     ruleset_message_placeholder: "Your post contains a restricted word: {{matched_word}}"
     ruleset_is_active: "Enabled"
+    ruleset_auto_flag: "Auto-flag post on match"
+    ruleset_auto_flag_help: "If enabled, triggering this ruleset will automatically create a flag for moderators to review. (Requires flarum/flags)"
+    ruleset_require_approval: "Require approval on match"
+    ruleset_require_approval_help: "If enabled, the post will be hidden until approved by a moderator. (Requires flarum/approval)"
     ruleset_block_cascade: "Stop evaluating lower-priority rulesets when this one triggers"
     ruleset_block_cascade_help: "Applies to all effect types. Use to short-circuit a chain of related rulesets."
     ruleset_rule_operator: "Combine rules using"
@@ -107,6 +112,9 @@ huoxin-filter-rule-manager:
       modal: "Modal"
       modal_help: "Modal dialog interrupting the user. Shown once per ruleset firing — re-opens only after the rule clears and triggers again."
 
+    providers:
+      builtin: "Built-in (Full-stack)"
+
     # ── Rule type labels ─────────────────────────────────────────────────
     type_contains_word: "Contains word(s)"
     type_regex: "Matches regex pattern(s)"
@@ -138,3 +146,6 @@ huoxin-filter-rule-manager:
     modal_title_warning: "Warning"
     modal_title_block: "Post blocked"
     modal_ok: "OK"
+
+    # ── Auto Flag ──────────────────────────────────────────────────────────
+    flag_message: "Auto-flagged by Filter Rule Manager. Triggered rulesets: {rulesets}"

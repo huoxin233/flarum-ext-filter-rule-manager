@@ -40,6 +40,8 @@ export default class RulesetEditorModal extends Modal {
     this.message = Stream(this.ruleset ? this.ruleset.message() : '');
     this.blockCascade = Stream(this.ruleset ? this.ruleset.blockCascade() : false);
     this.isActive = Stream(this.ruleset ? this.ruleset.isActive() : true);
+    this.autoFlag = Stream(this.ruleset ? this.ruleset.autoFlag() : false);
+    this.requireApproval = Stream(this.ruleset ? this.ruleset.requireApproval() : false);
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
 
@@ -74,6 +76,7 @@ export default class RulesetEditorModal extends Modal {
           {this.basicsSection()}
           {this.scopeSection()}
           {this.displaySection()}
+          {this.moderationSection()}
           {this.rulesSection()}
           {this.validationBlock()}
           {this.actionsBlock()}
@@ -249,6 +252,35 @@ export default class RulesetEditorModal extends Modal {
           </Switch>
           <div className="helpText">
             {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade_help')}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  moderationSection() {
+    return (
+      <div className="RulesetEditor-section">
+        <div className="RulesetEditor-section-header">
+          <i className="fas fa-shield-alt"></i>
+          <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_moderation')}</h4>
+        </div>
+
+        <div className="Form-group">
+          <Switch state={this.autoFlag()} onchange={this.autoFlag}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_auto_flag')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_auto_flag_help')}
+          </div>
+        </div>
+
+        <div className="Form-group">
+          <Switch state={this.requireApproval()} onchange={this.requireApproval}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_require_approval')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_require_approval_help')}
           </div>
         </div>
       </div>
@@ -499,6 +531,8 @@ export default class RulesetEditorModal extends Modal {
       message: this.message(),
       blockCascade: this.blockCascade(),
       isActive: this.isActive(),
+      autoFlag: this.autoFlag(),
+      requireApproval: this.requireApproval(),
       scopeType: this.scopeType(),
       scopeTagIds: this.scopeTagIds(),
       rules: this.rules(),
