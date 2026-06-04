@@ -18,7 +18,9 @@ use Huoxin\FilterRuleManager\Model\Rule;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
+use Flarum\Post\Exception\FloodingException;
 use Illuminate\Database\ConnectionInterface;
+use Carbon\Carbon;
 
 class EvaluateBlockRulesets
 {
@@ -39,7 +41,7 @@ class EvaluateBlockRulesets
             return;
         }
 
-        $content    = (string) $post->content;
+        $content = (string) $post->content;
         $discussion = $post->discussion;
 
         /** @var Ruleset[] $rulesets */
@@ -50,7 +52,7 @@ class EvaluateBlockRulesets
         $triggered = [];
 
         foreach ($rulesets as $ruleset) {
-            if (!$this->evaluator->scopeMatches($ruleset, $discussion)) {
+            if (! $this->evaluator->scopeMatches($ruleset, $discussion)) {
                 continue;
             }
 
@@ -60,11 +62,11 @@ class EvaluateBlockRulesets
             }
 
             $triggered[] = [
-                'ruleset_id'   => $ruleset->id,
+                'ruleset_id' => $ruleset->id,
                 'display_mode' => $ruleset->display_mode,
-                'effect_type'  => 'block',
-                'message'      => $this->evaluator->interpolate($ruleset->message, $tokens),
-                'tokens'       => $tokens,
+                'effect_type' => 'block',
+                'message' => $this->evaluator->interpolate($ruleset->message, $tokens),
+                'tokens' => $tokens,
             ];
 
             if ($ruleset->block_cascade) {
@@ -72,7 +74,25 @@ class EvaluateBlockRulesets
             }
         }
 
-        if (!empty($triggered)) {
+        if (! empty($triggered)) {
+            $actor = $event->actor;
+            if ($actor && ! $actor->isGuest()) {
+                $lastBlock = $this->db->table('filter_rule_block_logs')
+                    ->where('user_id', $actor->id)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                if ($lastBlock && Carbon::parse($lastBlock->created_at)->diffInSeconds(Carbon::now()) < 10) {
+                    throw new FloodingException();
+                }
+
+                $logs = array_map(fn ($t) => [
+                    'user_id' => $actor->id,
+                    'ruleset_id' => $t['ruleset_id'],
+                    'created_at' => Carbon::now(),
+                ], $triggered);
+                $this->db->table('filter_rule_block_logs')->insert($logs);
+            }
             throw new RuleBlockException($triggered);
         }
     }

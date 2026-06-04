@@ -24,7 +24,13 @@ export default class RuleBuilder extends Component {
 
     const providerOptions = {};
     providers.forEach((p) => {
-      if (p.provider) providerOptions[p.provider] = p.provider;
+      if (p.provider) {
+        const transKey = `huoxin-filter-rule-manager.admin.providers.${p.provider}`;
+        const translated = app.translator.trans(transKey);
+        // If it isn't translated, it returns an array containing the key in Flarum < 1.2, or the key itself in >= 1.2
+        const isTranslated = Array.isArray(translated) ? translated[0] !== transKey : translated !== transKey;
+        providerOptions[p.provider] = isTranslated ? translated : p.provider;
+      }
     });
 
     return (

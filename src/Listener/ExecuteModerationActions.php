@@ -30,7 +30,7 @@ class ExecuteModerationActions
 
     public function requireApproval(Saving $event): void
     {
-        if (!$this->extensions->isEnabled('flarum-approval')) {
+        if (! $this->extensions->isEnabled('flarum-approval')) {
             return;
         }
 
@@ -40,7 +40,7 @@ class ExecuteModerationActions
         }
 
         $content = (string) $post->content;
-        
+
         /** @var Ruleset[] $rulesets */
         $rulesets = Ruleset::active()->where('require_approval', true)->ordered()->with('rules')->get();
         if ($rulesets->isEmpty()) {
@@ -50,7 +50,7 @@ class ExecuteModerationActions
         $providers = $this->evaluator->getProviders();
 
         foreach ($rulesets as $ruleset) {
-            if (!$this->evaluator->scopeMatches($ruleset, $post->discussion)) {
+            if (! $this->evaluator->scopeMatches($ruleset, $post->discussion)) {
                 continue;
             }
 
@@ -64,7 +64,7 @@ class ExecuteModerationActions
 
     public function autoFlag(Saved $event): void
     {
-        if (!$this->extensions->isEnabled('flarum-flags')) {
+        if (! $this->extensions->isEnabled('flarum-flags')) {
             return;
         }
 
@@ -78,7 +78,7 @@ class ExecuteModerationActions
         $rulesets = Ruleset::active()->where('auto_flag', true)->ordered()->with('rules')->get();
 
         foreach ($rulesets as $ruleset) {
-            if (!$this->evaluator->scopeMatches($ruleset, $post->discussion)) {
+            if (! $this->evaluator->scopeMatches($ruleset, $post->discussion)) {
                 continue;
             }
 
@@ -89,16 +89,38 @@ class ExecuteModerationActions
         }
 
         $actor = $event->actor;
+        $isEvasion = false;
+        $blockedRulesetName = 'Unknown';
 
-        if (empty($triggeredRulesetNames)) {
+        if ($actor && ! $actor->isGuest()) {
+            $recentBlock = $this->db->table('filter_rule_block_logs')
+                ->where('user_id', $actor->id)
+                ->where('created_at', '>=', Carbon::now()->subMinutes(15))
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($recentBlock) {
+                $isEvasion = true;
+                $blockedRuleset = Ruleset::find($recentBlock->ruleset_id);
+                $blockedRulesetName = $blockedRuleset ? $blockedRuleset->name : 'Unknown';
+            }
+        }
+
+        if (empty($triggeredRulesetNames) && ! $isEvasion) {
             return;
         }
 
         $messages = [];
-        
-        $rulesStr = implode(', ', $triggeredRulesetNames);
-        $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
-        $messages[] = is_array($trans) ? $trans[0] : $trans;
+
+        if (! empty($triggeredRulesetNames)) {
+            $rulesStr = implode(', ', $triggeredRulesetNames);
+            $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
+            $messages[] = is_array($trans) ? $trans[0] : $trans;
+        }
+
+        if ($isEvasion) {
+            $messages[] = "Suspicious: User was recently blocked by ruleset '{$blockedRulesetName}', then successfully submitted this post. Please review for filter evasion.";
+        }
 
         $reasonDetail = implode("\n\n", $messages);
 
