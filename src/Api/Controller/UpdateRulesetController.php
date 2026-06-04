@@ -51,7 +51,6 @@ class UpdateRulesetController extends AbstractShowController
         if (isset($attributes['blockCascade'])) $ruleset->block_cascade = (bool) $attributes['blockCascade'];
         if (isset($attributes['isActive']))     $ruleset->is_active     = (bool) $attributes['isActive'];
         if (isset($attributes['autoFlag']))     $ruleset->auto_flag     = (bool) $attributes['autoFlag'];
-        if (isset($attributes['requireApproval'])) $ruleset->require_approval = (bool) $attributes['requireApproval'];
         if (isset($attributes['scopeType']))    $ruleset->scope_type    = $this->validEnum($attributes['scopeType'], ['global', 'normal_post', 'private_post', 'tag'], $ruleset->scope_type);
         if (array_key_exists('scopeTagIds', $attributes)) {
             $ruleset->scope_tag_ids = $this->sanitizeTagIds($attributes['scopeTagIds']);

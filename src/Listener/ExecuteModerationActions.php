@@ -42,7 +42,7 @@ class ExecuteModerationActions
         $content = (string) $post->content;
 
         /** @var Ruleset[] $rulesets */
-        $rulesets = Ruleset::active()->where('require_approval', true)->ordered()->with('rules')->get();
+        $rulesets = Ruleset::active()->where('auto_flag', true)->ordered()->with('rules')->get();
         if ($rulesets->isEmpty()) {
             return;
         }

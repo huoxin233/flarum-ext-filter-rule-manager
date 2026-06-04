@@ -41,7 +41,6 @@ class RulesetSerializer extends AbstractSerializer
             'blockCascade'  => (bool) $model->block_cascade,
             'isActive'      => (bool) $model->is_active,
             'autoFlag'      => (bool) $model->auto_flag,
-            'requireApproval' => (bool) $model->require_approval,
             'scopeType'     => $model->scope_type,
             'scopeTagIds'   => $model->scope_tag_ids ?? [],
             'groupIds'      => $model->group_ids ?? [],

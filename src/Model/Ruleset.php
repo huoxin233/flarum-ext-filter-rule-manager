@@ -28,7 +28,6 @@ use Illuminate\Database\Eloquent\Builder;
  * @property array|null $scope_tag_ids
  * @property array|null $group_ids
  * @property bool   $auto_flag
- * @property bool   $require_approval
  */
 class Ruleset extends AbstractModel
 {
@@ -38,7 +37,6 @@ class Ruleset extends AbstractModel
         'block_cascade'  => 'boolean',
         'is_active'      => 'boolean',
         'auto_flag'      => 'boolean',
-        'require_approval' => 'boolean',
         'scope_tag_ids'  => 'array',
         'group_ids'      => 'array',
     ];
