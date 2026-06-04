@@ -1,0 +1,198 @@
+// =========================================================================
+// Filter Rule Manager — forum styles
+// =========================================================================
+
+@filter-rule-info-bg:    #e8f4f8;
+@filter-rule-info-color: #2b7c93;
+@filter-rule-warning-bg: #fff4e5;
+@filter-rule-warning-color: #8a6d3b;
+@filter-rule-error-bg:   #fde8e8;
+@filter-rule-error-color: #a94442;
+
+// -------------------------------------------------------------------------
+// Wrapper injected as ComposerBody.headerItems entries — Flarum wraps each
+// item in <li class="item-...">. Reset the li so the banner / sidebar span
+// full width (and don't show a list bullet).
+// -------------------------------------------------------------------------
+
+.ComposerBody-header > .item-filter-rule-header-banner,
+.ComposerBody-header > .item-filter-rule-sidebar {
+  display: block;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// -------------------------------------------------------------------------
+// Host element created by Composer.oncreate at the .App-composer > .container
+// level — sibling of #composer, sitting above it.
+// -------------------------------------------------------------------------
+
+.FilterRuleManager-host {
+  // Lays out as a normal block element. m.mount() renders nothing inside
+  // when there are no banner-mode alerts, so the host collapses to height 0.
+}
+
+// Container-level banner: aligned with the editor by negative left margin
+// (escape the .container padding) and positive right margin (clear the
+// avatar gutter). On phones the composer is full-screen so drop the gutter.
+.FilterRuleManager--banner {
+  margin-left: -20px;
+  margin-right: 205px;
+  margin-bottom: 6px;
+
+  @media (max-width: 767px) {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.FilterRuleManager-banners {
+  padding: 8px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.FilterRuleManager-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  border-left: 3px solid transparent;
+
+  &--info {
+    background: @filter-rule-info-bg;
+    color: @filter-rule-info-color;
+    border-left-color: darken(@filter-rule-info-color, 5%);
+  }
+
+  &--warning {
+    background: @filter-rule-warning-bg;
+    color: @filter-rule-warning-color;
+    border-left-color: darken(@filter-rule-warning-color, 5%);
+  }
+
+  &--block {
+    background: @filter-rule-error-bg;
+    color: @filter-rule-error-color;
+    border-left-color: darken(@filter-rule-error-color, 5%);
+  }
+
+  &-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    display: inline-flex;
+  }
+
+  &-message {
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Sidebar variant — vertical floating card on the right of the composer.
+// Positioned relative to .ComposerBody (made position: relative above).
+// -------------------------------------------------------------------------
+
+.FilterRuleManager-sidebar {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 260px;
+  max-width: calc(50% - 24px);
+  z-index: 5;
+  padding: 10px 12px;
+  background: @body-bg;
+  border: 1px solid @control-bg;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  // On narrow screens / mobile, fall back to inline flow so it doesn't
+  // overlap the editor.
+  @media (max-width: 768px) {
+    position: static;
+    width: auto;
+    max-width: none;
+    margin-top: 8px;
+    box-shadow: none;
+  }
+
+  &Title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: @muted-color;
+    padding-bottom: 6px;
+    border-bottom: 1px solid @control-bg;
+    margin-bottom: 2px;
+  }
+
+  .FilterRuleManager-item {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Warning confirmation modal
+// -------------------------------------------------------------------------
+
+.FilterRuleWarningModal-list {
+  margin: 12px 0 16px;
+  padding-left: 20px;
+  color: @filter-rule-warning-color;
+
+  li { margin-bottom: 6px; }
+}
+
+// -------------------------------------------------------------------------
+// Alert modal (displayMode === 'modal')
+// -------------------------------------------------------------------------
+
+.FilterRuleModal {
+  &-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+
+    &--info    { background: @filter-rule-info-bg;    color: @filter-rule-info-color; }
+    &--warning { background: @filter-rule-warning-bg; color: @filter-rule-warning-color; }
+    &--block   { background: @filter-rule-error-bg;   color: @filter-rule-error-color; }
+  }
+
+  &-icon {
+    flex-shrink: 0;
+    font-size: 22px;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  &-text {
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+  }
+
+  &-actions {
+    text-align: right;
+    margin: 0;
+  }
+}

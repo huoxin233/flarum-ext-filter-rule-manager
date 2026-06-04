@@ -1,0 +1,53 @@
+import Component from 'flarum/common/Component';
+import Stream from 'flarum/common/utils/Stream';
+
+/**
+ * Config UI for the builtin `contains_word` rule type.
+ *
+ * Rule config shape: { words: string[] }
+ * Backward compatible with the legacy single-value shape { word: string }.
+ *
+ * The raw textarea text is held in component state so the user's cursor and
+ * partial input survive across redraws — the parsed `words` array is pushed
+ * to onchange on every keystroke, but the displayed value mirrors what the
+ * user typed (blank lines and all) until they leave the field.
+ */
+export default class WordsListConfig extends Component {
+  oninit(vnode) {
+    super.oninit(vnode);
+
+    const cfg = this.attrs.config || {};
+    const initial = Array.isArray(cfg.words)
+      ? cfg.words
+      : (typeof cfg.word === 'string' && cfg.word !== '' ? [cfg.word] : []);
+
+    this.text = Stream(initial.join('\n'));
+  }
+
+  view() {
+    return (
+      <div className="FilterRuleManager-ConfigForm">
+        <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_label')}</label>
+        <textarea
+          className="FormControl FilterRuleManager-LinesInput"
+          rows="5"
+          value={this.text()}
+          oninput={(e) => this.handleInput(e.target.value)}
+          placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.config_words_placeholder')}
+        ></textarea>
+        <div className="helpText">
+          {app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}
+        </div>
+      </div>
+    );
+  }
+
+  handleInput(raw) {
+    this.text(raw);
+    const words = raw
+      .split(/\r?\n/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+    this.attrs.onchange({ ...(this.attrs.config || {}), words });
+  }
+}

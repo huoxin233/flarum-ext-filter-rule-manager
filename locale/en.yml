@@ -1,0 +1,140 @@
+huoxin-filter-rule-manager:
+  admin:
+    # ── Page chrome ────────────────────────────────────────────────────────
+    tabs:
+      rulesets: "Rulesets"
+      providers: "Providers"
+    add_ruleset: "Add ruleset"
+    edit_ruleset: "Edit ruleset"
+    no_rulesets: "No rulesets have been created yet. Create one to start showing filter rules."
+    no_rulesets_in_scope: "No rulesets for this scope."
+    no_providers: "No rule providers are registered. Install or enable a provider extension to add rule types."
+    load_error: "Could not load filter rule data."
+    save: "Save"
+    save_success: "Ruleset saved."
+    save_error: "Could not save ruleset. Check the form for errors."
+    delete: "Delete"
+    delete_success: "Ruleset deleted."
+    delete_error: "Could not delete ruleset."
+    delete_ruleset_confirm: "Delete the ruleset \"{name}\"? Its rules will be removed too. This cannot be undone."
+    cancel: "Cancel"
+    edit: "Edit"
+    move_up: "Move up"
+    move_down: "Move down"
+    reorder_error: "Could not save the new order. Showing the latest server state."
+    toggle_error: "Could not update the ruleset's active state."
+    active: "Active"
+    inactive: "Inactive"
+
+    # ── List headers ───────────────────────────────────────────────────────
+    headers:
+      order: "Order"
+      name: "Name"
+      effect: "Effect"
+      scope: "Scope"
+      display: "Display"
+      rules: "Rules"
+      status: "Status"
+      active: "Active"
+      type: "Type"
+      label: "Label"
+      runs: "Runs"
+      tokens: "Tokens"
+
+    scope_filters:
+      all: "All"
+      global: "Global"
+      normal_post: "Normal posts"
+      private_post: "Private posts"
+      tag: "Tagged"
+
+    tokens_available: "Available tokens — click to insert"
+    tokens_none: "No tokens available — add a rule to see what tokens it exposes."
+
+    # ── Section titles in the editor ───────────────────────────────────────
+    section_basics: "Basics"
+    section_scope: "Scope"
+    section_display: "Display"
+    section_rules: "Rules"
+
+    # ── Form labels ────────────────────────────────────────────────────────
+    ruleset_name: "Name"
+    ruleset_name_placeholder: "e.g. Block spam keywords"
+    ruleset_priority: "Priority"
+    ruleset_priority_help: "Lower numbers are evaluated first. Use the up/down buttons on the list to reorder."
+    ruleset_effect_type: "Effect"
+    ruleset_display_mode: "Display mode"
+    ruleset_scope_type: "Applies to"
+    ruleset_scope_tags: "Tag IDs"
+    ruleset_scope_tags_help: "Comma-separated integer tag IDs. The ruleset will run when the discussion has any of these tags."
+    ruleset_message: "Message"
+    ruleset_message_placeholder: "Your post contains a restricted word: {{matched_word}}"
+    ruleset_is_active: "Enabled"
+    ruleset_block_cascade: "Stop evaluating lower-priority rulesets when this one triggers"
+    ruleset_block_cascade_help: "Applies to all effect types. Use to short-circuit a chain of related rulesets."
+    ruleset_rule_operator: "Combine rules using"
+    rule_operator_and: "AND — all rules must match"
+    rule_operator_or: "OR — any rule matches"
+    message_help: "Use {{token}} to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like <br>."
+    rule_regex_warning: "Regex patterns run server-side on every post save. Avoid catastrophic backtracking (e.g. nested quantifiers like (a+)+) — keep patterns simple and well-anchored."
+    preview: "Preview"
+    preview_placeholder: "Your message will appear here."
+
+    # ── Effect / scope / display labels ────────────────────────────────────
+    effects:
+      info: "Info"
+      info_help: "Real-time hint shown while typing. Doesn't block submitting."
+      warning: "Warning"
+      warning_help: "Real-time hint shown while typing. Requires user confirmation before the post is submitted."
+      block: "Block"
+      block_help: "Evaluated server-side at submit. The post is rejected and the user sees the message."
+
+    scopes:
+      global: "All posts"
+      normal_post: "Normal discussions only"
+      private_post: "Private discussions only"
+      tag: "Specific tags"
+
+    displays:
+      banner: "Banner"
+      banner_help: "Full-width strip rendered above the entire composer (inside .App-composer > .container, before #composer). Aligns visually with the editor."
+      header_banner: "Header banner"
+      header_banner_help: "Narrower strip rendered inside the composer header, directly above the text editor."
+      sidebar: "Sidebar"
+      sidebar_help: "Vertical card pinned to the right of the composer (collapses inline on mobile)."
+      toast: "Toast"
+      toast_help: "Transient notification at the top of the page. Re-appears if the user dismisses it while the rule is still firing."
+      modal: "Modal"
+      modal_help: "Modal dialog interrupting the user. Shown once per ruleset firing — re-opens only after the rule clears and triggers again."
+
+    # ── Rule type labels ─────────────────────────────────────────────────
+    type_contains_word: "Contains word(s)"
+    type_regex: "Matches regex pattern(s)"
+
+    # ── Config form strings ────────────────────────────────────────────────
+    config_words_label: "Words / phrases"
+    config_words_placeholder: "spam\nphishing\ngiveaway"
+    config_words_help: "One word or phrase per line. The rule triggers if the post contains any of them (case-insensitive). The first match is available as {{matched_word}} in the alert message."
+    config_patterns_label: "Regex patterns"
+    config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]{20,}$"
+    config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as {{matched_pattern}} and {{matched_string}}."
+
+    # ── Validation messages ────────────────────────────────────────────────
+    validation:
+      name_required: "Please give the ruleset a name."
+      message_required: "Please write the alert message that users will see."
+      tags_required: "Tag scope is selected — list at least one tag ID."
+      rules_required: "Add at least one rule, otherwise the ruleset can never trigger."
+
+  forum:
+    # ── Warning confirmation modal ─────────────────────────────────────────
+    warning_modal_title: "Review before submitting"
+    warning_modal_text: "Your post triggered the following warnings. Are you sure you want to submit it?"
+    warning_modal_continue: "Continue anyway"
+    warning_modal_cancel: "Go back & edit"
+
+    # ── Alert modal titles ─────────────────────────────────────────────────
+    modal_title_info: "Heads up"
+    modal_title_warning: "Warning"
+    modal_title_block: "Post blocked"
+    modal_ok: "OK"
