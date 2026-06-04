@@ -47,10 +47,20 @@ class ExecuteModerationActions
         $content = (string) $post->content;
 
         /** @var Ruleset[] $rulesets */
-        $rulesets = Ruleset::active()->where('auto_flag', true)->ordered()->with('rules')->get();
+        $rulesets = Ruleset::active()
+            ->where(function ($query) {
+                $query->where('auto_flag', true)
+                      ->orWhere('require_approval', true);
+            })
+            ->ordered()
+            ->with('rules')
+            ->get();
 
         $triggeredRulesetNames = [];
         $providers = $this->evaluator->getProviders();
+        $blockedRulesetName = null;
+        $requiresApproval = false;
+        $requiresFlag = false;
 
         foreach ($rulesets as $ruleset) {
             if (! $this->evaluator->scopeMatches($ruleset, $post->discussion)) {
@@ -60,12 +70,17 @@ class ExecuteModerationActions
             $tokens = $this->evaluator->evaluateRuleset($ruleset, $content, $providers);
             if ($tokens !== null) {
                 $triggeredRulesetNames[] = $ruleset->name;
+                if ($ruleset->require_approval) $requiresApproval = true;
+                if ($ruleset->auto_flag) $requiresFlag = true;
+
+                if ($ruleset->block_cascade) {
+                    $blockedRulesetName = $ruleset->name;
+                }
             }
         }
 
         $actor = $event->actor;
         $isEvasion = false;
-        $blockedRulesetName = 'Unknown';
 
         if ($actor && ! $actor->isGuest()) {
             $recentBlock = $this->db->table('filter_rule_block_logs')
@@ -85,7 +100,19 @@ class ExecuteModerationActions
             return;
         }
 
-        $flagType = $hasApproval ? 'approval' : 'autoMod';
+        if ($isEvasion) {
+            $requiresApproval = true;
+            $requiresFlag = true;
+        }
+
+        $shouldApprove = $hasApproval && $requiresApproval;
+        $shouldFlag = $hasFlags && $requiresFlag;
+
+        if (! $shouldApprove && ! $shouldFlag) {
+            return;
+        }
+
+        $flagType = $shouldApprove ? 'approval' : 'autoMod';
 
         // Prevent duplicate moderation actions on edits
         if ($post->exists) {
@@ -116,17 +143,17 @@ class ExecuteModerationActions
 
         $reasonDetail = implode("\n\n", $messages);
 
-        if ($hasApproval) {
+        if ($shouldApprove) {
             $post->is_approved = false;
         }
 
-        $post->afterSave(function ($post) use ($hasApproval, $hasFlags, $reasonDetail, $flagType) {
-            if ($hasApproval && $post->number == 1 && $post->discussion) {
+        $post->afterSave(function ($post) use ($shouldApprove, $shouldFlag, $reasonDetail, $flagType) {
+            if ($shouldApprove && $post->number == 1 && $post->discussion) {
                 $post->discussion->is_approved = false;
                 $post->discussion->save();
             }
 
-            if ($hasFlags && class_exists(\Flarum\Flags\Flag::class)) {
+            if ($shouldFlag && class_exists(\Flarum\Flags\Flag::class)) {
                 $flag = new \Flarum\Flags\Flag();
                 $flag->post_id = $post->id;
                 $flag->type = $flagType;

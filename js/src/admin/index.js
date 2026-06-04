@@ -16,6 +16,7 @@ Object.assign(Ruleset.prototype, {
   blockCascade: Model.attribute('blockCascade'),
   isActive: Model.attribute('isActive'),
   autoFlag: Model.attribute('autoFlag'),
+  requireApproval: Model.attribute('requireApproval'),
   scopeType: Model.attribute('scopeType'),
   scopeTagIds: Model.attribute('scopeTagIds'),
   // Rules are inlined as a JSON attribute (array of POJOs) — see

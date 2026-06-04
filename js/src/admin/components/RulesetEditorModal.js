@@ -41,6 +41,7 @@ export default class RulesetEditorModal extends Modal {
     this.blockCascade = Stream(this.ruleset ? this.ruleset.blockCascade() : false);
     this.isActive = Stream(this.ruleset ? this.ruleset.isActive() : true);
     this.autoFlag = Stream(this.ruleset ? this.ruleset.autoFlag() : false);
+    this.requireApproval = Stream(this.ruleset ? this.ruleset.requireApproval() : false);
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
 
@@ -267,12 +268,27 @@ export default class RulesetEditorModal extends Modal {
 
         <div className="Form-group">
           <Switch state={this.autoFlag()} onchange={this.autoFlag}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_auto_flag_and_approve')}
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_auto_flag')}
           </Switch>
           <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_auto_flag_and_approve_help')}
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_auto_flag_help')}
           </div>
         </div>
+
+        <div className="Form-group">
+          <Switch state={this.requireApproval()} onchange={this.requireApproval}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_require_approval')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_require_approval_help')}
+          </div>
+        </div>
+
+        {this.requireApproval() && !this.autoFlag() ? (
+          <div className="Alert Alert--warning">
+            <p>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -522,6 +538,7 @@ export default class RulesetEditorModal extends Modal {
       blockCascade: this.blockCascade(),
       isActive: this.isActive(),
       autoFlag: this.autoFlag(),
+      requireApproval: this.requireApproval(),
       scopeType: this.scopeType(),
       scopeTagIds: this.scopeTagIds(),
       rules: this.rules(),

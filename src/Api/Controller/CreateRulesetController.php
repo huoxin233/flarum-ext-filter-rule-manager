@@ -46,6 +46,7 @@ class CreateRulesetController extends AbstractCreateController
         $ruleset->block_cascade = (bool) ($attributes['blockCascade'] ?? false);
         $ruleset->is_active     = (bool) ($attributes['isActive'] ?? true);
         $ruleset->auto_flag     = (bool) ($attributes['autoFlag'] ?? false);
+        $ruleset->require_approval = (bool) ($attributes['requireApproval'] ?? false);
         $ruleset->scope_type    = $this->validEnum($attributes['scopeType'] ?? 'global', ['global', 'normal_post', 'private_post', 'tag'], 'global');
         $ruleset->scope_tag_ids = $this->sanitizeTagIds($attributes['scopeTagIds'] ?? null);
         $ruleset->save();
