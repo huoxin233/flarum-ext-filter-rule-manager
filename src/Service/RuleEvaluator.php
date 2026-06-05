@@ -41,10 +41,10 @@ class RuleEvaluator
         $op = $ruleset->rule_operator;
 
         $triggered = $op === 'AND'
-            ? !in_array(null, $results, true)
+            ? ! in_array(null, $results, true)
             : count(array_filter($results, fn ($r) => $r !== null)) > 0;
 
-        if (!$triggered) {
+        if (! $triggered) {
             return null;
         }
 
@@ -65,7 +65,7 @@ class RuleEvaluator
             return null;
         }
 
-        if (!in_array($rule->type, $provider->getSupportedBackendTypes(), true)) {
+        if (! in_array($rule->type, $provider->getSupportedBackendTypes(), true)) {
             return null;
         }
 
@@ -73,9 +73,9 @@ class RuleEvaluator
             $result = $provider->evaluate($rule->type, $content, $rule->config ?? []);
         } catch (\Throwable $e) {
             $this->logger->error('[filter-rule-manager] provider evaluate() threw', [
-                'provider'  => $rule->provider,
-                'type'      => $rule->type,
-                'rule_id'   => $rule->id,
+                'provider' => $rule->provider,
+                'type' => $rule->type,
+                'rule_id' => $rule->id,
                 'exception' => $e,
             ]);
             return null;
@@ -90,21 +90,32 @@ class RuleEvaluator
 
     public function scopeMatches(Ruleset $ruleset, $discussion): bool
     {
+        $isPrivate = false;
+        if ($discussion) {
+            $isPrivate = (bool) ($discussion->isByobu ?? $discussion->is_private ?? false);
+        }
+
         switch ($ruleset->scope_type) {
             case 'global':
                 return true;
 
             case 'normal_post':
-                return !($discussion?->is_private ?? false);
+                return ! $isPrivate;
 
             case 'private_post':
-                return (bool) ($discussion?->is_private ?? false);
+                return (bool) $isPrivate;
 
             case 'tag':
-                if (empty($ruleset->scope_tag_ids) || $discussion === null || !method_exists($discussion, 'tags')) {
+                if (empty($ruleset->scope_tag_ids) || $discussion === null) {
                     return false;
                 }
-                $tagIds = $discussion->tags->pluck('id')->toArray();
+
+                $tags = $discussion->tags;
+                if (! $tags) {
+                    return false;
+                }
+
+                $tagIds = $tags->pluck('id')->toArray();
                 return count(array_intersect($ruleset->scope_tag_ids, $tagIds)) > 0;
 
             default:
