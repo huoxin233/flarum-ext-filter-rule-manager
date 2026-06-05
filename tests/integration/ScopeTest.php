@@ -7,37 +7,14 @@ use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
-class ScopeTest extends TestCase
+class ScopeTest extends FilterTestCase
 {
-    use RetrievesAuthorizedUsers;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->extension('flarum-flags');
-        $this->extension('flarum-approval');
-        $this->extension('flarum-tags');
-        $this->extension('fof-byobu');
-        $this->extension('huoxin-filter-rule-manager');
-
         $this->prepareDatabase([
-            'users' => [
-                ['id' => 1, 'username' => 'admin', 'email' => 'admin@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 2, 'username' => 'normalUser1', 'email' => 'normal1@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 3, 'username' => 'normalUser2', 'email' => 'normal2@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 4, 'username' => 'normalUser3', 'email' => 'normal3@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 5, 'username' => 'normalUser4', 'email' => 'normal4@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 6, 'username' => 'normalUser5', 'email' => 'normal5@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 7, 'username' => 'normalUser6', 'email' => 'normal6@machine.local', 'is_email_confirmed' => 1],
-            ],
-            'tags' => [
-                ['id' => 1, 'name' => 'General', 'slug' => 'general', 'position' => 0],
-                ['id' => 2, 'name' => 'Gaming', 'slug' => 'gaming', 'position' => 1],
-            ],
             'discussions' => [
-                // Normal discussion with General tag
-                ['id' => 1, 'title' => 'Normal Discussion', 'created_at' => Carbon::now()->toDateTimeString(), 'user_id' => 1, 'first_post_id' => 1, 'comment_count' => 1, 'is_private' => 0],
                 // Private discussion (for User 3)
                 ['id' => 2, 'title' => 'Private Discussion', 'created_at' => Carbon::now()->toDateTimeString(), 'user_id' => 3, 'first_post_id' => 2, 'comment_count' => 1, 'is_private' => 1],
                 // Normal discussion with Gaming tag
@@ -50,7 +27,6 @@ class ScopeTest extends TestCase
                 ['discussion_id' => 3, 'tag_id' => 2],
             ],
             'posts' => [
-                ['id' => 1, 'discussion_id' => 1, 'user_id' => 1, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 ['id' => 2, 'discussion_id' => 2, 'user_id' => 3, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 ['id' => 3, 'discussion_id' => 3, 'user_id' => 1, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 ['id' => 4, 'discussion_id' => 4, 'user_id' => 4, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
@@ -121,38 +97,19 @@ class ScopeTest extends TestCase
         ]);
     }
 
-    protected function submitReply(int $discussionId, string $content, int $userId = 1)
-    {
-        return $this->send(
-            $this->request('POST', '/api/posts', [
-                'authenticatedAs' => $userId,
-                'json' => [
-                    'data' => [
-                        'attributes' => [
-                            'content' => $content
-                        ],
-                        'relationships' => [
-                            'discussion' => ['data' => ['type' => 'discussions', 'id' => (string) $discussionId]]
-                        ]
-                    ]
-                ]
-            ])
-        );
-    }
-
     /**
      * @test
      */
     public function private_ruleset_only_triggers_on_private_discussions()
     {
         // Normal discussion (ID 1) bypasses private rule
-        $response = $this->submitReply(1, 'This has secret word.', 1);
+        $response = $this->submitReply('This has secret word.', 1, 1);
         $this->assertEquals(201, $response->getStatusCode());
 
         // Private discussion (ID 2) gets blocked
-        $response = $this->submitReply(2, 'This has secret word.', 1);
+        $response = $this->submitReply('This has secret word.', 1, 2);
         $this->assertEquals(422, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals('Blocked by Private', $body['errors'][0]['detail']);
     }
@@ -163,13 +120,13 @@ class ScopeTest extends TestCase
     public function normal_ruleset_only_triggers_on_normal_discussions()
     {
         // Private discussion (ID 4) bypasses normal rule
-        $response = $this->submitReply(4, 'This has publicword.', 1);
+        $response = $this->submitReply('This has publicword.', 1, 4);
         $this->assertEquals(201, $response->getStatusCode());
 
         // Normal discussion (ID 1) gets blocked
-        $response = $this->submitReply(1, 'This has publicword.', 1);
+        $response = $this->submitReply('This has publicword.', 1, 1);
         $this->assertEquals(422, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals('Blocked by Normal', $body['errors'][0]['detail']);
     }
@@ -180,13 +137,13 @@ class ScopeTest extends TestCase
     public function tag_ruleset_only_triggers_on_specific_tags()
     {
         // Discussion 1 (General tag) bypasses Gaming tag rule
-        $response = $this->submitReply(1, 'This has gameword.', 1);
+        $response = $this->submitReply('This has gameword.', 1, 1);
         $this->assertEquals(201, $response->getStatusCode());
 
         // Discussion 3 (Gaming tag) gets blocked
-        $response = $this->submitReply(3, 'This has gameword.', 1);
+        $response = $this->submitReply('This has gameword.', 1, 3);
         $this->assertEquals(422, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals('Blocked by Tag', $body['errors'][0]['detail']);
     }

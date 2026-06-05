@@ -7,34 +7,13 @@ use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
-class RuleOperatorTest extends TestCase
+class RuleOperatorTest extends FilterTestCase
 {
-    use RetrievesAuthorizedUsers;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->extension('flarum-flags');
-        $this->extension('flarum-approval');
-        $this->extension('flarum-tags');
-        $this->extension('fof-byobu');
-        $this->extension('huoxin-filter-rule-manager');
-
         $this->prepareDatabase([
-            'users' => [
-                ['id' => 1, 'username' => 'admin', 'email' => 'admin@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 2, 'username' => 'normalUser1', 'email' => 'normal1@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 3, 'username' => 'normalUser2', 'email' => 'normal2@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 4, 'username' => 'normalUser3', 'email' => 'normal3@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 5, 'username' => 'normalUser4', 'email' => 'normal4@machine.local', 'is_email_confirmed' => 1],
-            ],
-            'discussions' => [
-                ['id' => 1, 'title' => 'Test Discussion', 'created_at' => Carbon::now()->toDateTimeString(), 'user_id' => 1, 'first_post_id' => 1, 'comment_count' => 1, 'is_approved' => 1],
-            ],
-            'posts' => [
-                ['id' => 1, 'discussion_id' => 1, 'user_id' => 1, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->toDateTimeString()],
-            ],
             'filter_rulesets' => [
                 [
                     'id' => 1,
@@ -106,25 +85,6 @@ class RuleOperatorTest extends TestCase
         ]);
     }
 
-    protected function submitReply(string $content, int $userId = 2)
-    {
-        return $this->send(
-            $this->request('POST', '/api/posts', [
-                'authenticatedAs' => $userId,
-                'json' => [
-                    'data' => [
-                        'attributes' => [
-                            'content' => $content
-                        ],
-                        'relationships' => [
-                            'discussion' => ['data' => ['type' => 'discussions', 'id' => '1']]
-                        ]
-                    ]
-                ]
-            ])
-        );
-    }
-
     /**
      * @test
      */
@@ -137,7 +97,7 @@ class RuleOperatorTest extends TestCase
         // Contains both
         $response = $this->submitReply('I like apple and banana.', 3);
         $this->assertEquals(422, $response->getStatusCode(), 'Should block because both words are present');
-        
+
         $body = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals('Blocked by AND', $body['errors'][0]['detail']);
     }
@@ -150,7 +110,7 @@ class RuleOperatorTest extends TestCase
         // Contains only one OR rule
         $response = $this->submitReply('I have a cat.', 4);
         $this->assertEquals(422, $response->getStatusCode(), 'Should block because cat is present');
-        
+
         $body = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals('Blocked by OR', $body['errors'][0]['detail']);
 

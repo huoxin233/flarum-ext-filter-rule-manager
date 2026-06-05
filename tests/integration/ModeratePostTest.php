@@ -7,34 +7,14 @@ use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
-class ModeratePostTest extends TestCase
+class ModeratePostTest extends FilterTestCase
 {
-    use RetrievesAuthorizedUsers;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->extension('flarum-flags');
-        $this->extension('flarum-approval');
-        $this->extension('huoxin-filter-rule-manager');
-
         $this->prepareDatabase([
-            'users' => [
-                ['id' => 1, 'username' => 'admin', 'email' => 'admin@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 2, 'username' => 'normalUser1', 'email' => 'normal1@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 3, 'username' => 'normalUser2', 'email' => 'normal2@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 4, 'username' => 'normalUser3', 'email' => 'normal3@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 5, 'username' => 'normalUser4', 'email' => 'normal4@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 6, 'username' => 'normalUser5', 'email' => 'normal5@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 7, 'username' => 'normalUser6', 'email' => 'normal6@machine.local', 'is_email_confirmed' => 1],
-                ['id' => 8, 'username' => 'normalUser7', 'email' => 'normal7@machine.local', 'is_email_confirmed' => 1],
-            ],
-            'discussions' => [
-                ['id' => 1, 'title' => 'Test Discussion', 'created_at' => Carbon::now()->toDateTimeString(), 'user_id' => 1, 'first_post_id' => 1, 'comment_count' => 1, 'is_approved' => 1],
-            ],
             'posts' => [
-                ['id' => 1, 'discussion_id' => 1, 'user_id' => 1, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->toDateTimeString()],
                 // Existing post to test edits
                 ['id' => 2, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Clean post</p></t>', 'is_approved' => 1, 'number' => 2, 'created_at' => Carbon::now()->toDateTimeString()],
             ],
@@ -118,25 +98,6 @@ class ModeratePostTest extends TestCase
                 ]
             ]
         ]);
-    }
-
-    protected function submitReply(string $content, int $userId = 2)
-    {
-        return $this->send(
-            $this->request('POST', '/api/posts', [
-                'authenticatedAs' => $userId,
-                'json' => [
-                    'data' => [
-                        'attributes' => [
-                            'content' => $content
-                        ],
-                        'relationships' => [
-                            'discussion' => ['data' => ['type' => 'discussions', 'id' => '1']]
-                        ]
-                    ]
-                ]
-            ])
-        );
     }
 
     /**
@@ -257,6 +218,9 @@ class ModeratePostTest extends TestCase
                         'attributes' => [
                             'title' => 'New Discussion',
                             'content' => 'This contains word_both.'
+                        ],
+                        'relationships' => [
+                            'tags' => ['data' => [['type' => 'tags', 'id' => '1']]]
                         ]
                     ]
                 ]
