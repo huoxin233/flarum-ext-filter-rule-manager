@@ -43,7 +43,12 @@ class EvaluateBlockRulesets
         $content = (string) $post->content;
         $discussion = $post->discussion;
         $title = $discussion ? (string) $discussion->title : '';
-        $isFirstPost = $post->number === 1 || $post->number === null;
+        
+        $isFirstPost = false;
+        if ($discussion) {
+            $isFirstPost = $discussion->first_post_id === $post->id 
+                || $discussion->first_post_id === null;
+        }
 
         /** @var Ruleset[] $rulesets */
         $rulesets = Ruleset::active()->block()->ordered()->with('rules')->get();
@@ -58,7 +63,8 @@ class EvaluateBlockRulesets
             }
 
             $targetContent = $content;
-            if ($isFirstPost && $title !== '' && $ruleset->evaluate_title !== false) {
+
+            if ($ruleset->evaluate_title && $title !== '' && $isFirstPost) {
                 $targetContent = $title . "\n\n" . $content;
             }
 

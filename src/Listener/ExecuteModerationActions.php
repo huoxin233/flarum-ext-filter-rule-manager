@@ -54,7 +54,13 @@ class ExecuteModerationActions
         $content = (string) $post->content;
         $discussion = $post->discussion;
         $title = $discussion ? (string) $discussion->title : '';
-        $isFirstPost = $post->number === 1 || $post->number === null;
+        
+        $isFirstPost = false;
+        if ($discussion) {
+            $isFirstPost = $post->number === 1 
+                || $discussion->first_post_id === $post->id 
+                || $discussion->first_post_id === null;
+        }
 
         /** @var Ruleset[] $rulesets */
         $rulesets = Ruleset::active()
