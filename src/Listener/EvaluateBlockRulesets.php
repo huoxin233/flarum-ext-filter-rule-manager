@@ -42,6 +42,8 @@ class EvaluateBlockRulesets
 
         $content = (string) $post->content;
         $discussion = $post->discussion;
+        $title = $discussion ? (string) $discussion->title : '';
+        $isFirstPost = $post->number === 1 || $post->number === null;
 
         /** @var Ruleset[] $rulesets */
         $rulesets = Ruleset::active()->block()->ordered()->with('rules')->get();
@@ -55,7 +57,12 @@ class EvaluateBlockRulesets
                 continue;
             }
 
-            $tokens = $this->evaluator->evaluateRuleset($ruleset, $content, $providers);
+            $targetContent = $content;
+            if ($isFirstPost && $title !== '' && $ruleset->evaluate_title !== false) {
+                $targetContent = $title . "\n\n" . $content;
+            }
+
+            $tokens = $this->evaluator->evaluateRuleset($ruleset, $targetContent, $providers);
             if ($tokens === null) {
                 continue;
             }

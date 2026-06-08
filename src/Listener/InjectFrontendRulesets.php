@@ -51,6 +51,7 @@ class InjectFrontendRulesets
                 'displayMode'      => $r->display_mode,
                 'message'          => $r->message,
                 'evaluateAllRules' => $r->evaluate_all_rules,
+                'evaluateTitle'    => $r->evaluate_title,
                 'blockCascade'     => $r->block_cascade,
                 'scopeType'        => $r->scope_type,
                 'scopeTagIds'  => $r->scope_tag_ids ?? [],

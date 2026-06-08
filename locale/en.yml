@@ -58,6 +58,9 @@ huoxin-filter-rule-manager:
     section_moderation: "Moderation Actions"
     section_rules: "Rules"
 
+    ruleset_evaluate_title_label: "Evaluate Discussion Title"
+    ruleset_evaluate_title_help: "When enabled, the rules engine will evaluate the title of the discussion alongside the post content."
+
     # ── Form labels ────────────────────────────────────────────────────────
     ruleset_name: "Name"
     ruleset_name_placeholder: "e.g. Block spam keywords"

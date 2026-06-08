@@ -40,6 +40,7 @@ export default class RulesetEditorModal extends Modal {
     this.message = Stream(this.ruleset ? this.ruleset.message() : '');
     this.flagMessage = Stream(this.ruleset ? this.ruleset.flagMessage() : '');
     this.evaluateAllRules = Stream(this.ruleset ? this.ruleset.evaluateAllRules() : false);
+    this.evaluateTitle = Stream(this.ruleset ? this.ruleset.evaluateTitle() : true);
     this.blockCascade = Stream(this.ruleset ? this.ruleset.blockCascade() : false);
     this.isActive = Stream(this.ruleset ? this.ruleset.isActive() : true);
     this.autoFlag = Stream(this.ruleset ? this.ruleset.autoFlag() : false);
@@ -171,6 +172,15 @@ export default class RulesetEditorModal extends Modal {
             </div>
           </div>
         )}
+
+        <div className="Form-group">
+          <Switch state={this.evaluateTitle()} onchange={this.evaluateTitle}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_title_label')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_title_help')}
+          </div>
+        </div>
       </div>
     );
   }
@@ -567,6 +577,7 @@ export default class RulesetEditorModal extends Modal {
       message: this.message(),
       flagMessage: this.flagMessage(),
       evaluateAllRules: this.evaluateAllRules(),
+      evaluateTitle: this.evaluateTitle(),
       blockCascade: this.blockCascade(),
       isActive: this.isActive(),
       autoFlag: this.autoFlag(),

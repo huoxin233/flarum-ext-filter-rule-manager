@@ -15,6 +15,7 @@ Object.assign(Ruleset.prototype, {
   message: Model.attribute('message'),
   flagMessage: Model.attribute('flagMessage'),
   evaluateAllRules: Model.attribute('evaluateAllRules'),
+  evaluateTitle: Model.attribute('evaluateTitle'),
   blockCascade: Model.attribute('blockCascade'),
   isActive: Model.attribute('isActive'),
   autoFlag: Model.attribute('autoFlag'),

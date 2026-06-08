@@ -50,6 +50,7 @@ class UpdateRulesetController extends AbstractShowController
         if (isset($attributes['message']))      $ruleset->message       = (string) $attributes['message'];
         if (array_key_exists('flagMessage', $attributes)) $ruleset->flag_message = $attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage'];
         if (isset($attributes['evaluateAllRules'])) $ruleset->evaluate_all_rules = (bool) $attributes['evaluateAllRules'];
+        if (isset($attributes['evaluateTitle'])) $ruleset->evaluate_title = (bool) $attributes['evaluateTitle'];
         if (isset($attributes['blockCascade'])) $ruleset->block_cascade = (bool) $attributes['blockCascade'];
         if (isset($attributes['isActive']))     $ruleset->is_active     = (bool) $attributes['isActive'];
         if (isset($attributes['autoFlag']))     $ruleset->auto_flag     = (bool) $attributes['autoFlag'];

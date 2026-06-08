@@ -148,17 +148,24 @@ class FilterEngine {
     if (!composer || typeof composer.isVisible !== 'function' || !composer.isVisible()) return;
 
     const content = (composer.fields && composer.fields.content && composer.fields.content()) || '';
+    const title = (composer.fields && composer.fields.title && composer.fields.title()) || '';
 
-    // Short-circuit when content has not changed since the last tick.
-    if (content === this._lastContent) return;
-    this._lastContent = content;
+    // Short-circuit when content and title have not changed since the last tick.
+    const stateKey = `${title}\n\n${content}`;
+    if (stateKey === this._lastStateKey) return;
+    this._lastStateKey = stateKey;
 
     const activeAlerts = [];
 
     for (const ruleset of this.rulesets) {
       if (!this.scopeMatches(ruleset, composer, application)) continue;
 
-      const tokens = this.evaluateRuleset(ruleset, content);
+      let targetContent = content;
+      if (ruleset.evaluateTitle !== false && title) {
+        targetContent = title + '\n\n' + content;
+      }
+
+      const tokens = this.evaluateRuleset(ruleset, targetContent);
       if (tokens !== null) {
         activeAlerts.push({
           ruleset,

@@ -45,6 +45,9 @@ class ExecuteModerationActions
         }
 
         $content = (string) $post->content;
+        $discussion = $post->discussion;
+        $title = $discussion ? (string) $discussion->title : '';
+        $isFirstPost = $post->number === 1 || $post->number === null;
 
         /** @var Ruleset[] $rulesets */
         $rulesets = Ruleset::active()
@@ -68,7 +71,12 @@ class ExecuteModerationActions
                 continue;
             }
 
-            $tokens = $this->evaluator->evaluateRuleset($ruleset, $content, $providers);
+            $targetContent = $content;
+            if ($isFirstPost && $title !== '' && $ruleset->evaluate_title !== false) {
+                $targetContent = $title . "\n\n" . $content;
+            }
+
+            $tokens = $this->evaluator->evaluateRuleset($ruleset, $targetContent, $providers);
             if ($tokens !== null) {
                 if (!empty($ruleset->flag_message)) {
                     $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);

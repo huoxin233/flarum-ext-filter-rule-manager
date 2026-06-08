@@ -40,6 +40,7 @@ class RulesetSerializer extends AbstractSerializer
             'message'          => $model->message,
             'flagMessage'      => $model->flag_message,
             'evaluateAllRules' => (bool) $model->evaluate_all_rules,
+            'evaluateTitle'    => (bool) $model->evaluate_title,
             'blockCascade'     => (bool) $model->block_cascade,
             'isActive'      => (bool) $model->is_active,
             'autoFlag'      => (bool) $model->auto_flag,
