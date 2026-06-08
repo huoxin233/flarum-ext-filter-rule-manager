@@ -25,6 +25,9 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string|null $flag_message
  * @property bool   $evaluate_all_rules
  * @property bool   $evaluate_title
+ * @property bool   $evasion_active
+ * @property int    $evasion_timeout
+ * @property int    $evasion_threshold
  * @property bool   $block_cascade
  * @property bool   $is_active
  * @property string $scope_type     global|normal_post|private_post|tag
@@ -42,6 +45,9 @@ class Ruleset extends AbstractModel
         'is_active'          => 'boolean',
         'evaluate_all_rules' => 'boolean',
         'evaluate_title'     => 'boolean',
+        'evasion_active'     => 'boolean',
+        'evasion_timeout'    => 'integer',
+        'evasion_threshold'  => 'integer',
         'auto_flag'          => 'boolean',
         'require_approval' => 'boolean',
         'scope_tag_ids'  => 'array',

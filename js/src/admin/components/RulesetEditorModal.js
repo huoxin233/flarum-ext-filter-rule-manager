@@ -41,6 +41,9 @@ export default class RulesetEditorModal extends Modal {
     this.flagMessage = Stream(this.ruleset ? this.ruleset.flagMessage() : '');
     this.evaluateAllRules = Stream(this.ruleset ? this.ruleset.evaluateAllRules() : false);
     this.evaluateTitle = Stream(this.ruleset ? this.ruleset.evaluateTitle() : true);
+    this.evasionActive = Stream(this.ruleset ? this.ruleset.evasionActive() : false);
+    this.evasionTimeout = Stream(this.ruleset ? this.ruleset.evasionTimeout() : 5);
+    this.evasionThreshold = Stream(this.ruleset ? this.ruleset.evasionThreshold() : 2);
     this.blockCascade = Stream(this.ruleset ? this.ruleset.blockCascade() : false);
     this.isActive = Stream(this.ruleset ? this.ruleset.isActive() : true);
     this.autoFlag = Stream(this.ruleset ? this.ruleset.autoFlag() : false);
@@ -320,6 +323,52 @@ export default class RulesetEditorModal extends Modal {
             <p>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
           </div>
         ) : null}
+
+        <hr className="RulesetEditor-divider" />
+
+        <div className="Form-group">
+          <Switch state={this.evasionActive()} onchange={this.evasionActive}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_active')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_active_help')}
+          </div>
+        </div>
+
+        {this.evasionActive() ? (
+          <div className="Form-group">
+            <div className="RulesetEditor-inline-inputs">
+              <div className="RulesetEditor-inline-input">
+                <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout')}</label>
+                <input
+                  className="FormControl"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={this.evasionTimeout()}
+                  oninput={(e) => this.evasionTimeout(Math.max(0, parseInt(e.target.value, 10)) || 0)}
+                />
+                <div className="helpText">
+                  {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout_help')}
+                </div>
+              </div>
+              <div className="RulesetEditor-inline-input">
+                <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold')}</label>
+                <input
+                  className="FormControl"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={this.evasionThreshold()}
+                  oninput={(e) => this.evasionThreshold(Math.max(1, parseInt(e.target.value, 10)) || 1)}
+                />
+                <div className="helpText">
+                  {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold_help')}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -578,6 +627,9 @@ export default class RulesetEditorModal extends Modal {
       flagMessage: this.flagMessage(),
       evaluateAllRules: this.evaluateAllRules(),
       evaluateTitle: this.evaluateTitle(),
+      evasionActive: this.evasionActive(),
+      evasionTimeout: this.evasionTimeout(),
+      evasionThreshold: this.evasionThreshold(),
       blockCascade: this.blockCascade(),
       isActive: this.isActive(),
       autoFlag: this.autoFlag(),

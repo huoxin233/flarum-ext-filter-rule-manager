@@ -73,6 +73,7 @@ class EvaluateBlockRulesets
                 'effect_type' => 'block',
                 'message' => $this->evaluator->interpolate($ruleset->message, $tokens),
                 'tokens' => $tokens,
+                'content' => $targetContent,
             ];
 
             if ($ruleset->block_cascade) {
@@ -95,6 +96,9 @@ class EvaluateBlockRulesets
                 $logs = array_map(fn ($t) => [
                     'user_id' => $actor->id,
                     'ruleset_id' => $t['ruleset_id'],
+                    'content' => $t['content'],
+                    'message' => $t['message'],
+                    'tokens' => json_encode($t['tokens']),
                     'created_at' => Carbon::now(),
                 ], $triggered);
                 $this->db->table('filter_rule_block_logs')->insert($logs);

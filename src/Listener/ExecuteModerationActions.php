@@ -38,6 +38,13 @@ class ExecuteModerationActions
 
         $post = $event->post;
 
+        // If the post is being explicitly approved by a moderator, forgive evasion for this user
+        if ($post->exists && $post->isDirty('is_approved') && $post->is_approved == true && $post->user_id) {
+            $this->db->table('filter_rule_block_logs')
+                ->where('user_id', $post->user_id)
+                ->update(['is_cleared' => true]);
+        }
+
         // Only evaluate if this is a new post or the content was edited.
         // This prevents re-evaluating during delete, recover, or approval actions.
         if ($post->exists && ! $post->isDirty('content')) {
@@ -97,16 +104,33 @@ class ExecuteModerationActions
         $isEvasion = false;
 
         if ($actor && ! $actor->isGuest()) {
-            $recentBlock = $this->db->table('filter_rule_block_logs')
-                ->where('user_id', $actor->id)
-                ->where('created_at', '>=', Carbon::now()->subMinutes(15))
-                ->orderBy('created_at', 'desc')
-                ->first();
+            $evasionRulesets = Ruleset::where('evasion_active', true)->get()->keyBy('id');
 
-            if ($recentBlock) {
-                $isEvasion = true;
-                $blockedRuleset = Ruleset::find($recentBlock->ruleset_id);
-                $blockedRulesetName = $blockedRuleset ? $blockedRuleset->name : 'Unknown';
+            if ($evasionRulesets->isNotEmpty()) {
+                $maxTimeout = $evasionRulesets->max('evasion_timeout');
+
+                if ($maxTimeout > 0) {
+                    $recentBlocks = $this->db->table('filter_rule_block_logs')
+                        ->where('user_id', $actor->id)
+                        ->where('is_cleared', false)
+                        ->where('created_at', '>=', Carbon::now()->subMinutes($maxTimeout))
+                        ->get();
+
+                    foreach ($evasionRulesets as $rulesetId => $ruleset) {
+                        if ($ruleset->evasion_timeout <= 0) continue;
+
+                        $cutoff = Carbon::now()->subMinutes($ruleset->evasion_timeout);
+                        $count = $recentBlocks->filter(function ($log) use ($rulesetId, $cutoff) {
+                            return $log->ruleset_id == $rulesetId && Carbon::parse($log->created_at)->gte($cutoff);
+                        })->count();
+
+                        if ($count >= max(1, $ruleset->evasion_threshold)) {
+                            $isEvasion = true;
+                            $blockedRulesetName = $ruleset->name;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
