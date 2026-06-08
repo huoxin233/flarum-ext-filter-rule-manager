@@ -63,15 +63,24 @@ class BuiltinProvider implements RuleProviderInterface
 
     public function evaluate(string $type, string $content, array $config): ?array
     {
+        $scanAll = $config['scan_all'] ?? false;
+
         if ($type === 'contains_word') {
             $words = $this->normalizeList($config, 'words', 'word');
             if ($words === []) {
                 return null;
             }
+            $matches = [];
             foreach ($words as $word) {
                 if (stripos($content, $word) !== false) {
-                    return ['matched_word' => $word];
+                    $matches[] = $word;
+                    if (!$scanAll) {
+                        break;
+                    }
                 }
+            }
+            if (!empty($matches)) {
+                return ['matched_word' => implode(', ', $matches)];
             }
             return null;
         }
@@ -81,17 +90,26 @@ class BuiltinProvider implements RuleProviderInterface
             if ($patterns === []) {
                 return null;
             }
+            $matchedPatterns = [];
+            $matchedStrings = [];
             foreach ($patterns as $pattern) {
                 $regex = str_starts_with($pattern, '/')
                     ? $pattern
                     : '/' . preg_quote($pattern, '/') . '/i';
 
                 if (@preg_match($regex, $content, $matches)) {
-                    return [
-                        'matched_pattern' => $pattern,
-                        'matched_string'  => $matches[0] ?? '',
-                    ];
+                    $matchedPatterns[] = $pattern;
+                    $matchedStrings[] = $matches[0] ?? '';
+                    if (!$scanAll) {
+                        break;
+                    }
                 }
+            }
+            if (!empty($matchedPatterns)) {
+                return [
+                    'matched_pattern' => implode(', ', $matchedPatterns),
+                    'matched_string'  => implode(', ', $matchedStrings),
+                ];
             }
             return null;
         }

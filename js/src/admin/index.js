@@ -13,6 +13,8 @@ Object.assign(Ruleset.prototype, {
   effectType: Model.attribute('effectType'),
   displayMode: Model.attribute('displayMode'),
   message: Model.attribute('message'),
+  flagMessage: Model.attribute('flagMessage'),
+  evaluateAllRules: Model.attribute('evaluateAllRules'),
   blockCascade: Model.attribute('blockCascade'),
   isActive: Model.attribute('isActive'),
   autoFlag: Model.attribute('autoFlag'),

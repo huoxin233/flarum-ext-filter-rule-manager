@@ -185,9 +185,20 @@ class FilterEngine {
     // Explicit sort by sortOrder so token merge order is deterministic
     // regardless of how the payload was serialised.
     const rules = [...ruleset.rules].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-    const results = rules.map((rule) => this.evaluateRule(rule, content));
-
+    const results = [];
     const op = ruleset.ruleOperator;
+    const evaluateAllRules = ruleset.evaluateAllRules || false;
+
+    for (const rule of rules) {
+      const r = this.evaluateRule(rule, content, ruleset);
+      results.push(r);
+
+      if (!evaluateAllRules) {
+        if (op === 'OR' && r !== null) break;
+        if (op === 'AND' && r === null) break;
+      }
+    }
+
     const triggered = op === 'AND'
       ? results.every((r) => r !== null)
       : results.some((r) => r !== null);
@@ -196,19 +207,30 @@ class FilterEngine {
 
     let merged = {};
     for (const r of results) {
-      if (r !== null) merged = { ...merged, ...r };
+      if (r !== null) {
+        for (const [key, val] of Object.entries(r)) {
+          if (typeof merged[key] === 'string' && typeof val === 'string') {
+            const existing = merged[key].split(',').map((s) => s.trim());
+            const added = val.split(',').map((s) => s.trim());
+            merged[key] = Array.from(new Set([...existing, ...added])).join(', ');
+          } else {
+            merged[key] = val;
+          }
+        }
+      }
     }
     return merged;
   }
 
-  evaluateRule(rule, content) {
+  evaluateRule(rule, content, ruleset = null) {
     const provider = this.providers[rule.provider];
     if (!provider || typeof provider.evaluate !== 'function') return null;
     if (!provider.getSupportedTypes().includes(rule.type)) return null;
 
     let result = null;
     try {
-      result = provider.evaluate(rule.type, content, rule.config || {});
+      const config = rule.config || {};
+      result = provider.evaluate(rule.type, content, config);
     } catch (e) {
       console.error(`[filter-rule-manager] rule ${rule.provider}/${rule.type} threw`, e);
       return null;
@@ -221,25 +243,49 @@ class FilterEngine {
   }
 
   scopeMatches(ruleset, composer, application) {
-    const isEditing = !!(composer.body && composer.body.attrs && composer.body.attrs.post);
     let isPrivate = false;
     let tagIds = [];
 
-    if (isEditing) {
-      const discussion = composer.body.attrs.post.discussion();
-      isPrivate = !!(discussion && discussion.isPrivate && discussion.isPrivate());
-      tagIds = (discussion && discussion.tags && discussion.tags())
+    let discussion = null;
+    if (composer.body && composer.body.attrs) {
+      if (composer.body.attrs.post) {
+        discussion = composer.body.attrs.post.discussion();
+      } else if (composer.body.attrs.discussion) {
+        discussion = composer.body.attrs.discussion;
+      }
+    }
+
+    if (discussion) {
+      // Replying or Editing
+      const recipientUsers = discussion.recipientUsers && discussion.recipientUsers();
+      const recipientGroups = discussion.recipientGroups && discussion.recipientGroups();
+      const isPrivateAttr = (discussion.isPrivate && discussion.isPrivate()) ||
+                            (discussion.isPrivateDiscussion && discussion.isPrivateDiscussion()) ||
+                            discussion.attribute('isPrivate') ||
+                            discussion.attribute('is_private');
+      
+      isPrivate = !!isPrivateAttr || (recipientUsers && recipientUsers.length > 0) || (recipientGroups && recipientGroups.length > 0);
+      tagIds = (discussion.tags && discussion.tags())
         ? discussion.tags().map((t) => t.id())
         : [];
     } else {
-      if (application && application.forum && application.forum.attribute('byobuEnabled')) {
-        const recipientUsers = composer.fields.recipientUsers && composer.fields.recipientUsers();
-        const recipientGroups = composer.fields.recipientGroups && composer.fields.recipientGroups();
-        isPrivate = (recipientUsers && recipientUsers.length > 0)
-          || (recipientGroups && recipientGroups.length > 0);
-      }
-      tagIds = (composer.fields.tags && composer.fields.tags())
-        ? composer.fields.tags().map((t) => t.id())
+      // New Discussion
+      const resolveField = (val) => typeof val === 'function' ? val() : val;
+      
+      let recipientUsers = resolveField(composer.fields.recipientUsers) || [];
+      let recipientGroups = resolveField(composer.fields.recipientGroups) || [];
+      
+      // Byobu stores recipients in composer.fields.recipients as an ItemList
+      const recipientsField = resolveField(composer.fields.recipients);
+      const recipientsArray = recipientsField && typeof recipientsField.toArray === 'function' ? recipientsField.toArray() : (Array.isArray(recipientsField) ? recipientsField : []);
+      
+      const fieldsIsPrivate = resolveField(composer.fields.isPrivate);
+      
+      const hasRecipients = recipientUsers.length > 0 || recipientGroups.length > 0 || recipientsArray.length > 0;
+      isPrivate = !!fieldsIsPrivate || hasRecipients;
+      
+      tagIds = resolveField(composer.fields.tags)
+        ? resolveField(composer.fields.tags).map((t) => t.id())
         : [];
     }
 

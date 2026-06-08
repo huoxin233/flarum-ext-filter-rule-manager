@@ -78,6 +78,13 @@ huoxin-filter-rule-manager:
     ruleset_approval_without_flag_warning: "Warning: Requiring approval without auto-flagging means the post will be hidden, but moderators will not be notified via the flag queue."
     ruleset_block_cascade: "Stop evaluating lower-priority rulesets when this one triggers"
     ruleset_block_cascade_help: "Applies to all effect types. Use to short-circuit a chain of related rulesets."
+    ruleset_flag_message: "Custom Flag/Approval Reason"
+    ruleset_flag_message_placeholder: "e.g. Matched words: {{matched_word}}"
+    ruleset_flag_message_help: "Optional. Define a custom flag or approval reason string for moderators to see when this ruleset triggers. If empty, the default group message will be used."
+    ruleset_evaluate_all_rules: "Evaluate all rules (Aggregate tokens)"
+    ruleset_evaluate_all_rules_help: "If enabled, the engine will evaluate every rule in this ruleset even if a match is already found. This allows you to gather tokens from multiple rules for your custom flag message. If disabled, the ruleset stops evaluating as soon as its condition is met, improving performance."
+    rule_scan_all: "Find all matches"
+    rule_scan_all_help: "If enabled, this rule will gather every matched word or pattern in your list. If disabled, it returns quickly on the first match to save processing time."
     ruleset_rule_operator: "Combine rules using"
     rule_operator_and: "AND — all rules must match"
     rule_operator_or: "OR — any rule matches"
@@ -150,3 +157,4 @@ huoxin-filter-rule-manager:
 
     # ── Auto Flag ──────────────────────────────────────────────────────────
     flag_message: "Auto-flagged by Filter Rule Manager. Triggered rulesets: {rulesets}"
+    flagger_name: "Filter Rule Manager"

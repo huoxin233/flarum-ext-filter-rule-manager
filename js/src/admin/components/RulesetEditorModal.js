@@ -38,6 +38,8 @@ export default class RulesetEditorModal extends Modal {
     this.effectType = Stream(this.ruleset ? this.ruleset.effectType() : 'info');
     this.displayMode = Stream(this.ruleset ? this.ruleset.displayMode() : 'banner');
     this.message = Stream(this.ruleset ? this.ruleset.message() : '');
+    this.flagMessage = Stream(this.ruleset ? this.ruleset.flagMessage() : '');
+    this.evaluateAllRules = Stream(this.ruleset ? this.ruleset.evaluateAllRules() : false);
     this.blockCascade = Stream(this.ruleset ? this.ruleset.blockCascade() : false);
     this.isActive = Stream(this.ruleset ? this.ruleset.isActive() : true);
     this.autoFlag = Stream(this.ruleset ? this.ruleset.autoFlag() : false);
@@ -238,7 +240,7 @@ export default class RulesetEditorModal extends Modal {
           <div className="helpText">
             {app.translator.trans('huoxin-filter-rule-manager.admin.message_help')}
           </div>
-          {this.tokenChipsBlock(tokens)}
+          {this.tokenChipsBlock(tokens, 'message')}
         </div>
 
         <div className="Form-group">
@@ -284,6 +286,25 @@ export default class RulesetEditorModal extends Modal {
           </div>
         </div>
 
+        {(this.autoFlag() || this.requireApproval()) ? (
+          <div className="Form-group">
+            <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message')}</label>
+            <textarea
+              className="FormControl"
+              oncreate={(vnode) => { this.flagMessageTextarea = vnode.dom; }}
+              onremove={() => { this.flagMessageTextarea = null; }}
+              value={this.flagMessage()}
+              oninput={(e) => this.flagMessage(e.target.value)}
+              placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_placeholder')}
+              rows={2}
+            ></textarea>
+            <div className="helpText">
+              {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_help')}
+            </div>
+            {this.tokenChipsBlock(this.availableTokens(), 'flagMessage')}
+          </div>
+        ) : null}
+
         {this.requireApproval() && !this.autoFlag() ? (
           <div className="Alert Alert--warning">
             <p>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
@@ -311,6 +332,15 @@ export default class RulesetEditorModal extends Modal {
             value={this.ruleOperator()}
             onchange={this.ruleOperator}
           />
+        </div>
+
+        <div className="Form-group">
+          <Switch state={this.evaluateAllRules()} onchange={this.evaluateAllRules}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules_help')}
+          </div>
         </div>
 
         <RuleBuilder
@@ -378,7 +408,7 @@ export default class RulesetEditorModal extends Modal {
     return out;
   }
 
-  tokenChipsBlock(tokens) {
+  tokenChipsBlock(tokens, targetField) {
     if (!tokens || tokens.length === 0) {
       return (
         <div className="TokenHints TokenHints--empty">
@@ -399,7 +429,7 @@ export default class RulesetEditorModal extends Modal {
               className="TokenHints-chip"
               key={t.name}
               title={t.description || t.name}
-              onclick={() => this.insertToken(t.name)}
+              onclick={() => this.insertToken(t.name, targetField)}
             >
               <code>{`{{${t.name}}}`}</code>
               {t.description && <span className="TokenHints-chip-desc">{t.description}</span>}
@@ -410,27 +440,27 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  insertToken(name) {
+  insertToken(name, targetField) {
     const insertion = `{{${name}}}`;
-    const textarea = this.messageTextarea;
-    const current = this.message() || '';
+    const stream = targetField === 'flagMessage' ? this.flagMessage : this.message;
+    const ref = targetField === 'flagMessage' ? this.flagMessageTextarea : this.messageTextarea;
 
-    if (!textarea) {
-      this.message(current + insertion);
+    const current = stream() || '';
+
+    if (!ref) {
+      stream(current + insertion);
       return;
     }
 
-    const start = textarea.selectionStart != null ? textarea.selectionStart : current.length;
-    const end   = textarea.selectionEnd   != null ? textarea.selectionEnd   : current.length;
+    const start = ref.selectionStart != null ? ref.selectionStart : current.length;
+    const end   = ref.selectionEnd   != null ? ref.selectionEnd   : current.length;
     const next  = current.substring(0, start) + insertion + current.substring(end);
 
-    this.message(next);
-    // Update the DOM synchronously and restore the cursor right after the
-    // insertion. m.redraw is async; updating textarea.value avoids the race.
-    textarea.value = next;
-    textarea.focus();
+    stream(next);
+    ref.value = next;
+    ref.focus();
     const cursor = start + insertion.length;
-    try { textarea.setSelectionRange(cursor, cursor); } catch (e) { /* ignore */ }
+    try { ref.setSelectionRange(cursor, cursor); } catch (e) { /* ignore */ }
   }
 
   previewBlock(effect, message) {
@@ -535,6 +565,8 @@ export default class RulesetEditorModal extends Modal {
       effectType: this.effectType(),
       displayMode: this.displayMode(),
       message: this.message(),
+      flagMessage: this.flagMessage(),
+      evaluateAllRules: this.evaluateAllRules(),
       blockCascade: this.blockCascade(),
       isActive: this.isActive(),
       autoFlag: this.autoFlag(),

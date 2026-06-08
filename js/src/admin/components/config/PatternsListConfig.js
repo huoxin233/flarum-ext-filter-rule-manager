@@ -1,5 +1,6 @@
 import Component from 'flarum/common/Component';
 import Stream from 'flarum/common/utils/Stream';
+import Switch from 'flarum/common/components/Switch';
 
 /**
  * Config UI for the builtin `regex` rule type.
@@ -20,6 +21,7 @@ export default class PatternsListConfig extends Component {
       : (typeof cfg.pattern === 'string' && cfg.pattern !== '' ? [cfg.pattern] : []);
 
     this.text = Stream(initial.join('\n'));
+    this.scanAll = Stream(cfg.scan_all || false);
   }
 
   view() {
@@ -35,6 +37,20 @@ export default class PatternsListConfig extends Component {
         ></textarea>
         <div className="helpText">
           {app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_help')}
+        </div>
+        <div className="Form-group">
+          <Switch
+            state={this.scanAll()}
+            onchange={(val) => {
+              this.scanAll(val);
+              this.attrs.onchange({ ...(this.attrs.config || {}), scan_all: val });
+            }}
+          >
+            {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all_help')}
+          </div>
         </div>
       </div>
     );

@@ -29,16 +29,26 @@ class RuleEvaluator
     {
         $results = [];
         $rules = $ruleset->rules->sortBy('sort_order')->values();
+        $op = $ruleset->rule_operator;
+        $evaluateAllRules = (bool) $ruleset->evaluate_all_rules;
 
         foreach ($rules as $rule) {
-            $results[] = $this->evaluateRule($rule, $content, $providers);
+            $r = $this->evaluateRule($rule, $content, $providers, $ruleset);
+            $results[] = $r;
+
+            if (! $evaluateAllRules) {
+                if ($op === 'OR' && $r !== null) {
+                    break;
+                }
+                if ($op === 'AND' && $r === null) {
+                    break;
+                }
+            }
         }
 
         if (empty($results)) {
             return null;
         }
-
-        $op = $ruleset->rule_operator;
 
         $triggered = $op === 'AND'
             ? ! in_array(null, $results, true)
@@ -51,14 +61,23 @@ class RuleEvaluator
         $merged = [];
         foreach ($results as $r) {
             if ($r !== null) {
-                $merged = array_merge($merged, $r);
+                foreach ($r as $key => $val) {
+                    if (isset($merged[$key]) && is_string($val) && is_string($merged[$key])) {
+                        // Concatenate without duplicating
+                        $existing = array_map('trim', explode(',', $merged[$key]));
+                        $new = array_map('trim', explode(',', $val));
+                        $merged[$key] = implode(', ', array_unique(array_merge($existing, $new)));
+                    } else {
+                        $merged[$key] = $val;
+                    }
+                }
             }
         }
 
         return $merged;
     }
 
-    public function evaluateRule(Rule $rule, string $content, array $providers): ?array
+    public function evaluateRule(Rule $rule, string $content, array $providers, ?Ruleset $ruleset = null): ?array
     {
         $provider = $providers[$rule->provider] ?? null;
         if ($provider === null) {
@@ -70,7 +89,8 @@ class RuleEvaluator
         }
 
         try {
-            $result = $provider->evaluate($rule->type, $content, $rule->config ?? []);
+            $config = $rule->config ?? [];
+            $result = $provider->evaluate($rule->type, $content, $config);
         } catch (\Throwable $e) {
             $this->logger->error('[filter-rule-manager] provider evaluate() threw', [
                 'provider' => $rule->provider,
@@ -92,7 +112,7 @@ class RuleEvaluator
     {
         $isPrivate = false;
         if ($discussion) {
-            $isPrivate = (bool) ($discussion->isByobu ?? $discussion->is_private ?? false);
+            $isPrivate = (bool) ($discussion->is_private ?? false);
         }
 
         switch ($ruleset->scope_type) {

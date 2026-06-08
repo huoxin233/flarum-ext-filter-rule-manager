@@ -56,7 +56,8 @@ class ExecuteModerationActions
             ->with('rules')
             ->get();
 
-        $triggeredRulesetNames = [];
+        $defaultRulesets = [];
+        $customMessages = [];
         $providers = $this->evaluator->getProviders();
         $blockedRulesetName = null;
         $requiresApproval = false;
@@ -69,7 +70,12 @@ class ExecuteModerationActions
 
             $tokens = $this->evaluator->evaluateRuleset($ruleset, $content, $providers);
             if ($tokens !== null) {
-                $triggeredRulesetNames[] = $ruleset->name;
+                if (!empty($ruleset->flag_message)) {
+                    $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);
+                } else {
+                    $defaultRulesets[] = $ruleset->name;
+                }
+
                 if ($ruleset->require_approval) $requiresApproval = true;
                 if ($ruleset->auto_flag) $requiresFlag = true;
 
@@ -96,7 +102,7 @@ class ExecuteModerationActions
             }
         }
 
-        if (empty($triggeredRulesetNames) && ! $isEvasion) {
+        if (empty($defaultRulesets) && empty($customMessages) && ! $isEvasion) {
             return;
         }
 
@@ -112,16 +118,12 @@ class ExecuteModerationActions
             return;
         }
 
-        $flagType = $shouldApprove ? 'approval' : 'autoMod';
+        $flagType = 'autoMod';
 
         // Prevent duplicate moderation actions on edits
         if ($post->exists) {
-            // If the post is already held for approval, no need to re-flag
-            if ($hasApproval && $post->is_approved === false) {
-                return;
-            }
-            
-            // If the post is already flagged with our target flag type, skip creating another
+            // If the post is already held for approval and not flagged, we still want to flag it if needed.
+            // But if it already has our autoMod flag, skip.
             if ($hasFlags && class_exists(\Flarum\Flags\Flag::class)) {
                 if (\Flarum\Flags\Flag::where('post_id', $post->id)->where('type', $flagType)->exists()) {
                     return;
@@ -131,10 +133,14 @@ class ExecuteModerationActions
 
         $messages = [];
 
-        if (! empty($triggeredRulesetNames)) {
-            $rulesStr = implode(', ', $triggeredRulesetNames);
+        if (! empty($defaultRulesets)) {
+            $rulesStr = implode(', ', $defaultRulesets);
             $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
             $messages[] = is_array($trans) ? $trans[0] : $trans;
+        }
+
+        foreach ($customMessages as $customMsg) {
+            $messages[] = $customMsg;
         }
 
         if ($isEvasion) {

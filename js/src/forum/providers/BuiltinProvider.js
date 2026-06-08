@@ -14,17 +14,26 @@ export default class BuiltinProvider {
   }
 
   evaluate(type, content, config) {
+    const scanAll = config.scan_all || false;
     if (type === 'contains_word') {
       const words = this.normalizeList(config, 'words', 'word');
       if (words.length === 0) return null;
       const lowered = String(content).toLowerCase();
-      const hit = words.find((w) => lowered.includes(w.toLowerCase()));
-      return hit ? { matched_word: hit } : null;
+      const matches = [];
+      for (const w of words) {
+        if (lowered.includes(w.toLowerCase())) {
+          matches.push(w);
+          if (!scanAll) break;
+        }
+      }
+      return matches.length > 0 ? { matched_word: matches.join(', ') } : null;
     }
 
     if (type === 'regex') {
       const patterns = this.normalizeList(config, 'patterns', 'pattern');
       if (patterns.length === 0) return null;
+      const matchedPatterns = [];
+      const matchedStrings = [];
       for (const pattern of patterns) {
         try {
           let body = pattern;
@@ -39,11 +48,19 @@ export default class BuiltinProvider {
           const re = new RegExp(body, flags);
           const match = String(content).match(re);
           if (match) {
-            return { matched_pattern: pattern, matched_string: match[0] };
+            matchedPatterns.push(pattern);
+            matchedStrings.push(match[0]);
+            if (!scanAll) break;
           }
         } catch (e) {
           console.warn('[FilterRuleManager] invalid regex in BuiltinProvider:', pattern, e);
         }
+      }
+      if (matchedPatterns.length > 0) {
+        return {
+          matched_pattern: matchedPatterns.join(', '),
+          matched_string: matchedStrings.join(', ')
+        };
       }
     }
 

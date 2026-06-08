@@ -23,9 +23,11 @@ class ModeratePostTest extends FilterTestCase
                     'id' => 1,
                     'name' => 'Both Enabled',
                     'priority' => 0,
-                    'rule_operator' => 'AND',
+                    'rule_operator' => 'OR', // Change to OR so it triggers if either matches
                     'effect_type' => 'warning',
                     'display_mode' => 'banner',
+                    'flag_message' => 'Matched custom: {{matched_word}}',
+                    'evaluate_all_rules' => 1,
                     'scope_type' => 'global',
                     'is_active' => 1,
                     'auto_flag' => 1,
@@ -68,8 +70,16 @@ class ModeratePostTest extends FilterTestCase
                     'ruleset_id' => 1,
                     'provider' => 'builtin',
                     'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['word_both']]),
+                    'config' => json_encode(['words' => ['word_both'], 'scan_all' => true]),
                     'sort_order' => 0
+                ],
+                [
+                    'id' => 4,
+                    'ruleset_id' => 1,
+                    'provider' => 'builtin',
+                    'type' => 'contains_word',
+                    'config' => json_encode(['words' => ['apple'], 'scan_all' => true]),
+                    'sort_order' => 1
                 ],
                 [
                     'id' => 2,
@@ -123,19 +133,23 @@ class ModeratePostTest extends FilterTestCase
      */
     public function posting_triggers_both_approval_and_flag()
     {
-        $response = $this->submitReply('This contains word_both which triggers everything.', 3);
+        // Notice we include both words from the OR ruleset 1
+        $response = $this->submitReply('This contains word_both and apple.', 3);
 
         $this->assertEquals(201, $response->getStatusCode());
 
         $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
         $post = $this->database()->table('posts')->where('id', $postId)->first();
 
-        // Assert is_approved is 0 (This will likely fail due to Flarum Core race conditions, proving the bug)
+        // Assert is_approved is 0
         $this->assertEquals(0, $post->is_approved, 'Post should be unapproved (0)');
 
         // Assert flag is created and type is 'approval'
         $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'approval')->first();
         $this->assertNotNull($flag, 'Approval flag should be created');
+
+        // Assert the custom aggregated flag message!
+        $this->assertEquals('Matched custom: word_both, apple', $flag->reason_detail);
     }
 
     /**

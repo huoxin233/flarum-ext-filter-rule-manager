@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string $effect_type    info|warning|block
  * @property string $display_mode   banner|toast|modal|sidebar
  * @property string $message
+ * @property string|null $flag_message
+ * @property bool   $evaluate_all_rules
  * @property bool   $block_cascade
  * @property bool   $is_active
  * @property string $scope_type     global|normal_post|private_post|tag
@@ -35,9 +37,10 @@ class Ruleset extends AbstractModel
     protected $table = 'filter_rulesets';
 
     protected $casts = [
-        'block_cascade'  => 'boolean',
-        'is_active'      => 'boolean',
-        'auto_flag'      => 'boolean',
+        'block_cascade'      => 'boolean',
+        'is_active'          => 'boolean',
+        'evaluate_all_rules' => 'boolean',
+        'auto_flag'          => 'boolean',
         'require_approval' => 'boolean',
         'scope_tag_ids'  => 'array',
         'group_ids'      => 'array',

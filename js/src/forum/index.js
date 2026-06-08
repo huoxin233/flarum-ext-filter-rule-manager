@@ -5,6 +5,7 @@ import ComposerBody from 'flarum/forum/components/ComposerBody';
 import DiscussionComposer from 'flarum/forum/components/DiscussionComposer';
 import ReplyComposer from 'flarum/forum/components/ReplyComposer';
 import EditPostComposer from 'flarum/forum/components/EditPostComposer';
+import CommentPost from 'flarum/forum/components/CommentPost';
 
 import filterEngine from '../common/FilterEngine';
 import RuleDispatcher from './RuleDispatcher';
@@ -113,4 +114,14 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
     }
     return original(error);
   });
-});
+
+  if ('flarum-flags' in flarum.extensions) {
+    override(CommentPost.prototype, 'flagReason', function (original, flag) {
+      if (flag.type() === 'autoMod') {
+        const detail = flag.reasonDetail();
+        return [app.translator.trans('huoxin-filter-rule-manager.forum.flagger_name'), detail ? <span className="Post-flagged-detail">{detail}</span> : ''];
+      }
+      return original(flag);
+    });
+  }
+}, -20);

@@ -1,5 +1,6 @@
 import Component from 'flarum/common/Component';
 import Stream from 'flarum/common/utils/Stream';
+import Switch from 'flarum/common/components/Switch';
 
 /**
  * Config UI for the builtin `contains_word` rule type.
@@ -22,6 +23,7 @@ export default class WordsListConfig extends Component {
       : (typeof cfg.word === 'string' && cfg.word !== '' ? [cfg.word] : []);
 
     this.text = Stream(initial.join('\n'));
+    this.scanAll = Stream(cfg.scan_all || false);
   }
 
   view() {
@@ -37,6 +39,20 @@ export default class WordsListConfig extends Component {
         ></textarea>
         <div className="helpText">
           {app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}
+        </div>
+        <div className="Form-group">
+          <Switch
+            state={this.scanAll()}
+            onchange={(val) => {
+              this.scanAll(val);
+              this.attrs.onchange({ ...(this.attrs.config || {}), scan_all: val });
+            }}
+          >
+            {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all_help')}
+          </div>
         </div>
       </div>
     );
