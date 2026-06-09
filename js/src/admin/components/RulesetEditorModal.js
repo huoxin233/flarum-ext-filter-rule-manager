@@ -40,14 +40,14 @@ export default class RulesetEditorModal extends Modal {
     this.message = Stream(this.ruleset ? this.ruleset.message() : '');
     this.flagMessage = Stream(this.ruleset ? this.ruleset.flagMessage() : '');
     this.evaluateAllRules = Stream(this.ruleset ? this.ruleset.evaluateAllRules() : false);
-    this.evaluateTitle = Stream(this.ruleset ? this.ruleset.evaluateTitle() : true);
-    this.evasionActive = Stream(this.ruleset ? this.ruleset.evasionActive() : false);
-    this.evasionTimeout = Stream(this.ruleset ? this.ruleset.evasionTimeout() : 5);
-    this.evasionThreshold = Stream(this.ruleset ? this.ruleset.evasionThreshold() : 2);
+    this.evaluateTitle = Stream(this.ruleset ? this.ruleset.evaluateTitle() : null);
+    this.evasionActive = Stream(this.ruleset ? this.ruleset.evasionActive() : null);
+    this.evasionTimeout = Stream(this.ruleset ? this.ruleset.evasionTimeout() : null);
+    this.evasionThreshold = Stream(this.ruleset ? this.ruleset.evasionThreshold() : null);
     this.blockCascade = Stream(this.ruleset ? this.ruleset.blockCascade() : false);
     this.isActive = Stream(this.ruleset ? this.ruleset.isActive() : true);
-    this.autoFlag = Stream(this.ruleset ? this.ruleset.autoFlag() : false);
-    this.requireApproval = Stream(this.ruleset ? this.ruleset.requireApproval() : false);
+    this.autoFlag = Stream(this.ruleset ? this.ruleset.autoFlag() : null);
+    this.requireApproval = Stream(this.ruleset ? this.ruleset.requireApproval() : null);
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
 
@@ -92,6 +92,40 @@ export default class RulesetEditorModal extends Modal {
   }
 
   // ── Sections ─────────────────────────────────────────────────────────────
+
+  nullableBooleanSelect(labelKey, helpKey, stream) {
+    const val = stream();
+    return (
+      <div className="Form-group">
+        <label>{app.translator.trans(labelKey)}</label>
+        
+        <div className="RulesetEditor-segmentedControl">
+          <button 
+            type="button"
+            className={`segmented-option ${val === null ? 'active' : ''}`} 
+            onclick={() => stream(null)}>
+            {icon('fas fa-globe')} {app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default', {}, 'Inherit Global')}
+          </button>
+          <button 
+            type="button"
+            className={`segmented-option ${val === true ? 'active-enabled' : ''}`} 
+            onclick={() => stream(true)}>
+            {icon('fas fa-check')} {app.translator.trans('huoxin-filter-rule-manager.admin.force_enabled', {}, 'Force Enabled')}
+          </button>
+          <button 
+            type="button"
+            className={`segmented-option ${val === false ? 'active-disabled' : ''}`} 
+            onclick={() => stream(false)}>
+            {icon('fas fa-times')} {app.translator.trans('huoxin-filter-rule-manager.admin.force_disabled', {}, 'Disabled')}
+          </button>
+        </div>
+
+        <div className="helpText" style={{ marginTop: '8px' }}>
+          {app.translator.trans(helpKey)}
+        </div>
+      </div>
+    );
+  }
 
   basicsSection() {
     return (
@@ -176,14 +210,11 @@ export default class RulesetEditorModal extends Modal {
           </div>
         )}
 
-        <div className="Form-group">
-          <Switch state={this.evaluateTitle()} onchange={this.evaluateTitle}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_title_label')}
-          </Switch>
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_title_help')}
-          </div>
-        </div>
+        {this.nullableBooleanSelect(
+          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_label',
+          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_help',
+          this.evaluateTitle
+        )}
       </div>
     );
   }
@@ -281,25 +312,19 @@ export default class RulesetEditorModal extends Modal {
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_moderation')}</h4>
         </div>
 
-        <div className="Form-group">
-          <Switch state={this.autoFlag()} onchange={this.autoFlag}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_auto_flag')}
-          </Switch>
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_auto_flag_help')}
-          </div>
-        </div>
+        {this.nullableBooleanSelect(
+          'huoxin-filter-rule-manager.admin.ruleset_auto_flag',
+          'huoxin-filter-rule-manager.admin.ruleset_auto_flag_help',
+          this.autoFlag
+        )}
 
-        <div className="Form-group">
-          <Switch state={this.requireApproval()} onchange={this.requireApproval}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_require_approval')}
-          </Switch>
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_require_approval_help')}
-          </div>
-        </div>
+        {this.nullableBooleanSelect(
+          'huoxin-filter-rule-manager.admin.ruleset_require_approval',
+          'huoxin-filter-rule-manager.admin.ruleset_require_approval_help',
+          this.requireApproval
+        )}
 
-        {(this.autoFlag() || this.requireApproval()) ? (
+        {(this.autoFlag() !== false || this.requireApproval() !== false) ? (
           <div className="Form-group">
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message')}</label>
             <textarea
@@ -318,7 +343,7 @@ export default class RulesetEditorModal extends Modal {
           </div>
         ) : null}
 
-        {this.requireApproval() && !this.autoFlag() ? (
+        {this.requireApproval() === true && this.autoFlag() === false ? (
           <div className="Alert Alert--warning">
             <p>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
           </div>
@@ -326,16 +351,13 @@ export default class RulesetEditorModal extends Modal {
 
         <hr className="RulesetEditor-divider" />
 
-        <div className="Form-group">
-          <Switch state={this.evasionActive()} onchange={this.evasionActive}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_active')}
-          </Switch>
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_active_help')}
-          </div>
-        </div>
+        {this.nullableBooleanSelect(
+          'huoxin-filter-rule-manager.admin.ruleset_evasion_active',
+          'huoxin-filter-rule-manager.admin.ruleset_evasion_active_help',
+          this.evasionActive
+        )}
 
-        {this.evasionActive() ? (
+        {this.evasionActive() !== false ? (
           <div className="Form-group">
             <div className="RulesetEditor-inline-inputs">
               <div className="RulesetEditor-inline-input">
@@ -345,8 +367,12 @@ export default class RulesetEditorModal extends Modal {
                   type="number"
                   min="0"
                   step="1"
-                  value={this.evasionTimeout()}
-                  oninput={(e) => this.evasionTimeout(Math.max(0, parseInt(e.target.value, 10)) || 0)}
+                  value={this.evasionTimeout() === null ? '' : this.evasionTimeout()}
+                  oninput={(e) => {
+                    const val = e.target.value;
+                    this.evasionTimeout(val === '' ? null : Math.max(0, parseInt(val, 10)) || 0);
+                  }}
+                  placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default', {}, 'Inherit Global Default')}
                 />
                 <div className="helpText">
                   {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout_help')}
@@ -359,8 +385,12 @@ export default class RulesetEditorModal extends Modal {
                   type="number"
                   min="1"
                   step="1"
-                  value={this.evasionThreshold()}
-                  oninput={(e) => this.evasionThreshold(Math.max(1, parseInt(e.target.value, 10)) || 1)}
+                  value={this.evasionThreshold() === null ? '' : this.evasionThreshold()}
+                  oninput={(e) => {
+                    const val = e.target.value;
+                    this.evasionThreshold(val === '' ? null : Math.max(1, parseInt(val, 10)) || 1);
+                  }}
+                  placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default', {}, 'Inherit Global Default')}
                 />
                 <div className="helpText">
                   {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold_help')}

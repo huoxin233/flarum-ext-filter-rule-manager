@@ -50,14 +50,14 @@ class UpdateRulesetController extends AbstractShowController
         if (isset($attributes['message']))      $ruleset->message       = (string) $attributes['message'];
         if (array_key_exists('flagMessage', $attributes)) $ruleset->flag_message = $attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage'];
         if (isset($attributes['evaluateAllRules'])) $ruleset->evaluate_all_rules = (bool) $attributes['evaluateAllRules'];
-        if (isset($attributes['evaluateTitle'])) $ruleset->evaluate_title = (bool) $attributes['evaluateTitle'];
-        if (isset($attributes['evasionActive'])) $ruleset->evasion_active = (bool) $attributes['evasionActive'];
-        if (isset($attributes['evasionTimeout'])) $ruleset->evasion_timeout = max(0, (int) $attributes['evasionTimeout']);
-        if (isset($attributes['evasionThreshold'])) $ruleset->evasion_threshold = max(1, (int) $attributes['evasionThreshold']);
+        if (array_key_exists('evaluateTitle', $attributes)) $ruleset->evaluate_title = $attributes['evaluateTitle'] === null ? null : (bool) $attributes['evaluateTitle'];
+        if (array_key_exists('evasionActive', $attributes)) $ruleset->evasion_active = $attributes['evasionActive'] === null ? null : (bool) $attributes['evasionActive'];
+        if (array_key_exists('evasionTimeout', $attributes)) $ruleset->evasion_timeout = $attributes['evasionTimeout'] === null ? null : max(0, (int) $attributes['evasionTimeout']);
+        if (array_key_exists('evasionThreshold', $attributes)) $ruleset->evasion_threshold = $attributes['evasionThreshold'] === null ? null : max(1, (int) $attributes['evasionThreshold']);
         if (isset($attributes['blockCascade'])) $ruleset->block_cascade = (bool) $attributes['blockCascade'];
         if (isset($attributes['isActive']))     $ruleset->is_active     = (bool) $attributes['isActive'];
-        if (isset($attributes['autoFlag']))     $ruleset->auto_flag     = (bool) $attributes['autoFlag'];
-        if (isset($attributes['requireApproval'])) $ruleset->require_approval = (bool) $attributes['requireApproval'];
+        if (array_key_exists('autoFlag', $attributes)) $ruleset->auto_flag = $attributes['autoFlag'] === null ? null : (bool) $attributes['autoFlag'];
+        if (array_key_exists('requireApproval', $attributes)) $ruleset->require_approval = $attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval'];
         if (isset($attributes['scopeType']))    $ruleset->scope_type    = $this->validEnum($attributes['scopeType'], ['global', 'normal_post', 'private_post', 'tag'], $ruleset->scope_type);
         if (array_key_exists('scopeTagIds', $attributes)) {
             $ruleset->scope_tag_ids = $this->sanitizeTagIds($attributes['scopeTagIds']);

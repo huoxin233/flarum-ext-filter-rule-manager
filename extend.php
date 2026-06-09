@@ -56,4 +56,13 @@ return [
     // ── Custom exception → structured 422 response ────────────────────────────
     (new Extend\ErrorHandling())
         ->handler(RuleBlockException::class, RuleBlockExceptionHandler::class),
+
+    // ── Default Settings ──────────────────────────────────────────────────
+    (new Extend\Settings())
+        ->default('huoxin-filter.global_evaluate_title', true)
+        ->default('huoxin-filter.global_auto_flag', true)
+        ->default('huoxin-filter.global_require_approval', true)
+        ->default('huoxin-filter.global_evasion_active', false)
+        ->default('huoxin-filter.global_evasion_timeout', 5)
+        ->default('huoxin-filter.global_evasion_threshold', 2),
 ];

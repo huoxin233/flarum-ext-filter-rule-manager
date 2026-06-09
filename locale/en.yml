@@ -4,6 +4,7 @@ huoxin-filter-rule-manager:
     tabs:
       rulesets: "Rulesets"
       providers: "Providers"
+      settings: "Settings"
     add_ruleset: "Add ruleset"
     edit_ruleset: "Edit ruleset"
     no_rulesets: "No rulesets have been created yet. Create one to start showing filter rules."
@@ -57,6 +58,20 @@ huoxin-filter-rule-manager:
     section_display: "Display"
     section_moderation: "Moderation Actions"
     section_rules: "Rules"
+
+    # ── Settings Tab ───────────────────────────────────────────────────────
+    settings_header: "Global Settings"
+    settings:
+      global_evaluate_title: "Evaluate Discussion Title"
+      global_auto_flag: "Auto Flag"
+      global_require_approval: "Require Approval"
+      global_evasion_active: "Evasion Tracking"
+      global_evasion_timeout: "Evasion Timeout (minutes)"
+      global_evasion_threshold: "Evasion Threshold"
+
+    inherit_global_default: "Inherit Global Default"
+    force_enabled: "Force Enabled"
+    force_disabled: "Force Disabled"
 
     ruleset_evaluate_title_label: "Evaluate Discussion Title"
     ruleset_evaluate_title_help: "When enabled, the rules engine will evaluate the title of the discussion alongside the post content."

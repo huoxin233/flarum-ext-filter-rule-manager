@@ -94,6 +94,13 @@ export default class RulesetManagerPage extends ExtensionPage {
               {app.translator.trans('huoxin-filter-rule-manager.admin.tabs.providers')}
               <span className="Button-badge">{this.providers.length}</span>
             </Button>
+            <Button
+              className={`Button ${this.activeTab === 'settings' ? 'active' : ''}`}
+              onclick={() => { this.activeTab = 'settings'; m.redraw(); }}
+            >
+              <i className="fas fa-cog"></i>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.tabs.settings', {}, 'Settings')}
+            </Button>
           </div>
           <div className="FilterRulePage-actions">
             {this.activeTab === 'rulesets' && (
@@ -111,6 +118,94 @@ export default class RulesetManagerPage extends ExtensionPage {
         <div className="FilterRulePage-content">
           {this.activeTab === 'rulesets' && this.rulesetsTab()}
           {this.activeTab === 'providers' && this.providersTab()}
+          {this.activeTab === 'settings' && this.settingsTab()}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Settings Tab ────────────────────────────────────────────────────────
+  
+  settingsTab() {
+    const requireApprovalVal = this.setting('huoxin-filter.global_require_approval', '1')();
+    const autoFlagVal = this.setting('huoxin-filter.global_auto_flag', '1')();
+    const requireApproval = requireApprovalVal === true || requireApprovalVal === '1';
+    const autoFlag = autoFlagVal === true || autoFlagVal === '1';
+
+    return (
+      <div className="RulesetEditor-section">
+        <div className="RulesetEditor-section-header">
+          <i className="fas fa-cog"></i>
+          <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.settings_header', {}, 'Global Settings')}</h4>
+        </div>
+        
+        <div className="Form-group">
+          {this.buildSettingComponent({
+            type: 'boolean',
+            setting: 'huoxin-filter.global_evaluate_title',
+            label: app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title'),
+            help: "If enabled, new posts will be evaluated against their discussion's title.",
+            default: true,
+          })}
+        </div>
+        <div className="Form-group">
+          {this.buildSettingComponent({
+            type: 'boolean',
+            setting: 'huoxin-filter.global_auto_flag',
+            label: app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag'),
+            help: "Automatically flag posts that trigger rulesets.",
+            default: true,
+          })}
+        </div>
+        <div className="Form-group">
+          {this.buildSettingComponent({
+            type: 'boolean',
+            setting: 'huoxin-filter.global_require_approval',
+            label: app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval'),
+            help: "Automatically hold posts for approval.",
+            default: true,
+          })}
+        </div>
+        
+        {requireApproval && !autoFlag ? (
+          <div className="Alert Alert--warning">
+            <p>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
+          </div>
+        ) : null}
+
+        <hr className="RulesetEditor-divider" />
+
+        <div className="Form-group">
+          {this.buildSettingComponent({
+            type: 'boolean',
+            setting: 'huoxin-filter.global_evasion_active',
+            label: app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active'),
+            help: "Track users who repeatedly trigger block rules.",
+            default: false,
+          })}
+        </div>
+        <div className="Form-group">
+          <div className="RulesetEditor-inline-inputs">
+            <div className="RulesetEditor-inline-input">
+              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_timeout')}</label>
+              {this.buildSettingComponent({
+                type: 'number',
+                setting: 'huoxin-filter.global_evasion_timeout',
+                default: 5,
+              })}
+            </div>
+            <div className="RulesetEditor-inline-input">
+              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_threshold')}</label>
+              {this.buildSettingComponent({
+                type: 'number',
+                setting: 'huoxin-filter.global_evasion_threshold',
+                default: 2,
+              })}
+            </div>
+          </div>
+        </div>
+        <div className="Form-group">
+          {this.submitButton()}
         </div>
       </div>
     );

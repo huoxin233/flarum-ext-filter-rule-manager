@@ -21,12 +21,14 @@ use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Flarum\Post\Exception\FloodingException;
 use Illuminate\Database\ConnectionInterface;
 use Carbon\Carbon;
+use Flarum\Settings\SettingsRepositoryInterface;
 
 class EvaluateBlockRulesets
 {
     public function __construct(
         protected RuleEvaluator $evaluator,
-        protected ConnectionInterface $db
+        protected ConnectionInterface $db,
+        protected SettingsRepositoryInterface $settings
     ) {
     }
 
@@ -64,7 +66,9 @@ class EvaluateBlockRulesets
 
             $targetContent = $content;
 
-            if ($ruleset->evaluate_title && $title !== '' && $isFirstPost) {
+            $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
+
+            if ($evaluateTitle && $title !== '' && $isFirstPost) {
                 $targetContent = $title . "\n\n" . $content;
             }
 

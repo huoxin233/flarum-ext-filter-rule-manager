@@ -3,7 +3,6 @@
 namespace Huoxin\FilterRuleManager\Listener;
 
 use Flarum\Extension\ExtensionManager;
-use Flarum\Post\Event\Saved;
 use Flarum\Post\Event\Saving;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
@@ -11,6 +10,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 use Carbon\Carbon;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Flarum\Settings\SettingsRepositoryInterface;
 
 class ExecuteModerationActions
 {
@@ -18,7 +18,8 @@ class ExecuteModerationActions
         protected RuleEvaluator $evaluator,
         protected ExtensionManager $extensions,
         protected ConnectionInterface $db,
-        protected TranslatorInterface $translator
+        protected TranslatorInterface $translator,
+        protected SettingsRepositoryInterface $settings
     ) {
     }
 
@@ -30,7 +31,7 @@ class ExecuteModerationActions
     public function moderatePost(Saving $event): void
     {
         $hasApproval = $this->extensions->isEnabled('flarum-approval');
-        $hasFlags    = $this->extensions->isEnabled('flarum-flags');
+        $hasFlags = $this->extensions->isEnabled('flarum-flags');
 
         if (! $hasApproval && ! $hasFlags) {
             return;
@@ -54,19 +55,33 @@ class ExecuteModerationActions
         $content = (string) $post->content;
         $discussion = $post->discussion;
         $title = $discussion ? (string) $discussion->title : '';
-        
+
         $isFirstPost = false;
         if ($discussion) {
-            $isFirstPost = $post->number === 1 
-                || $discussion->first_post_id === $post->id 
+            $isFirstPost = $discussion->first_post_id === $post->id
                 || $discussion->first_post_id === null;
         }
 
+        $globalAutoFlag = (bool) $this->settings->get('huoxin-filter.global_auto_flag', true);
+        $globalRequireApproval = (bool) $this->settings->get('huoxin-filter.global_require_approval', true);
+        $globalEvaluateTitle = (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
+
         /** @var Ruleset[] $rulesets */
         $rulesets = Ruleset::active()
-            ->where(function ($query) {
-                $query->where('auto_flag', true)
-                      ->orWhere('require_approval', true);
+            ->where(function ($query) use ($globalAutoFlag, $globalRequireApproval) {
+                $query->where(function ($q) use ($globalAutoFlag) {
+                    if ($globalAutoFlag) {
+                        $q->where('auto_flag', true)->orWhereNull('auto_flag');
+                    } else {
+                        $q->where('auto_flag', true);
+                    }
+                })->orWhere(function ($q) use ($globalRequireApproval) {
+                    if ($globalRequireApproval) {
+                        $q->where('require_approval', true)->orWhereNull('require_approval');
+                    } else {
+                        $q->where('require_approval', true);
+                    }
+                });
             })
             ->ordered()
             ->with('rules')
@@ -85,20 +100,27 @@ class ExecuteModerationActions
             }
 
             $targetContent = $content;
-            if ($isFirstPost && $title !== '' && $ruleset->evaluate_title !== false) {
-                $targetContent = $title . "\n\n" . $content;
+
+            $evaluateTitle = $ruleset->evaluate_title ?? $globalEvaluateTitle;
+            if ($isFirstPost && $title !== '' && $evaluateTitle !== false) {
+                $targetContent = $title."\n\n".$content;
             }
 
             $tokens = $this->evaluator->evaluateRuleset($ruleset, $targetContent, $providers);
             if ($tokens !== null) {
-                if (!empty($ruleset->flag_message)) {
+                if (! empty($ruleset->flag_message)) {
                     $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);
                 } else {
                     $defaultRulesets[] = $ruleset->name;
                 }
 
-                if ($ruleset->require_approval) $requiresApproval = true;
-                if ($ruleset->auto_flag) $requiresFlag = true;
+                $autoFlag = $ruleset->auto_flag ?? $globalAutoFlag;
+                $requireApproval = $ruleset->require_approval ?? $globalRequireApproval;
+
+                if ($requireApproval)
+                    $requiresApproval = true;
+                if ($autoFlag)
+                    $requiresFlag = true;
 
                 if ($ruleset->block_cascade) {
                     $blockedRulesetName = $ruleset->name;
@@ -110,10 +132,25 @@ class ExecuteModerationActions
         $isEvasion = false;
 
         if ($actor && ! $actor->isGuest()) {
-            $evasionRulesets = Ruleset::where('evasion_active', true)->get()->keyBy('id');
+            $globalEvasionActive = (bool) $this->settings->get('huoxin-filter.global_evasion_active', false);
+            $globalEvasionTimeout = (int) $this->settings->get('huoxin-filter.global_evasion_timeout', 5);
+            $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter.global_evasion_threshold', 2);
+
+            $evasionRulesets = Ruleset::where(function ($query) use ($globalEvasionActive) {
+                if ($globalEvasionActive) {
+                    $query->where('evasion_active', true)->orWhereNull('evasion_active');
+                } else {
+                    $query->where('evasion_active', true);
+                }
+            })->get()->keyBy('id');
 
             if ($evasionRulesets->isNotEmpty()) {
-                $maxTimeout = $evasionRulesets->max('evasion_timeout');
+                $maxTimeout = 0;
+                foreach ($evasionRulesets as $ruleset) {
+                    $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
+                    if ($timeout > $maxTimeout)
+                        $maxTimeout = $timeout;
+                }
 
                 if ($maxTimeout > 0) {
                     $recentBlocks = $this->db->table('filter_rule_block_logs')
@@ -123,14 +160,18 @@ class ExecuteModerationActions
                         ->get();
 
                     foreach ($evasionRulesets as $rulesetId => $ruleset) {
-                        if ($ruleset->evasion_timeout <= 0) continue;
+                        $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
+                        $threshold = $ruleset->evasion_threshold ?? $globalEvasionThreshold;
 
-                        $cutoff = Carbon::now()->subMinutes($ruleset->evasion_timeout);
+                        if ($timeout <= 0)
+                            continue;
+
+                        $cutoff = Carbon::now()->subMinutes($timeout);
                         $count = $recentBlocks->filter(function ($log) use ($rulesetId, $cutoff) {
                             return $log->ruleset_id == $rulesetId && Carbon::parse($log->created_at)->gte($cutoff);
                         })->count();
 
-                        if ($count >= max(1, $ruleset->evasion_threshold)) {
+                        if ($count >= max(1, $threshold)) {
                             $isEvasion = true;
                             $blockedRulesetName = $ruleset->name;
                             break;

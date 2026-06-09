@@ -451,6 +451,62 @@
   max-width: 140px;
 }
 
+// Segmented control for inheritance (3-state)
+.RulesetEditor-segmentedControl {
+  display: flex;
+  background: var(--control-bg, @control-bg);
+  border-radius: 6px;
+  padding: 3px;
+  gap: 3px;
+  margin-top: 0px;
+
+  .segmented-option {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted-color, @muted-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    outline: none;
+
+    &:hover:not([class*="active"]) {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text-color, @text-color);
+    }
+
+    &.active {
+      background: var(--body-bg, @body-bg);
+      color: var(--primary-color, @primary-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    &.active-enabled {
+      background: var(--body-bg, @body-bg);
+      color: @success-color;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    &.active-disabled {
+      background: var(--body-bg, @body-bg);
+      color: @error-color;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    i {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+  }
+}
+
 // Segmented control for effect type
 .RulesetEditor-effectSelector {
   display: flex;

@@ -24,17 +24,17 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string $message
  * @property string|null $flag_message
  * @property bool   $evaluate_all_rules
- * @property bool   $evaluate_title
- * @property bool   $evasion_active
- * @property int    $evasion_timeout
- * @property int    $evasion_threshold
+ * @property bool|null $evaluate_title
+ * @property bool|null $evasion_active
+ * @property int|null  $evasion_timeout
+ * @property int|null  $evasion_threshold
  * @property bool   $block_cascade
  * @property bool   $is_active
  * @property string $scope_type     global|normal_post|private_post|tag
  * @property array|null $scope_tag_ids
  * @property array|null $group_ids
- * @property bool   $auto_flag
- * @property bool   $require_approval
+ * @property bool|null $auto_flag
+ * @property bool|null $require_approval
  */
 class Ruleset extends AbstractModel
 {
