@@ -44,15 +44,16 @@ export default class RuleBuilder extends Component {
 
           return (
             <div className="RuleBuilder-rule" key={index}>
+              <Button className="Button RuleBuilder-rule-delete" onclick={() => this.removeRule(index)}>
+                {icon('fas fa-times')}
+              </Button>
+
               <div className="RuleBuilder-rule-header">
                 <Select
                   options={providerOptions}
                   value={rule.provider}
                   onchange={(val) => {
                     const firstType = providers.find((p) => p.provider === val);
-                    // Resetting type AND config when the provider changes
-                    // avoids carrying old fields (e.g. `words`) into a new
-                    // type that expects a different schema (e.g. `patterns`).
                     this.updateRule(index, {
                       provider: val,
                       type: firstType ? firstType.type : '',
@@ -74,10 +75,6 @@ export default class RuleBuilder extends Component {
                 >
                   Negate (NOT)
                 </Switch>
-
-                <Button className="Button" onclick={() => this.removeRule(index)}>
-                  {icon('fas fa-times')}
-                </Button>
               </div>
               <div className="RuleBuilder-rule-config">
                 {this.renderConfig(rule, index)}

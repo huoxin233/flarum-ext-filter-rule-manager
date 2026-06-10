@@ -11,7 +11,7 @@ import filterEngine from '../../common/FilterEngine';
 /**
  * Sectioned editor for a ruleset:
  *
- *   1. Basics   — name, priority, active toggle
+ *   1. General   — name, priority, active toggle
  *   2. Scope    — global/normal/private/tag (+ tag IDs when applicable)
  *   3. Display  — effect, display mode, message + token hint chips + preview
  *   4. Rules    — operator + RuleBuilder
@@ -79,7 +79,7 @@ export default class RulesetEditorModal extends Modal {
     return (
       <div className="Modal-body">
         <div className="Form">
-          {this.basicsSection()}
+          {this.generalSection()}
           {this.scopeSection()}
           {this.displaySection()}
           {this.moderationSection()}
@@ -120,19 +120,19 @@ export default class RulesetEditorModal extends Modal {
           </button>
         </div>
 
-        <div className="helpText" style={{ marginTop: '8px' }}>
+        <div className="helpText">
           {app.translator.trans(helpKey)}
         </div>
       </div>
     );
   }
 
-  basicsSection() {
+  generalSection() {
     return (
       <div className="RulesetEditor-section">
         <div className="RulesetEditor-section-header">
-          <i className="fas fa-tag"></i>
-          <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_basics')}</h4>
+          <i className="fas fa-info-circle"></i>
+          <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_general')}</h4>
         </div>
 
         <div className="Form-group">
@@ -144,6 +144,12 @@ export default class RulesetEditorModal extends Modal {
             placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_name_placeholder')}
             required
           />
+        </div>
+
+        <div className="Form-group">
+          <Switch state={this.isActive()} onchange={this.isActive}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_is_active')}
+          </Switch>
         </div>
 
         <div className="Form-group">
@@ -160,9 +166,12 @@ export default class RulesetEditorModal extends Modal {
         </div>
 
         <div className="Form-group">
-          <Switch state={this.isActive()} onchange={this.isActive}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_is_active')}
+          <Switch state={this.blockCascade()} onchange={this.blockCascade}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade')}
           </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade_help')}
+          </div>
         </div>
       </div>
     );
@@ -209,12 +218,6 @@ export default class RulesetEditorModal extends Modal {
             </div>
           </div>
         )}
-
-        {this.nullableBooleanSelect(
-          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_label',
-          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_help',
-          this.evaluateTitle
-        )}
       </div>
     );
   }
@@ -227,7 +230,7 @@ export default class RulesetEditorModal extends Modal {
     return (
       <div className="RulesetEditor-section">
         <div className="RulesetEditor-section-header">
-          <i className="fas fa-bell"></i>
+          <i className="fas fa-eye"></i>
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_display')}</h4>
         </div>
 
@@ -291,15 +294,6 @@ export default class RulesetEditorModal extends Modal {
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.preview')}</label>
           {this.previewBlock(effect, this.message() || app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder'))}
         </div>
-
-        <div className="Form-group">
-          <Switch state={this.blockCascade()} onchange={this.blockCascade}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade')}
-          </Switch>
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade_help')}
-          </div>
-        </div>
       </div>
     );
   }
@@ -324,28 +318,9 @@ export default class RulesetEditorModal extends Modal {
           this.requireApproval
         )}
 
-        {(this.autoFlag() !== false || this.requireApproval() !== false) ? (
-          <div className="Form-group">
-            <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message')}</label>
-            <textarea
-              className="FormControl"
-              oncreate={(vnode) => { this.flagMessageTextarea = vnode.dom; }}
-              onremove={() => { this.flagMessageTextarea = null; }}
-              value={this.flagMessage()}
-              oninput={(e) => this.flagMessage(e.target.value)}
-              placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_placeholder')}
-              rows={2}
-            ></textarea>
-            <div className="helpText">
-              {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_help')}
-            </div>
-            {this.tokenChipsBlock(this.availableTokens(), 'flagMessage')}
-          </div>
-        ) : null}
-
         {this.requireApproval() === true && this.autoFlag() === false ? (
-          <div className="Alert Alert--warning">
-            <p>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
+          <div className="Alert Alert--warning RulesetEditor-warningAlert">
+            <p><i className="fas fa-exclamation-circle"></i> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
           </div>
         ) : null}
 
@@ -399,6 +374,27 @@ export default class RulesetEditorModal extends Modal {
             </div>
           </div>
         ) : null}
+
+        <hr className="RulesetEditor-divider" />
+
+        {(this.autoFlag() !== false || this.requireApproval() !== false || this.evasionActive() !== false) ? (
+          <div className="Form-group">
+            <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message')}</label>
+            <textarea
+              className="FormControl"
+              oncreate={(vnode) => { this.flagMessageTextarea = vnode.dom; }}
+              onremove={() => { this.flagMessageTextarea = null; }}
+              value={this.flagMessage()}
+              oninput={(e) => this.flagMessage(e.target.value)}
+              placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_placeholder')}
+              rows={2}
+            ></textarea>
+            <div className="helpText">
+              {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_help')}
+            </div>
+            {this.tokenChipsBlock(this.availableTokens(), 'flagMessage')}
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -410,6 +406,12 @@ export default class RulesetEditorModal extends Modal {
           <i className="fas fa-sliders-h"></i>
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_rules')}</h4>
         </div>
+
+        {this.nullableBooleanSelect(
+          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_label',
+          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_help',
+          this.evaluateTitle
+        )}
 
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_rule_operator')}</label>
@@ -431,6 +433,8 @@ export default class RulesetEditorModal extends Modal {
             {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules_help')}
           </div>
         </div>
+
+        <hr className="RulesetEditor-divider" />
 
         <RuleBuilder
           rules={this.rules()}

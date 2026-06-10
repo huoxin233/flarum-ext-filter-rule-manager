@@ -17,7 +17,7 @@ huoxin-filter-rule-manager:
     delete: "Delete"
     delete_success: "Ruleset deleted."
     delete_error: "Could not delete ruleset."
-    delete_ruleset_confirm: "Delete the ruleset \"{name}\"? Its rules will be removed too. This cannot be undone."
+    delete_ruleset_confirm: 'Delete the ruleset "{name}"? Its rules will be removed too. This cannot be undone.'
     cancel: "Cancel"
     edit: "Edit"
     move_up: "Move up"
@@ -53,7 +53,7 @@ huoxin-filter-rule-manager:
     tokens_none: "No tokens available — add a rule to see what tokens it exposes."
 
     # ── Section titles in the editor ───────────────────────────────────────
-    section_basics: "Basics"
+    section_general: "General"
     section_scope: "Scope"
     section_display: "Display"
     section_moderation: "Moderation Actions"
@@ -93,7 +93,7 @@ huoxin-filter-rule-manager:
     ruleset_auto_flag_help: "If enabled, triggering this ruleset will automatically create a flag for moderators to review. (Requires flarum/flags)"
     ruleset_require_approval: "Require approval on match"
     ruleset_require_approval_help: "If enabled, the post will be hidden until approved by a moderator. (Requires flarum/approval)"
-    ruleset_approval_without_flag_warning: "Warning: Requiring approval without auto-flagging means the post will be hidden, but moderators will not be notified via the flag queue."
+    ruleset_approval_without_flag_warning: "Requiring approval without auto-flagging means the post will be hidden, but moderators will not be notified via the flag queue."
     ruleset_block_cascade: "Stop evaluating lower-priority rulesets when this one triggers"
     ruleset_block_cascade_help: "Applies to all effect types. Use to short-circuit a chain of related rulesets."
     ruleset_evasion_active: "Enable Evasion Detection"
@@ -128,8 +128,8 @@ huoxin-filter-rule-manager:
 
     scopes:
       global: "All posts"
-      normal_post: "Normal discussions only"
-      private_post: "Private discussions only"
+      normal_post: "Normal Discussions"
+      private_post: "Private Discussions"
       tag: "Specific tags"
 
     displays:

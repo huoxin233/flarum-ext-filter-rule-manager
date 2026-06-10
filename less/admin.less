@@ -49,8 +49,8 @@
     }
 
     > .Button {
-      background: transparent !important;
-      border: none !important;
+      background: transparent;
+      border: none;
       border-radius: 6px;
       padding: 8px 16px;
       cursor: pointer;
@@ -62,17 +62,16 @@
       font-weight: 600;
       transition: all 150ms ease;
       white-space: nowrap;
-      box-shadow: none !important;
+      box-shadow: none;
 
       &:hover {
-        color: var(--text-color, @text-color);
-        background: rgba(255, 255, 255, 0.08) !important;
+        background: rgba(127, 127, 127, 0.1);
       }
 
       &.active {
-        background: var(--body-bg, @body-bg) !important;
-        color: var(--primary-color, @primary-color) !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+        background: var(--body-bg, @body-bg);
+        color: var(--primary-color, @primary-color);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         font-weight: 700;
       }
 
@@ -84,13 +83,18 @@
 
     .Button-badge {
       margin-left: 6px;
-      padding: 2px 8px;
+      padding: 0 6px;
       background: var(--primary-color, @primary-color);
       color: #fff;
       border-radius: 10px;
       font-size: 11px;
       font-weight: 700;
       line-height: 1.2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
     }
   }
 
@@ -273,24 +277,40 @@
         background: rgba(231, 76, 60, 0.1);
         color: #e74c3c;
         border: none;
+        
         &:hover {
           background: #e74c3c;
-          color: white;
+          color: #fff;
         }
       }
     }
 
-    @media (max-width: 768px) {
-      width: 100%;
-      margin-top: 8px;
-      padding-top: 12px;
-      border-top: 2px solid var(--control-bg, @control-bg);
-      flex-wrap: wrap;
+    @media (max-width: 1100px) {
+      .Button-label {
+        display: none;
+      }
+      .Button {
+        padding: 6px 8px;
+        min-width: 32px;
+        justify-content: center;
+      }
+    }
 
+    @media (max-width: 768px) {
+      position: relative;
+      right: auto;
+      top: auto;
+      transform: none;
+      width: 100%;
+      margin-top: 10px;
+      justify-content: stretch;
+      
       .Button {
         flex: 1;
         justify-content: center;
-        min-width: 80px;
+      }
+      .Button-label {
+        display: inline;
       }
     }
   }
@@ -298,10 +318,10 @@
 
 // Grid sizings per list
 .RulesetsList .CardList {
-  --grid-cols: 60px 1.4fr 140px 130px 100px 70px 100px 200px;
+  --grid-cols: 70px 1.4fr 110px 1.5fr 1fr 60px 90px 150px;
 
   @media (max-width: 1100px) {
-    --grid-cols: 60px 1.2fr 120px 110px 90px 60px 90px 170px;
+    --grid-cols: 70px 1.2fr 100px 1.3fr 0.9fr 50px 80px 80px;
   }
 }
 
@@ -333,9 +353,8 @@
   .EffectBadge,
   .ScopeBadge,
   .StatusBadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    display: inline-block;
+    vertical-align: middle;
     padding: 3px 10px;
     border-radius: 4px;
     font-size: 11px;
@@ -343,8 +362,11 @@
     text-transform: uppercase;
     letter-spacing: 0.3px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 
-    i { font-size: 10px; }
+    i { font-size: 10px; margin-right: 4px; }
   }
 
   .EffectBadge {
@@ -396,47 +418,59 @@
 }
 
 .RulesetEditor-section {
-  .card-style();
-  padding: 18px 20px;
-  margin-bottom: 18px;
+  background: var(--body-bg, @body-bg);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+  padding: 24px;
+  margin-bottom: 24px;
 
   &-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
+    gap: 12px;
+    margin-bottom: 20px;
     padding-bottom: 12px;
-    border-bottom: 2px solid var(--control-bg, @control-bg);
+    border-bottom: 1px solid var(--control-bg-shaded, @control-bg);
 
     h4 {
       margin: 0;
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 700;
       color: var(--heading-color, @heading-color);
     }
 
     i {
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: fade(@info-color, 12%);
-      border-radius: 6px;
       color: var(--primary-color, @primary-color);
-      font-size: 12px;
+      font-size: 18px;
     }
   }
 
   .Form-group {
-    margin-bottom: 14px;
+    margin-bottom: 20px;
     &:last-child { margin-bottom: 0; }
 
-    label {
+    > label {
       display: block;
       font-weight: 600;
-      margin-bottom: 6px;
-      font-size: 13px;
+      color: var(--heading-color, @heading-color);
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+  }
+
+  .FormControl {
+    background: var(--control-bg, @control-bg);
+    border: 2px solid transparent;
+    border-radius: var(--border-radius);
+    color: var(--control-color, @control-color);
+    transition: all 0.2s ease;
+    
+    &:focus {
+      background: var(--body-bg, @body-bg);
+      border-color: var(--primary-color, @primary-color);
+      box-shadow: none;
+      outline: none;
     }
   }
 
@@ -458,7 +492,6 @@
   border-radius: 6px;
   padding: 3px;
   gap: 3px;
-  margin-top: 0px;
 
   .segmented-option {
     flex: 1;
@@ -468,7 +501,7 @@
     border-radius: 4px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--muted-color, @muted-color);
+    color: var(--control-color, @control-color);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -482,22 +515,21 @@
       color: var(--text-color, @text-color);
     }
 
-    &.active {
+    &.active, &.active-enabled, &.active-disabled {
       background: var(--body-bg, @body-bg);
-      color: var(--primary-color, @primary-color);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    &.active {
+      color: var(--primary-color, @primary-color);
     }
 
     &.active-enabled {
-      background: var(--body-bg, @body-bg);
       color: @success-color;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     &.active-disabled {
-      background: var(--body-bg, @body-bg);
       color: @error-color;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     i {
@@ -548,7 +580,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 6px;
+  border-radius: var(--border-radius);
   font-size: 14px;
   border-left: 3px solid transparent;
 
@@ -568,6 +600,16 @@
   margin-top: 8px;
 }
 
+.RulesetEditor-divider {
+  border: none;
+  border-top: 1px solid var(--control-bg-shaded, @control-bg);
+  margin: 20px 0;
+}
+
+.RulesetEditor-warningAlert {
+  margin-bottom: 20px;
+}
+
 // -------------------------------------------------------------------------
 // RuleBuilder
 // -------------------------------------------------------------------------
@@ -578,22 +620,59 @@
   gap: 12px;
 
   &-rule {
-    background: rgba(0, 0, 0, 0.03);
-    border: 1px solid var(--control-bg, @control-bg);
-    border-radius: 8px;
-    padding: 12px;
+    background: var(--control-bg-light, rgba(0, 0, 0, 0.02));
+    border-radius: var(--border-radius);
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
+    position: relative;
 
     &-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding-right: 48px;
+
+      .Select { 
+        min-width: 140px; 
+        max-width: 280px; 
+
+        .FormControl {
+          background: var(--body-bg, @body-bg);
+          border: 1px solid var(--control-bg-shaded, rgba(0, 0, 0, 0.1));
+          
+          &:focus {
+            border-color: var(--primary-color, @primary-color);
+          }
+        }
+      }
+      
+    }
+    
+    .Button.RuleBuilder-rule-delete {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 36px;
+      height: 36px;
+      min-width: 0;
+      padding: 0;
       display: flex;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-
-      .Select { flex: 1; min-width: 140px; }
-      .Switch { margin-left: 4px; }
+      justify-content: center;
+      border-radius: 0 var(--border-radius) 0 var(--border-radius);
+      background: transparent;
+      color: var(--muted-color, @muted-color);
+      border: none;
+      box-shadow: none;
+      transition: all 0.2s;
+      
+      &:hover {
+        color: var(--text-on-dark, #fff);
+        background: var(--error-color, @error-color);
+      }
     }
 
     &-config { margin-top: 4px; }
@@ -601,25 +680,31 @@
 }
 
 .FilterRuleManager-ConfigForm {
-  background: var(--body-bg, @body-bg);
-  border: 1px dashed var(--control-bg, @control-bg);
-  border-radius: 6px;
-  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
 
-  label {
+  > label {
     display: block;
-    font-weight: 600;
-    font-size: 12px;
+    font-weight: 700;
+    font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
     color: var(--muted-color, @muted-color);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   textarea.FilterRuleManager-LinesInput {
+    background: var(--body-bg, @body-bg);
+    border: 1px solid var(--control-bg-shaded, rgba(0, 0, 0, 0.1));
     font-size: 13px;
     line-height: 1.5;
     resize: vertical;
+    
+    &:focus {
+      border-color: var(--primary-color, @primary-color);
+    }
   }
 }
 
@@ -652,13 +737,12 @@
 
     &:hover {
       background: rgba(0, 0, 0, 0.04);
-      color: var(--text-color, @text-color);
     }
 
     &.active {
-      background: fade(@info-color, 12%);
-      border-color: fade(@info-color, 35%);
-      color: darken(@info-color, 10%);
+      background: fade(@primary-color, 20%);
+      border-color: fade(@primary-color, 50%);
+      color: var(--primary-color, @primary-color);
     }
   }
 
@@ -678,7 +762,8 @@
   }
 
   .SubTab.active .SubTab-count {
-    background: fade(@info-color, 25%);
+    background: fade(@primary-color, 25%);
+    color: var(--primary-color, @primary-color);
   }
 }
 

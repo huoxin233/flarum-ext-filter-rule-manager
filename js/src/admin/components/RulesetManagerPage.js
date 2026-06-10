@@ -169,7 +169,7 @@ export default class RulesetManagerPage extends ExtensionPage {
         
         {requireApproval && !autoFlag ? (
           <div className="Alert Alert--warning">
-            <p>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
+            <p><i className="fas fa-exclamation-circle"></i> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}</p>
           </div>
         ) : null}
 
@@ -185,8 +185,6 @@ export default class RulesetManagerPage extends ExtensionPage {
           })}
         </div>
         <div className="Form-group">
-          <div className="RulesetEditor-inline-inputs">
-            <div className="RulesetEditor-inline-input">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_timeout')}</label>
               {this.buildSettingComponent({
                 type: 'number',
@@ -194,15 +192,13 @@ export default class RulesetManagerPage extends ExtensionPage {
                 default: 5,
               })}
             </div>
-            <div className="RulesetEditor-inline-input">
+        <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_threshold')}</label>
               {this.buildSettingComponent({
                 type: 'number',
                 setting: 'huoxin-filter.global_evasion_threshold',
                 default: 2,
               })}
-            </div>
-          </div>
         </div>
         <div className="Form-group">
           {this.submitButton()}
@@ -358,11 +354,11 @@ export default class RulesetManagerPage extends ExtensionPage {
         </div>
 
         <div className="CardList-item-actions">
-          <Button className="Button" onclick={() => this.showEditor(ruleset)}>
-            {icon('fas fa-edit')} {app.translator.trans('huoxin-filter-rule-manager.admin.edit')}
+          <Button className="Button" icon="fas fa-edit" onclick={() => this.showEditor(ruleset)} aria-label={app.translator.trans('huoxin-filter-rule-manager.admin.edit')}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.edit')}
           </Button>
-          <Button className="Button Button--danger" onclick={() => this.deleteRuleset(ruleset)}>
-            {icon('fas fa-trash')} {app.translator.trans('huoxin-filter-rule-manager.admin.delete')}
+          <Button className="Button Button--danger" icon="fas fa-trash" onclick={() => this.deleteRuleset(ruleset)} aria-label={app.translator.trans('huoxin-filter-rule-manager.admin.delete')}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.delete')}
           </Button>
         </div>
       </div>
