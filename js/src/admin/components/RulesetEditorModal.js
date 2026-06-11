@@ -34,7 +34,6 @@ export default class RulesetEditorModal extends Modal {
     this.messageTextarea = null;
 
     this.name = Stream(this.ruleset ? this.ruleset.name() : '');
-    this.priority = Stream(this.ruleset ? this.ruleset.priority() : 0);
     this.expression = Stream(this.ruleset ? this.ruleset.expression() : '');
     this.effectType = Stream(this.ruleset ? this.ruleset.effectType() : 'info');
     this.displayMode = Stream(this.ruleset ? this.ruleset.displayMode() : 'banner');
@@ -118,9 +117,14 @@ export default class RulesetEditorModal extends Modal {
   generalSection() {
     return (
       <div className="RulesetEditor-section">
-        <div className="RulesetEditor-section-header">
-          <i className="fas fa-info-circle"></i>
-          <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_general')}</h4>
+        <div className="RulesetEditor-section-header RulesetEditor-section-header--with-toggle">
+          <div className="RulesetEditor-section-header-title">
+            <i className="fas fa-info-circle"></i>
+            <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_general')}</h4>
+          </div>
+          <Switch state={this.isActive()} onchange={this.isActive}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_is_active')}
+          </Switch>
         </div>
 
         <div className="Form-group">
@@ -134,24 +138,6 @@ export default class RulesetEditorModal extends Modal {
           />
         </div>
 
-        <div className="Form-group">
-          <Switch state={this.isActive()} onchange={this.isActive}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_is_active')}
-          </Switch>
-        </div>
-
-        <div className="Form-group">
-          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_priority')}</label>
-          <input
-            className="FormControl RulesetEditor-priorityInput"
-            type="number"
-            value={this.priority()}
-            oninput={(e) => this.priority(parseInt(e.target.value, 10) || 0)}
-          />
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_priority_help')}
-          </div>
-        </div>
 
         <div className="Form-group">
           <Switch state={this.blockCascade()} onchange={this.blockCascade}>
@@ -640,7 +626,6 @@ export default class RulesetEditorModal extends Modal {
 
     const data = {
       name: this.name(),
-      priority: this.priority(),
       expression: this.expression(),
       effectType: this.effectType(),
       displayMode: this.displayMode(),

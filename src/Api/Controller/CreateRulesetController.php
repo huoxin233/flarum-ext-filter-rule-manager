@@ -39,7 +39,7 @@ class CreateRulesetController extends AbstractCreateController
 
         $ruleset = new Ruleset();
         $ruleset->name          = $name;
-        $ruleset->priority      = (int) ($attributes['priority'] ?? 0);
+        $ruleset->priority      = ((int) Ruleset::max('priority')) + 10;
 
         $expression = trim((string) ($attributes['expression'] ?? ''));
         $ruleset->expression = $expression;

@@ -79,8 +79,7 @@ huoxin-filter-rule-manager:
     # ── Form labels ────────────────────────────────────────────────────────
     ruleset_name: "Name"
     ruleset_name_placeholder: "e.g. Block spam keywords"
-    ruleset_priority: "Priority"
-    ruleset_priority_help: "Lower numbers are evaluated first. Use the up/down buttons on the list to reorder."
+
     ruleset_effect_type: "Effect"
     ruleset_display_mode: "Display mode"
     ruleset_scope_type: "Applies to"
@@ -94,7 +93,7 @@ huoxin-filter-rule-manager:
     ruleset_require_approval: "Require approval on match"
     ruleset_require_approval_help: "If enabled, the post will be hidden until approved by a moderator. (Requires flarum/approval)"
     ruleset_approval_without_flag_warning: "Requiring approval without auto-flagging means the post will be hidden, but moderators will not be notified via the flag queue."
-    ruleset_block_cascade: "Stop evaluating lower-priority rulesets when this one triggers"
+    ruleset_block_cascade: "Stop evaluating subsequent rulesets when this one triggers"
     ruleset_block_cascade_help: "Applies to all effect types. Use to short-circuit a chain of related rulesets."
     ruleset_evasion_active: "Enable Evasion Detection"
     ruleset_evasion_active_help: "If enabled, subsequent clean posts made shortly after this ruleset blocks the user will be flagged for review."
