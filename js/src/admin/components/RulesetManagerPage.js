@@ -295,8 +295,8 @@ export default class RulesetManagerPage extends ExtensionPage {
     const effect = ruleset.effectType();
     const scope = ruleset.scopeType();
     const display = ruleset.displayMode();
-    const rules = ruleset.rules() || [];
     const isTogglingThis = this.toggling.has(ruleset.id());
+    const rulesCount = this.countRules(ruleset.compiledAst());
 
     return (
       <div className={`CardList-item ${!isActive ? 'CardList-item--inactive' : ''}`} key={ruleset.id()}>
@@ -342,7 +342,7 @@ export default class RulesetManagerPage extends ExtensionPage {
         </div>
 
         <div className="CardList-item-cell CardList-item-cell--muted" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.rules')}>
-          <span className="CountBadge">{rules.length}</span>
+          <span className="CountBadge">{rulesCount}</span>
         </div>
 
         <div className="CardList-item-cell CardList-item-cell--switch" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.active')}>
@@ -363,6 +363,14 @@ export default class RulesetManagerPage extends ExtensionPage {
         </div>
       </div>
     );
+  }
+
+  countRules(ast) {
+    if (!ast) return 0;
+    if (ast.type === 'rule') return 1;
+    if (ast.type === 'logical') return this.countRules(ast.left) + this.countRules(ast.right);
+    if (ast.type === 'not') return this.countRules(ast.node);
+    return 0;
   }
 
   effectIcon(effect) {

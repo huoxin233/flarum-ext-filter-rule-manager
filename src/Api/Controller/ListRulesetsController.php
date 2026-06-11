@@ -26,6 +26,6 @@ class ListRulesetsController extends AbstractListController
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        return Ruleset::with('rules')->ordered()->get();
+        return Ruleset::ordered()->get();
     }
 }

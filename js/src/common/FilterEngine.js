@@ -93,8 +93,19 @@ class FilterEngine {
       if (typeof provider.getSupportedTypes !== 'function') continue;
       const supported = provider.getSupportedTypes();
       const labels = typeof provider.getTypeLabels === 'function' ? provider.getTypeLabels() : {};
+      
+      let providerLabel = name;
+      if (typeof provider.getProviderLabel === 'function') {
+        providerLabel = provider.getProviderLabel();
+      } else {
+        const transKey = `huoxin-filter-rule-manager.admin.providers.${name}`;
+        const translated = app.translator.trans(transKey);
+        const isTranslated = Array.isArray(translated) ? translated[0] !== transKey : translated !== transKey;
+        if (isTranslated) providerLabel = translated;
+      }
+
       supported.forEach((type) => {
-        types.push({ provider: name, type, label: labels[type] || type });
+        types.push({ provider: name, providerLabel, type, label: labels[type] || type });
       });
     }
     return types;
@@ -187,31 +198,49 @@ class FilterEngine {
   }
 
   evaluateRuleset(ruleset, content) {
-    if (!ruleset.rules || ruleset.rules.length === 0) return null;
+    // Both Ruleset model (compiledAst()) and raw object (compiled_ast) might be passed depending on usage.
+    const ast = typeof ruleset.compiledAst === 'function' ? ruleset.compiledAst() : ruleset.compiled_ast;
+    if (!ast) return null;
 
-    // Explicit sort by sortOrder so token merge order is deterministic
-    // regardless of how the payload was serialised.
-    const rules = [...ruleset.rules].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-    const results = [];
-    const op = ruleset.ruleOperator;
-    const evaluateAllRules = ruleset.evaluateAllRules || false;
+    return this.evaluateAST(ast, content, ruleset);
+  }
 
-    for (const rule of rules) {
-      const r = this.evaluateRule(rule, content, ruleset);
-      results.push(r);
+  evaluateAST(node, content, ruleset) {
+    if (!node) return null;
 
-      if (!evaluateAllRules) {
-        if (op === 'OR' && r !== null) break;
-        if (op === 'AND' && r === null) break;
+    if (node.type === 'logical') {
+      const left = this.evaluateAST(node.left, content, ruleset);
+      
+      if (node.operator === 'OR') {
+        const evaluateAll = typeof ruleset.evaluateAllRules === 'function' ? ruleset.evaluateAllRules() : ruleset.evaluateAllRules;
+        if (left !== null && !evaluateAll) return left;
+        
+        const right = this.evaluateAST(node.right, content, ruleset);
+        if (left !== null && right !== null) return this.mergeResults([left, right]);
+        return left !== null ? left : right;
+      }
+
+      if (node.operator === 'AND') {
+        if (left === null) return null;
+        const right = this.evaluateAST(node.right, content, ruleset);
+        if (right === null) return null;
+        return this.mergeResults([left, right]);
       }
     }
 
-    const triggered = op === 'AND'
-      ? results.every((r) => r !== null)
-      : results.some((r) => r !== null);
+    if (node.type === 'not') {
+      const result = this.evaluateAST(node.node, content, ruleset);
+      return result === null ? {} : null;
+    }
 
-    if (!triggered) return null;
+    if (node.type === 'rule') {
+      return this.evaluateRuleNode(node, content);
+    }
 
+    return null;
+  }
+
+  mergeResults(results) {
     let merged = {};
     for (const r of results) {
       if (r !== null) {
@@ -229,23 +258,30 @@ class FilterEngine {
     return merged;
   }
 
-  evaluateRule(rule, content, ruleset = null) {
-    const provider = this.providers[rule.provider];
+  evaluateRuleNode(node, content) {
+    const provider = this.providers[node.provider];
     if (!provider || typeof provider.evaluate !== 'function') return null;
-    if (!provider.getSupportedTypes().includes(rule.type)) return null;
+    if (!provider.getSupportedTypes().includes(node.ruleType)) return null;
 
     let result = null;
     try {
-      const config = rule.config || {};
-      result = provider.evaluate(rule.type, content, config);
+      const isObject = typeof node.value === 'object' && node.value !== null && !Array.isArray(node.value);
+      let config = isObject 
+        ? { ...node.value, operator: node.operator }
+        : { operator: node.operator, value: node.value };
+      
+      if (node.provider === 'builtin' && !isObject) {
+        let val = Array.isArray(node.value) ? node.value : [node.value];
+        if (node.ruleType === 'contains_word') config = { words: val };
+        else if (node.ruleType === 'regex') config = { patterns: val };
+      }
+
+      result = provider.evaluate(node.ruleType, content, config);
     } catch (e) {
-      console.error(`[filter-rule-manager] rule ${rule.provider}/${rule.type} threw`, e);
+      console.error(`[filter-rule-manager] rule ${node.provider}/${node.ruleType} threw`, e);
       return null;
     }
 
-    if (rule.negate) {
-      return result === null ? {} : null;
-    }
     return result;
   }
 

@@ -145,7 +145,7 @@ huoxin-filter-rule-manager:
       modal_help: "Modal dialog interrupting the user. Shown once per ruleset firing — re-opens only after the rule clears and triggers again."
 
     providers:
-      builtin: "Built-in (Full-stack)"
+      builtin: "Built-in"
 
     # ── Rule type labels ─────────────────────────────────────────────────
     type_contains_word: "Contains word(s)"
@@ -165,6 +165,23 @@ huoxin-filter-rule-manager:
       message_required: "Please write the alert message that users will see."
       tags_required: "Tag scope is selected — list at least one tag ID."
       rules_required: "Add at least one rule, otherwise the ruleset can never trigger."
+      expression_required: "An expression is required."
+
+    rule_builder:
+      visual_builder: "Visual Builder"
+      expression_editor: "Expression Editor"
+      parse_error: "Parse Error:"
+      parse_error_help: "Please fix the expression in the editor before switching to the Visual Builder."
+      editor_help: "Write expressions using <code>provider.type operator value</code>. Use <code>AND</code>, <code>OR</code>, and <code>( )</code> for grouping."
+      negate: "Negate (NOT)"
+      add_rule: "Add Rule"
+      delete_rule: "Delete Rule"
+      unknown_node_type: "Unknown node type"
+      value_placeholder: "Value..."
+      editor_placeholder: "e.g. builtin.contains_word eq ['crypto'] AND (builtin.regex eq '/spam/i' OR ...)"
+      and: "AND"
+      or: "OR"
+      not: "NOT"
 
   forum:
     # ── Warning confirmation modal ─────────────────────────────────────────

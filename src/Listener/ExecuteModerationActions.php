@@ -84,7 +84,6 @@ class ExecuteModerationActions
                 });
             })
             ->ordered()
-            ->with('rules')
             ->get();
 
         $defaultRulesets = [];

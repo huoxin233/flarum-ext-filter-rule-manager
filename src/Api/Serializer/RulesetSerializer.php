@@ -12,7 +12,7 @@
 namespace Huoxin\FilterRuleManager\Api\Serializer;
 
 use Flarum\Api\Serializer\AbstractSerializer;
-use Huoxin\FilterRuleManager\Model\Rule;
+
 use Huoxin\FilterRuleManager\Model\Ruleset;
 
 /**
@@ -34,7 +34,8 @@ class RulesetSerializer extends AbstractSerializer
         return [
             'name'          => $model->name,
             'priority'      => (int) $model->priority,
-            'ruleOperator'  => $model->rule_operator,
+            'expression'    => $model->expression,
+            'compiledAst'   => $model->compiled_ast ?? [],
             'effectType'    => $model->effect_type,
             'displayMode'      => $model->display_mode,
             'message'          => $model->message,
@@ -51,13 +52,7 @@ class RulesetSerializer extends AbstractSerializer
             'scopeType'     => $model->scope_type,
             'scopeTagIds'   => $model->scope_tag_ids ?? [],
             'groupIds'      => $model->group_ids ?? [],
-            'rules'         => $model->rules->map(fn (Rule $r) => [
-                'provider'  => $r->provider,
-                'type'      => $r->type,
-                'config'    => $r->config ?? [],
-                'negate'    => (bool) $r->negate,
-                'sortOrder' => (int) $r->sort_order,
-            ])->values()->toArray(),
+
             'createdAt'     => $this->formatDate($model->created_at),
             'updatedAt'     => $this->formatDate($model->updated_at),
         ];

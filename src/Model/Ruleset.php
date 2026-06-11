@@ -18,7 +18,8 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int    $id
  * @property string $name
  * @property int    $priority
- * @property string $rule_operator  AND|OR
+ * @property string|null $expression
+ * @property array|null $compiled_ast
  * @property string $effect_type    info|warning|block
  * @property string $display_mode   banner|toast|modal|sidebar
  * @property string $message
@@ -41,23 +42,21 @@ class Ruleset extends AbstractModel
     protected $table = 'filter_rulesets';
 
     protected $casts = [
+        'compiled_ast'       => 'array',
         'block_cascade'      => 'boolean',
         'is_active'          => 'boolean',
-        'evaluate_all_rules' => 'boolean',
         'evaluate_title'     => 'boolean',
+        'evaluate_all_rules' => 'boolean',
         'evasion_active'     => 'boolean',
         'evasion_timeout'    => 'integer',
         'evasion_threshold'  => 'integer',
         'auto_flag'          => 'boolean',
-        'require_approval' => 'boolean',
-        'scope_tag_ids'  => 'array',
-        'group_ids'      => 'array',
+        'require_approval'   => 'boolean',
+        'scope_tag_ids'      => 'array',
+        'group_ids'          => 'array',
     ];
 
-    public function rules()
-    {
-        return $this->hasMany(Rule::class, 'ruleset_id')->orderBy('sort_order');
-    }
+
 
     public function scopeActive(Builder $query): Builder
     {

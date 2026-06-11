@@ -13,10 +13,7 @@ namespace Huoxin\FilterRuleManager\Listener;
 
 use Flarum\Post\Event\Saving;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
-use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
-use Huoxin\FilterRuleManager\Model\Rule;
 use Huoxin\FilterRuleManager\Model\Ruleset;
-use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Flarum\Post\Exception\FloodingException;
 use Illuminate\Database\ConnectionInterface;
@@ -48,12 +45,13 @@ class EvaluateBlockRulesets
         
         $isFirstPost = false;
         if ($discussion) {
-            $isFirstPost = $discussion->first_post_id === $post->id 
+            $isFirstPost = $post->number === 1 
+                || $discussion->first_post_id === $post->id 
                 || $discussion->first_post_id === null;
         }
 
         /** @var Ruleset[] $rulesets */
-        $rulesets = Ruleset::active()->block()->ordered()->with('rules')->get();
+        $rulesets = Ruleset::active()->block()->ordered()->get();
 
         $providers = $this->evaluator->getProviders();
 

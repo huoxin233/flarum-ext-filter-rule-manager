@@ -16,9 +16,11 @@ export default class PatternsListConfig extends Component {
     super.oninit(vnode);
 
     const cfg = this.attrs.config || {};
-    const initial = Array.isArray(cfg.patterns)
-      ? cfg.patterns
-      : (typeof cfg.pattern === 'string' && cfg.pattern !== '' ? [cfg.pattern] : []);
+    let initial = [];
+    if (Array.isArray(cfg.patterns)) initial = cfg.patterns;
+    else if (Array.isArray(cfg.value)) initial = cfg.value;
+    else if (typeof cfg.value === 'string' && cfg.value !== '') initial = [cfg.value];
+    else if (typeof cfg.pattern === 'string' && cfg.pattern !== '') initial = [cfg.pattern];
 
     this.text = Stream(initial.join('\n'));
     this.scanAll = Stream(cfg.scan_all || false);
@@ -62,6 +64,9 @@ export default class PatternsListConfig extends Component {
       .split(/\r?\n/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
-    this.attrs.onchange({ ...(this.attrs.config || {}), patterns });
+    const newCfg = { ...(this.attrs.config || {}), patterns };
+    delete newCfg.value;
+    delete newCfg.pattern;
+    this.attrs.onchange(newCfg);
   }
 }

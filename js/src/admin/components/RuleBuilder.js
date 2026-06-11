@@ -3,167 +3,370 @@ import Button from 'flarum/common/components/Button';
 import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
 import icon from 'flarum/common/helpers/icon';
+import { parseExpression, stringifyExpression } from '../utils/ExpressionParser';
 
-/**
- * Stateless rule list editor. Owns no state; `attrs.rules` is the source of
- * truth and every change produces a brand-new `rules` array passed to
- * `attrs.onchange`.
- *
- * Each rule's config block is rendered by the provider when possible:
- *   provider.getConfigComponent(type) => MithrilComponentClass
- *
- * The component receives { config, onchange, type } and is responsible for
- * its own internal state. When a provider doesn't expose a config component
- * (or returns null), the rule falls back to a generic JSON textarea so any
- * provider remains usable without a custom UI.
- */
-export default class RuleBuilder extends Component {
+let nodeIdCounter = 1;
+
+function ensureKeys(node) {
+  if (!node) return;
+  if (!node._key) node._key = nodeIdCounter++;
+  if (node.left) ensureKeys(node.left);
+  if (node.right) ensureKeys(node.right);
+  if (node.node) ensureKeys(node.node);
+}
+
+function createEmptyRule(providers) {
+  const first = providers[0];
+  return { _key: nodeIdCounter++, type: 'rule', provider: first ? first.provider : '', ruleType: first ? first.type : '', operator: 'eq', value: '' };
+}
+
+class LogicalNodeView extends Component {
   view() {
-    const rules = this.attrs.rules || [];
-    const providers = this.attrs.providers || [];
+    const { node, onchange, providers } = this.attrs;
+    const isAnd = node.operator === 'AND';
+    const isOr = node.operator === 'OR';
+
+    return (
+      <div className="Expression-LogicalNode" key={node._key}>
+        {[
+          <NodeView key={node.left ? node.left._key : 'l'} node={node.left} onchange={v => {
+            if (v === null) onchange(node.right); // collapse
+            else onchange({ ...node, left: v });
+          }} providers={providers} />,
+          
+          isAnd ? (
+            <div className="LogicalNode-andContainer" key="and">
+              <div className="LogicalNode-connector"></div>
+              <Button className="Button Button--basic LogicalNode-andButton" onclick={() => {
+                onchange({ ...node, operator: 'OR' });
+              }}>{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.and')}</Button>
+              <div className="LogicalNode-connector"></div>
+            </div>
+          ) : null,
+
+          isOr ? (
+            <div className="LogicalNode-orContainer" key="or">
+              <Button className="Button Button--basic LogicalNode-orButton" onclick={() => {
+                onchange({ ...node, operator: 'AND' });
+              }}>{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.or')}</Button>
+            </div>
+          ) : null,
+
+          <NodeView key={node.right ? node.right._key : 'r'} node={node.right} onchange={v => {
+            if (v === null) onchange(node.left); // collapse
+            else onchange({ ...node, right: v });
+          }} providers={providers} />
+        ].filter(Boolean)}
+      </div>
+    );
+  }
+}
+
+class RuleNodeView extends Component {
+  view() {
+    const { node, onchange, providers } = this.attrs;
 
     const providerOptions = {};
     providers.forEach((p) => {
       if (p.provider) {
-        const transKey = `huoxin-filter-rule-manager.admin.providers.${p.provider}`;
-        const translated = app.translator.trans(transKey);
-        // If it isn't translated, it returns an array containing the key in Flarum < 1.2, or the key itself in >= 1.2
-        const isTranslated = Array.isArray(translated) ? translated[0] !== transKey : translated !== transKey;
-        providerOptions[p.provider] = isTranslated ? translated : p.provider;
+        providerOptions[p.provider] = p.providerLabel || p.provider;
       }
     });
 
+    const availableTypes = providers.filter((p) => p.provider === node.provider);
+    const typeOptions = availableTypes.reduce((acc, p) => {
+      acc[p.type] = p.label || p.type;
+      return acc;
+    }, {});
+
     return (
-      <div className="RuleBuilder">
-        {rules.map((rule, index) => {
-          const availableTypes = providers.filter((p) => p.provider === rule.provider);
-          const typeOptions = availableTypes.reduce((acc, p) => {
-            acc[p.type] = p.label || p.type;
-            return acc;
-          }, {});
+      <div className="Expression-RuleNode">
+        <div className="RuleNode-header">
+          <Select
+            options={providerOptions}
+            value={node.provider}
+            onchange={(val) => {
+              const firstType = providers.find((p) => p.provider === val);
+              onchange({ ...node, provider: val, ruleType: firstType ? firstType.type : '', value: '' });
+            }}
+          />
 
-          return (
-            <div className="RuleBuilder-rule" key={index}>
-              <Button className="Button RuleBuilder-rule-delete" onclick={() => this.removeRule(index)}>
-                {icon('fas fa-times')}
-              </Button>
+          <Select
+            options={typeOptions}
+            value={node.ruleType}
+            onchange={(val) => onchange({ ...node, ruleType: val, value: '' })}
+            disabled={!node.provider}
+          />
 
-              <div className="RuleBuilder-rule-header">
-                <Select
-                  options={providerOptions}
-                  value={rule.provider}
-                  onchange={(val) => {
-                    const firstType = providers.find((p) => p.provider === val);
-                    this.updateRule(index, {
-                      provider: val,
-                      type: firstType ? firstType.type : '',
-                      config: {},
-                    });
-                  }}
-                />
+          <div className="RuleNode-negateToggle">
+            <Switch state={this.attrs.isNegated} onchange={this.attrs.onNegateChange}>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.negate')}
+            </Switch>
+          </div>
 
-                <Select
-                  options={typeOptions}
-                  value={rule.type}
-                  onchange={(val) => this.updateRule(index, { type: val, config: {} })}
-                  disabled={!rule.provider}
-                />
+          <div className="RuleNode-actions">
+            <Button 
+              className="Button Button--icon Button--danger" 
+              icon="fas fa-times" 
+              onclick={() => onchange(null)} 
+              title={app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.delete_rule')} 
+            />
+          </div>
+        </div>
 
-                <Switch
-                  state={rule.negate}
-                  onchange={(val) => this.updateRule(index, { negate: val })}
-                >
-                  Negate (NOT)
-                </Switch>
-              </div>
-              <div className="RuleBuilder-rule-config">
-                {this.renderConfig(rule, index)}
-              </div>
-            </div>
-          );
-        })}
-
-        <Button className="Button" onclick={() => this.addRule()}>
-          {icon('fas fa-plus')} Add Rule
-        </Button>
+        <div className="Expression-RuleNode-config">
+          {this.renderConfig()}
+        </div>
       </div>
     );
   }
 
-  renderConfig(rule, index) {
-    const provider = (app.filterRuleManager && typeof app.filterRuleManager.getProvider === 'function')
-      ? app.filterRuleManager.getProvider(rule.provider)
+  renderConfig() {
+    const { node, onchange } = this.attrs;
+    
+    // Check if the provider has a custom config component
+    const providerInstance = (app.filterRuleManager && typeof app.filterRuleManager.getProvider === 'function')
+      ? app.filterRuleManager.getProvider(node.provider)
       : null;
 
-    const ConfigComponent = (provider && typeof provider.getConfigComponent === 'function')
-      ? provider.getConfigComponent(rule.type)
+    const ConfigComponent = (providerInstance && typeof providerInstance.getConfigComponent === 'function')
+      ? providerInstance.getConfigComponent(node.ruleType)
       : null;
 
     if (ConfigComponent) {
+      const configObj = typeof node.value === 'object' && node.value !== null && !Array.isArray(node.value) 
+        ? node.value 
+        : { value: node.value };
+
       return (
         <ConfigComponent
-          // Re-mount the config component whenever the rule's provider/type
-          // changes so it re-initialises from the (now-reset) config.
-          key={`${rule.provider}:${rule.type}:${index}`}
-          config={rule.config || {}}
-          type={rule.type}
-          onchange={(newConfig) => this.updateRule(index, { config: newConfig })}
+          config={configObj}
+          type={node.ruleType}
+          onchange={(newConfig) => {
+            onchange({ ...node, value: newConfig });
+          }}
         />
       );
     }
 
-    // Fallback: raw JSON editor for providers without a custom form.
+    // Fallback simple input
+    let valStr = typeof node.value === 'string' ? node.value : JSON.stringify(node.value, null, 2);
+    if (valStr === undefined) valStr = '';
+
     return (
-      <div className="FilterRuleManager-ConfigForm">
-        <label>Config (JSON):</label>
-        <textarea
-          className="FormControl"
-          value={JSON.stringify(rule.config || {}, null, 2)}
-          onchange={(e) => {
-            let parsed;
-            try {
-              parsed = JSON.parse(e.target.value);
-            } catch (err) {
-              return;
-            }
-            this.updateRule(index, { config: parsed });
-          }}
-          placeholder='{"key": "value"}'
-        ></textarea>
+      <textarea 
+        className="FormControl" 
+        rows="2"
+        value={valStr} 
+        onchange={e => {
+          let v = e.target.value;
+          const trimmed = v.trim();
+          // Only attempt JSON parsing for objects/arrays to prevent accidental primitive coercion
+          if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+            try { v = JSON.parse(trimmed); } catch(e){}
+          }
+          onchange({ ...node, value: v });
+        }} 
+        placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.value_placeholder')} 
+      />
+    );
+  }
+}
+
+class NodeView extends Component {
+  view() {
+    const { node, onchange, providers } = this.attrs;
+    
+    if (!node) {
+      return (
+        <Button className="Button Button--danger" onclick={() => {
+           onchange(createEmptyRule(providers));
+        }}>
+          {icon('fas fa-plus')} {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.add_rule')}
+        </Button>
+      );
+    }
+
+    if (node.type === 'logical') {
+      return <LogicalNodeView node={node} onchange={onchange} providers={providers} />;
+    }
+    
+    if (node.type === 'rule') {
+      return (
+        <div className="NodeView-ruleContainer" key={node._key}>
+          <RuleNodeView 
+            node={node} 
+            isNegated={false}
+            onchange={onchange} 
+            providers={providers}
+            onNegateChange={(v) => {
+              if (v) {
+                onchange({ type: 'not', node: node });
+              }
+            }}
+          />
+        </div>
+      );
+    }
+    
+    if (node.type === 'not') {
+      if (node.node && node.node.type === 'rule') {
+        // Render it as a single RuleNodeView with Negated toggle ON
+        return (
+          <div className="NodeView-ruleContainer" key={node._key}>
+            <RuleNodeView 
+              node={node.node}  
+              isNegated={true}
+              onchange={v => {
+                if (v === null) onchange(null);
+                else onchange({ ...node, node: v });
+              }} 
+              providers={providers}
+              onNegateChange={(v) => {
+                if (!v) {
+                  onchange(node.node); // Unwrap
+                }
+              }}
+            />
+          </div>
+        );
+      }
+
+      // Fallback for complex NOT nodes (e.g. NOT (A AND B))
+      return (
+        <div className="Expression-NotNode" key={node._key}>
+           <div className="NotNode-label" key="label">
+             {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.not')}
+           </div>
+           <NodeView key={node.node ? node.node._key : 'n'} node={node.node} onchange={v => {
+             if (v === null) onchange(null);
+             else onchange({ ...node, node: v });
+           }} providers={providers} />
+        </div>
+      );
+    }
+
+    return <div>{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.unknown_node_type')}</div>;
+  }
+}
+
+export default class RuleBuilder extends Component {
+  oninit(vnode) {
+    super.oninit(vnode);
+    this.mode = 'visual'; // 'visual' or 'editor'
+    this.expression = this.attrs.expression || '';
+    this.ast = null;
+    this.parseError = null;
+
+    if (this.expression) {
+      this.syncToVisual();
+    } else {
+      this.ast = null;
+    }
+  }
+
+  syncToVisual() {
+    this.parseError = null;
+    try {
+      this.ast = parseExpression(this.expression);
+      ensureKeys(this.ast);
+    } catch (e) {
+      this.parseError = e.message;
+      this.mode = 'editor';
+    }
+  }
+
+  syncToEditor() {
+    this.expression = stringifyExpression(this.ast);
+    this.emit();
+  }
+
+  emit() {
+    if (typeof this.attrs.onchange === 'function') {
+      this.attrs.onchange(this.expression);
+    }
+  }
+
+  view() {
+    const providers = this.attrs.providers || [];
+
+    return (
+      <div className="RuleBuilder">
+        <div className="RuleBuilder-tabs">
+          <Button 
+            className={`Button RuleBuilder-tabButton ${this.mode === 'visual' ? 'active' : ''}`}
+            onclick={() => {
+              this.syncToVisual();
+              if (!this.parseError) this.mode = 'visual';
+            }}
+          >
+            {icon('fas fa-project-diagram')} {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.visual_builder')}
+          </Button>
+          <Button 
+            className={`Button RuleBuilder-tabButton ${this.mode === 'editor' ? 'active' : ''}`}
+            onclick={() => {
+              if (this.mode === 'visual') this.syncToEditor();
+              this.mode = 'editor';
+            }}
+          >
+            {icon('fas fa-code')} {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.expression_editor')}
+          </Button>
+        </div>
+
+        {this.parseError && (
+          <div className="Alert Alert--error RuleBuilder-errorAlert">
+            <strong>{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.parse_error')}</strong> {this.parseError}
+            <br />
+            {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.parse_error_help')}
+          </div>
+        )}
+
+        {this.mode === 'visual' ? (
+          <div className="RuleBuilder-visual">
+            {[
+              <NodeView 
+                key={this.ast ? this.ast._key : 'root'}
+                node={this.ast} 
+                onchange={(newAst) => {
+                  this.ast = newAst;
+                  this.syncToEditor();
+                }} 
+                providers={providers} 
+              />,
+              this.ast ? (
+                <div className="RuleBuilder-appendButtons" key="appendButtons">
+                  <Button className="Button Button--basic RuleBuilder-appendButton" onclick={() => {
+                    const newLogical = { _key: nodeIdCounter++, type: 'logical', operator: 'AND', left: this.ast, right: createEmptyRule(providers) };
+                    this.ast = newLogical;
+                    this.syncToEditor();
+                  }}>{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.and')}</Button>
+                  <Button className="Button Button--basic RuleBuilder-appendButton" onclick={() => {
+                    const newLogical = { _key: nodeIdCounter++, type: 'logical', operator: 'OR', left: this.ast, right: createEmptyRule(providers) };
+                    this.ast = newLogical;
+                    this.syncToEditor();
+                  }}>{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.or')}</Button>
+                </div>
+              ) : null
+            ].filter(Boolean)}
+          </div>
+        ) : (
+          <div className="RuleBuilder-editor">
+            <textarea 
+              className="FormControl RuleBuilder-textarea" 
+              value={this.expression} 
+              oninput={e => {
+                 this.expression = e.target.value;
+                 this.emit();
+              }}
+              placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_placeholder')}
+              rows="6"
+            />
+            <div className="helpText RuleBuilder-editorHelp">
+               {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_help')}
+            </div>
+          </div>
+        )}
       </div>
     );
-  }
-
-  updateRule(index, patch) {
-    const rules = (this.attrs.rules || []).map((rule, i) =>
-      i === index ? { ...rule, ...patch } : rule
-    );
-    this.emit(rules);
-  }
-
-  addRule() {
-    const providers = this.attrs.providers || [];
-    const first = providers[0];
-    const next = [
-      ...(this.attrs.rules || []),
-      {
-        provider: first ? first.provider : '',
-        type: first ? first.type : '',
-        config: {},
-        negate: false,
-      },
-    ];
-    this.emit(next);
-  }
-
-  removeRule(index) {
-    const next = (this.attrs.rules || []).filter((_, i) => i !== index);
-    this.emit(next);
-  }
-
-  emit(rules) {
-    if (typeof this.attrs.onchange === 'function') {
-      this.attrs.onchange(rules);
-    }
   }
 }

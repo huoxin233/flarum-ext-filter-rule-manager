@@ -85,7 +85,7 @@
       margin-left: 6px;
       padding: 0 6px;
       background: var(--primary-color, @primary-color);
-      color: #fff;
+      color: var(--body-bg, @body-bg);
       border-radius: 10px;
       font-size: 11px;
       font-weight: 700;
@@ -275,12 +275,12 @@
 
       &--danger {
         background: rgba(231, 76, 60, 0.1);
-        color: #e74c3c;
-        border: none;
+        color: @error-color;
+        border: 1px solid transparent;
         
         &:hover {
-          background: #e74c3c;
-          color: #fff;
+          background: @error-color;
+          color: var(--body-bg, @body-bg);
         }
       }
     }
@@ -292,7 +292,10 @@
       .Button {
         padding: 6px 8px;
         min-width: 32px;
-        justify-content: center;
+        
+        i, .icon {
+          margin: 0;
+        }
       }
     }
 
@@ -308,6 +311,10 @@
       .Button {
         flex: 1;
         justify-content: center;
+        
+        i, .icon {
+          margin-right: 6px;
+        }
       }
       .Button-label {
         display: inline;
@@ -380,7 +387,7 @@
     color: var(--muted-color, @muted-color);
 
     &--global       { background: fade(@info-color, 12%);    color: darken(@info-color, 12%); }
-    &--normal_post  { background: rgba(127, 140, 141, 0.15); color: #7f8c8d; }
+    &--normal_post  { background: var(--body-bg-shaded); color: var(--muted-color-light); }
     &--private_post { background: fade(@warning-color, 15%); color: darken(@warning-color, 12%); }
     &--tag          { background: fade(@success-color, 15%); color: darken(@success-color, 12%); }
     &--backend      { background: fade(@info-color, 12%);    color: darken(@info-color, 12%); }
@@ -400,7 +407,7 @@
     height: 22px;
     padding: 0 8px;
     background: var(--primary-color, @primary-color);
-    color: #fff;
+    color: var(--body-bg, @body-bg);
     border-radius: 11px;
     font-size: 12px;
     font-weight: 700;
@@ -614,70 +621,6 @@
 // RuleBuilder
 // -------------------------------------------------------------------------
 
-.RuleBuilder {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  &-rule {
-    background: var(--control-bg-light, rgba(0, 0, 0, 0.02));
-    border-radius: var(--border-radius);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    position: relative;
-
-    &-header {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      align-items: center;
-      gap: 16px;
-      padding-right: 48px;
-
-      .Select { 
-        min-width: 140px; 
-        max-width: 280px; 
-
-        .FormControl {
-          background: var(--body-bg, @body-bg);
-          border: 1px solid var(--control-bg-shaded, rgba(0, 0, 0, 0.1));
-          
-          &:focus {
-            border-color: var(--primary-color, @primary-color);
-          }
-        }
-      }
-      
-    }
-    
-    .Button.RuleBuilder-rule-delete {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 36px;
-      height: 36px;
-      min-width: 0;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 0 var(--border-radius) 0 var(--border-radius);
-      background: transparent;
-      color: var(--muted-color, @muted-color);
-      border: none;
-      box-shadow: none;
-      transition: all 0.2s;
-      
-      &:hover {
-        color: var(--text-on-dark, #fff);
-        background: var(--error-color, @error-color);
-      }
-    }
-
-    &-config { margin-top: 4px; }
-  }
-}
 
 .FilterRuleManager-ConfigForm {
   background: transparent;
@@ -867,4 +810,190 @@
   border-radius: 3px;
   font-size: 11px;
   color: darken(@info-color, 10%);
+}
+
+// -------------------------------------------------------------------------
+// Extracted Styles from RuleBuilder.js and Config Components
+// -------------------------------------------------------------------------
+
+.Expression-LogicalNode {
+  .LogicalNode-andContainer {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+  }
+  .LogicalNode-connector {
+    width: 1px;
+    height: 15px;
+    background: var(--control-bg-shaded);
+  }
+  .LogicalNode-andButton {
+    background: var(--control-bg-light);
+    border: 1px solid var(--control-bg-shaded);
+    padding: 2px 8px;
+    font-size: 12px;
+  }
+  .LogicalNode-orContainer {
+    margin: 20px 0;
+  }
+  .LogicalNode-orButton {
+    background: var(--control-bg-light);
+    border: 1px solid var(--control-bg-shaded);
+    padding: 4px 12px;
+    font-size: 13px;
+  }
+}
+
+.Expression-RuleNode {
+  background: var(--body-bg, @body-bg);
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid var(--control-bg-shaded);
+  width: 100%;
+
+  .RuleNode-header {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr auto auto;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+
+    .Select {
+      min-width: 0;
+
+      > select {
+        width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
+  .RuleNode-negateToggle {
+    padding-left: 10px;
+    border-left: 1px solid var(--control-bg-shaded);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
+  .RuleNode-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 767px) {
+    .RuleNode-header {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .RuleNode-negateToggle {
+      padding-left: 0;
+      border-left: none;
+      flex: 1;
+    }
+    .RuleNode-actions {
+      width: 100%;
+      .Button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.NodeView-ruleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.Expression-NotNode {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+
+  .NotNode-label {
+    display: flex;
+    align-items: center;
+    background: var(--control-bg-shaded);
+    padding: 0 10px;
+    border-radius: 4px;
+    border: 1px solid var(--control-bg-shaded);
+    font-weight: bold;
+  }
+}
+
+.RuleBuilder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--body-bg);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--control-bg-shaded);
+
+  .RuleBuilder-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--control-bg, @control-bg);
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    width: 100%;
+
+    @media (max-width: 767px) {
+      flex-direction: column;
+    }
+  }
+
+  .RuleBuilder-tabButton {
+    flex: 1;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: var(--muted-color, @muted-color);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 150ms ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: none;
+
+    &:hover {
+      background: rgba(127, 127, 127, 0.1);
+    }
+
+    &.active {
+      background: var(--body-bg, @body-bg);
+      color: var(--primary-color, @primary-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      font-weight: 700;
+    }
+  }
+
+  .RuleBuilder-errorAlert {
+    margin-bottom: 15px;
+  }
+  .RuleBuilder-appendButtons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  .RuleBuilder-appendButton {
+    background: var(--body-bg, @body-bg);
+    border: 1px solid var(--control-bg-shaded);
+    padding: 4px 12px;
+  }
+  .RuleBuilder-textarea {
+    font-family: monospace;
+  }
+  .RuleBuilder-editorHelp {
+    margin-top: 10px;
+  }
 }

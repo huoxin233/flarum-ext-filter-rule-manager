@@ -18,9 +18,11 @@ export default class WordsListConfig extends Component {
     super.oninit(vnode);
 
     const cfg = this.attrs.config || {};
-    const initial = Array.isArray(cfg.words)
-      ? cfg.words
-      : (typeof cfg.word === 'string' && cfg.word !== '' ? [cfg.word] : []);
+    let initial = [];
+    if (Array.isArray(cfg.words)) initial = cfg.words;
+    else if (Array.isArray(cfg.value)) initial = cfg.value;
+    else if (typeof cfg.value === 'string' && cfg.value !== '') initial = [cfg.value];
+    else if (typeof cfg.word === 'string' && cfg.word !== '') initial = [cfg.word];
 
     this.text = Stream(initial.join('\n'));
     this.scanAll = Stream(cfg.scan_all || false);
@@ -58,12 +60,12 @@ export default class WordsListConfig extends Component {
     );
   }
 
-  handleInput(raw) {
-    this.text(raw);
-    const words = raw
-      .split(/\r?\n/)
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-    this.attrs.onchange({ ...(this.attrs.config || {}), words });
+  handleInput(val) {
+    this.text(val);
+    const words = val.split('\n').map((w) => w.trim()).filter((w) => w.length > 0);
+    const newCfg = { ...(this.attrs.config || {}), words };
+    delete newCfg.value;
+    delete newCfg.word;
+    this.attrs.onchange(newCfg);
   }
 }

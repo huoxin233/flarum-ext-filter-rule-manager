@@ -40,28 +40,20 @@ class InjectFrontendRulesets
         $rulesets = Ruleset::active()
             ->frontend()
             ->ordered()
-            ->with('rules')
             ->get()
             ->map(fn (Ruleset $r) => [
                 'id'           => $r->id,
                 'name'         => $r->name,
                 'priority'     => $r->priority,
-                'ruleOperator' => $r->rule_operator,
+                'compiled_ast' => $r->compiled_ast,
                 'effectType'   => $r->effect_type,
-                'displayMode'      => $r->display_mode,
-                'message'          => $r->message,
                 'evaluateAllRules' => $r->evaluate_all_rules,
-                'evaluateTitle'    => $r->evaluate_title,
+                'displayMode'  => $r->display_mode,
+                'message'      => $r->message,
+                'evaluateTitle'    => $r->evaluate_title === null ? null : (bool) $r->evaluate_title,
                 'blockCascade'     => $r->block_cascade,
                 'scopeType'        => $r->scope_type,
                 'scopeTagIds'  => $r->scope_tag_ids ?? [],
-                'rules'        => $r->rules->map(fn ($rule) => [
-                    'provider'  => $rule->provider,
-                    'type'      => $rule->type,
-                    'config'    => $rule->config ?? [],
-                    'negate'    => $rule->negate,
-                    'sortOrder' => $rule->sort_order,
-                ])->toArray(),
             ])
             ->toArray();
 

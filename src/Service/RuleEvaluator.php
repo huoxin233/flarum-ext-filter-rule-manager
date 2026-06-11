@@ -3,7 +3,6 @@
 namespace Huoxin\FilterRuleManager\Service;
 
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
-use Huoxin\FilterRuleManager\Model\Rule;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Illuminate\Contracts\Container\Container;
@@ -27,43 +26,62 @@ class RuleEvaluator
 
     public function evaluateRuleset(Ruleset $ruleset, string $content, array $providers): ?array
     {
-        $results = [];
-        $rules = $ruleset->rules->sortBy('sort_order')->values();
-        $op = $ruleset->rule_operator;
-        $evaluateAllRules = (bool) $ruleset->evaluate_all_rules;
+        $ast = $ruleset->compiled_ast;
+        if (empty($ast)) {
+            return null;
+        }
 
-        foreach ($rules as $rule) {
-            $r = $this->evaluateRule($rule, $content, $providers, $ruleset);
-            $results[] = $r;
+        return $this->evaluateAST($ast, $content, $providers, $ruleset);
+    }
 
-            if (! $evaluateAllRules) {
-                if ($op === 'OR' && $r !== null) {
-                    break;
+    public function evaluateAST(array $node, string $content, array $providers, Ruleset $ruleset): ?array
+    {
+        if ($node['type'] === 'logical') {
+            $left = $this->evaluateAST($node['left'], $content, $providers, $ruleset);
+
+            if ($node['operator'] === 'OR') {
+                if ($left !== null && ! $ruleset->evaluate_all_rules) {
+                    return $left;
                 }
-                if ($op === 'AND' && $r === null) {
-                    break;
+                $right = $this->evaluateAST($node['right'], $content, $providers, $ruleset);
+
+                if ($left !== null && $right !== null) {
+                    return $this->mergeResults([$left, $right]);
                 }
+                return $left !== null ? $left : $right;
+            }
+
+            if ($node['operator'] === 'AND') {
+                if ($left === null) {
+                    return null;
+                }
+                $right = $this->evaluateAST($node['right'], $content, $providers, $ruleset);
+                if ($right === null) {
+                    return null;
+                }
+                return $this->mergeResults([$left, $right]);
             }
         }
 
-        if (empty($results)) {
-            return null;
+        if ($node['type'] === 'not') {
+            $result = $this->evaluateAST($node['node'], $content, $providers, $ruleset);
+            return $result === null ? [] : null;
         }
 
-        $triggered = $op === 'AND'
-            ? ! in_array(null, $results, true)
-            : count(array_filter($results, fn ($r) => $r !== null)) > 0;
-
-        if (! $triggered) {
-            return null;
+        if ($node['type'] === 'rule') {
+            return $this->evaluateRuleNode($node, $content, $providers);
         }
 
+        return null;
+    }
+
+    private function mergeResults(array $results): array
+    {
         $merged = [];
         foreach ($results as $r) {
             if ($r !== null) {
                 foreach ($r as $key => $val) {
                     if (isset($merged[$key]) && is_string($val) && is_string($merged[$key])) {
-                        // Concatenate without duplicating
                         $existing = array_map('trim', explode(',', $merged[$key]));
                         $new = array_map('trim', explode(',', $val));
                         $merged[$key] = implode(', ', array_unique(array_merge($existing, $new)));
@@ -73,39 +91,49 @@ class RuleEvaluator
                 }
             }
         }
-
         return $merged;
     }
 
-    public function evaluateRule(Rule $rule, string $content, array $providers, ?Ruleset $ruleset = null): ?array
+    public function evaluateRuleNode(array $node, string $content, array $providers): ?array
     {
-        $provider = $providers[$rule->provider] ?? null;
+        $provider = $providers[$node['provider']] ?? null;
         if ($provider === null) {
             return null;
         }
 
-        if (! in_array($rule->type, $provider->getSupportedBackendTypes(), true)) {
+        if (! in_array($node['ruleType'], $provider->getSupportedBackendTypes(), true)) {
             return null;
         }
 
         try {
-            $config = $rule->config ?? [];
-            $result = $provider->evaluate($rule->type, $content, $config);
+            $isObject = is_array($node['value']) && !array_is_list($node['value']);
+            
+            if ($isObject) {
+                $config = array_merge($node['value'], ['operator' => $node['operator']]);
+            } else {
+                $config = ['operator' => $node['operator'], 'value' => $node['value']];
+            }
+
+            // Adapter for built-in provider
+            if ($node['provider'] === 'builtin' && !$isObject) {
+                $val = is_array($node['value']) ? $node['value'] : [$node['value']];
+                if ($node['ruleType'] === 'contains_word') {
+                    $config = ['words' => $val];
+                } elseif ($node['ruleType'] === 'regex') {
+                    $config = ['patterns' => $val];
+                }
+            }
+
+            $result = $provider->evaluate($node['ruleType'], $content, $config);
+            return $result;
         } catch (\Throwable $e) {
             $this->logger->error('[filter-rule-manager] provider evaluate() threw', [
-                'provider' => $rule->provider,
-                'type' => $rule->type,
-                'rule_id' => $rule->id,
+                'provider' => $node['provider'],
+                'type' => $node['ruleType'],
                 'exception' => $e,
             ]);
             return null;
         }
-
-        if ($rule->negate) {
-            return $result === null ? [] : null;
-        }
-
-        return $result;
     }
 
     public function scopeMatches(Ruleset $ruleset, $discussion): bool
@@ -147,7 +175,23 @@ class RuleEvaluator
     {
         return preg_replace_callback('/\{\{(\w+)\}\}/', function (array $m) use ($tokens) {
             if (isset($tokens[$m[1]])) {
-                return htmlspecialchars((string) $tokens[$m[1]], ENT_QUOTES, 'UTF-8');
+                $val = $tokens[$m[1]];
+                if (is_array($val)) {
+                    // Flatten multi-dimensional arrays from recursive merges
+                    $flatten = function ($array) use (&$flatten) {
+                        $result = [];
+                        foreach ($array as $item) {
+                            if (is_array($item)) {
+                                $result = array_merge($result, $flatten($item));
+                            } else {
+                                $result[] = $item;
+                            }
+                        }
+                        return $result;
+                    };
+                    $val = implode(', ', array_unique($flatten($val)));
+                }
+                return htmlspecialchars((string) $val, ENT_QUOTES, 'UTF-8');
             }
             return $m[0];
         }, $template);

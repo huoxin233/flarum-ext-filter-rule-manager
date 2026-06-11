@@ -7,6 +7,7 @@ import icon from 'flarum/common/helpers/icon';
 
 import RuleBuilder from './RuleBuilder';
 import filterEngine from '../../common/FilterEngine';
+import { parseExpression } from '../utils/ExpressionParser';
 
 /**
  * Sectioned editor for a ruleset:
@@ -34,7 +35,7 @@ export default class RulesetEditorModal extends Modal {
 
     this.name = Stream(this.ruleset ? this.ruleset.name() : '');
     this.priority = Stream(this.ruleset ? this.ruleset.priority() : 0);
-    this.ruleOperator = Stream(this.ruleset ? this.ruleset.ruleOperator() : 'AND');
+    this.expression = Stream(this.ruleset ? this.ruleset.expression() : '');
     this.effectType = Stream(this.ruleset ? this.ruleset.effectType() : 'info');
     this.displayMode = Stream(this.ruleset ? this.ruleset.displayMode() : 'banner');
     this.message = Stream(this.ruleset ? this.ruleset.message() : '');
@@ -50,19 +51,6 @@ export default class RulesetEditorModal extends Modal {
     this.requireApproval = Stream(this.ruleset ? this.ruleset.requireApproval() : null);
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
-
-    const rawRules = (this.ruleset && this.ruleset.rules && this.ruleset.rules()) || [];
-    const initialRules = rawRules.map((r) => {
-      const get = (key) => (typeof r[key] === 'function' ? r[key]() : r[key]);
-      return {
-        provider: get('provider') || '',
-        type: get('type') || '',
-        config: get('config') || {},
-        negate: !!get('negate'),
-        sortOrder: typeof get('sortOrder') === 'number' ? get('sortOrder') : undefined,
-      };
-    });
-    this.rules = Stream(initialRules);
   }
 
   className() {
@@ -171,6 +159,15 @@ export default class RulesetEditorModal extends Modal {
           </Switch>
           <div className="helpText">
             {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade_help')}
+          </div>
+        </div>
+
+        <div className="Form-group">
+          <Switch state={this.evaluateAllRules()} onchange={this.evaluateAllRules}>
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules')}
+          </Switch>
+          <div className="helpText">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules_help')}
           </div>
         </div>
       </div>
@@ -407,38 +404,9 @@ export default class RulesetEditorModal extends Modal {
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_rules')}</h4>
         </div>
 
-        {this.nullableBooleanSelect(
-          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_label',
-          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_help',
-          this.evaluateTitle
-        )}
-
-        <div className="Form-group">
-          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_rule_operator')}</label>
-          <Select
-            options={{
-              AND: app.translator.trans('huoxin-filter-rule-manager.admin.rule_operator_and'),
-              OR: app.translator.trans('huoxin-filter-rule-manager.admin.rule_operator_or'),
-            }}
-            value={this.ruleOperator()}
-            onchange={this.ruleOperator}
-          />
-        </div>
-
-        <div className="Form-group">
-          <Switch state={this.evaluateAllRules()} onchange={this.evaluateAllRules}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules')}
-          </Switch>
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules_help')}
-          </div>
-        </div>
-
-        <hr className="RulesetEditor-divider" />
-
         <RuleBuilder
-          rules={this.rules()}
-          onchange={this.rules}
+          expression={this.expression()}
+          onchange={this.expression}
           providers={this.providers}
         />
 
@@ -477,25 +445,44 @@ export default class RulesetEditorModal extends Modal {
       });
     };
 
-    for (const rule of this.rules() || []) {
-      if (!rule.provider || !rule.type) continue;
+    let ast = null;
+    try {
+      ast = parseExpression(this.expression() || '');
+    } catch (e) {
+      // Ignore parse errors, user might be typing
+    }
 
+    const activeRules = [];
+    const traverse = (node) => {
+      if (!node) return;
+      if (node.type === 'rule' && node.provider && node.ruleType) {
+        activeRules.push(node);
+      } else if (node.type === 'logical') {
+        traverse(node.left);
+        traverse(node.right);
+      } else if (node.type === 'not') {
+        traverse(node.node);
+      }
+    };
+    traverse(ast);
+
+    for (const rule of activeRules) {
       // 1) Frontend provider
       const fp = (app.filterRuleManager && typeof app.filterRuleManager.getProvider === 'function')
         ? app.filterRuleManager.getProvider(rule.provider)
         : null;
       if (fp && typeof fp.getProvidedTokens === 'function') {
-        const tokens = fp.getProvidedTokens(rule.type) || [];
-        tokens.forEach((t) => push(t, `${rule.provider}/${rule.type}`));
-        continue; // frontend takes precedence
+        const ftokens = fp.getProvidedTokens(rule.ruleType) || [];
+        ftokens.forEach((t) => push(t, `${rule.provider}/${rule.ruleType}`));
+        continue;
       }
 
-      // 2) Backend metadata from /providers
+      // 2) Backend metadata
       const meta = (this.providers || []).find(
-        (p) => p.provider === rule.provider && p.type === rule.type
+        (p) => p.provider === rule.provider && p.type === rule.ruleType
       );
       const tokens = (meta && Array.isArray(meta.tokens)) ? meta.tokens : [];
-      tokens.forEach((t) => push(t, `${rule.provider}/${rule.type}`));
+      tokens.forEach((t) => push(t, `${rule.provider}/${rule.ruleType}`));
     }
 
     return out;
@@ -620,7 +607,7 @@ export default class RulesetEditorModal extends Modal {
     if (!this.name() || !this.name().trim()) return false;
     if (!this.message() || !this.message().trim()) return false;
     if (this.scopeType() === 'tag' && (!this.scopeTagIds() || this.scopeTagIds().length === 0)) return false;
-    if ((this.rules() || []).length === 0) return false;
+    if (!this.expression() || !this.expression().trim()) return false;
     return true;
   }
 
@@ -634,8 +621,8 @@ export default class RulesetEditorModal extends Modal {
     if (this.scopeType() === 'tag' && (!this.scopeTagIds() || this.scopeTagIds().length === 0)) {
       return app.translator.trans('huoxin-filter-rule-manager.admin.validation.tags_required');
     }
-    if ((this.rules() || []).length === 0) {
-      return app.translator.trans('huoxin-filter-rule-manager.admin.validation.rules_required');
+    if (!this.expression() || !this.expression().trim()) {
+      return app.translator.trans('huoxin-filter-rule-manager.admin.validation.expression_required');
     }
     return null;
   }
@@ -654,7 +641,7 @@ export default class RulesetEditorModal extends Modal {
     const data = {
       name: this.name(),
       priority: this.priority(),
-      ruleOperator: this.ruleOperator(),
+      expression: this.expression(),
       effectType: this.effectType(),
       displayMode: this.displayMode(),
       message: this.message(),
@@ -670,7 +657,6 @@ export default class RulesetEditorModal extends Modal {
       requireApproval: this.requireApproval(),
       scopeType: this.scopeType(),
       scopeTagIds: this.scopeTagIds(),
-      rules: this.rules(),
     };
 
     try {

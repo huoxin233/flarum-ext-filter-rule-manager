@@ -9,7 +9,8 @@ class Ruleset extends Model {}
 Object.assign(Ruleset.prototype, {
   name: Model.attribute('name'),
   priority: Model.attribute('priority'),
-  ruleOperator: Model.attribute('ruleOperator'),
+  expression: Model.attribute('expression'),
+  compiledAst: Model.attribute('compiledAst'),
   effectType: Model.attribute('effectType'),
   displayMode: Model.attribute('displayMode'),
   message: Model.attribute('message'),
@@ -25,9 +26,6 @@ Object.assign(Ruleset.prototype, {
   requireApproval: Model.attribute('requireApproval'),
   scopeType: Model.attribute('scopeType'),
   scopeTagIds: Model.attribute('scopeTagIds'),
-  // Rules are inlined as a JSON attribute (array of POJOs) — see
-  // RulesetSerializer. They are NOT separate JSON:API resources.
-  rules: Model.attribute('rules'),
 });
 
 export { Ruleset };
