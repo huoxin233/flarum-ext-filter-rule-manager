@@ -31,30 +31,22 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
     if (app.filterRuleDispatcher) app.filterRuleDispatcher.dismissAll();
   });
 
-  // ── `header_banner` mode: injected via ComposerBody.headerItems ──────────
-  // Sits inside <ul.ComposerBody-header>, narrower than the composer width
-  // (aligned with the editor). Sidebar shares this hook because its
-  // position:absolute lifts it out anyway.
+  // ── `header_banner` and `sidebar` mode: injected via ComposerBody.headerItems ──────────
   extend(ComposerBody.prototype, 'headerItems', function (items) {
     if (!filterEngine.hasAlerts) return;
-    items.add('filter-rule-header-banner', <FilterRuleBanner variant="header_banner" />, 100);
-    items.add('filter-rule-sidebar',       <FilterRuleBanner variant="sidebar"       />, 90);
+    items.add('filter-rule-header-banner', <FilterRuleBanner variant="header_banner" />, -10);
+    items.add('filter-rule-sidebar',       <FilterRuleBanner variant="sidebar"       />, -20);
   });
 
-  // ── `banner` mode: injected at .App-composer > .container level ──────────
-  // This sits ABOVE the entire #composer mount, full container width with the
-  // negative left / positive right margin to align visually with the editor.
-  // We can't render it from Composer.view() because the .Composer root only
-  // returns one vnode — instead we DOM-mount a sibling node before #composer
-  // and let Mithril keep it in sync via m.mount + FilterEngine.subscribe.
+  // ── `banner` mode: injected at the top of #composer ─────────────────────
   extend(Composer.prototype, 'oncreate', function () {
     const composerEl = document.getElementById('composer');
-    if (!composerEl || !composerEl.parentElement) return;
-    if (this.alertBannerHost) return; // defensive: oncreate fires once but be safe
+    if (!composerEl || this.alertBannerHost) return;
 
     this.alertBannerHost = document.createElement('div');
     this.alertBannerHost.className = 'FilterRuleManager-host';
-    composerEl.parentElement.insertBefore(this.alertBannerHost, composerEl);
+    // Insert at the very beginning of #composer, above the .Composer card
+    composerEl.insertBefore(this.alertBannerHost, composerEl.firstChild);
 
     m.mount(this.alertBannerHost, {
       view: () => m(FilterRuleBanner, { variant: 'banner' }),

@@ -24,27 +24,81 @@
   padding: 0;
 }
 
+// Fix drag handle blocked by relative content context
+.Composer .Composer-handle {
+  z-index: 10;
+}
+
+// Ensure the header flexbox can wrap so the banner goes on a new line
+.ComposerBody-header {
+  flex-wrap: wrap;
+}
+
+// header_banner lives inside ComposerBody-header which has margin-right: 120px
+// (Flarum reserves that for the minimize/fullscreen/close controls). Extend
+// the banner to the full content width with a compensating negative margin.
+.ComposerBody-header > .item-filter-rule-header-banner {
+  flex-basis: 100%;
+  order: 99;
+  margin-right: -120px;
+}
+
+// Hide completely when empty (no active alerts, or grouped away on mobile)
+// This prevents layout shifts from the negative margin.
+.ComposerBody-header > .item-filter-rule-header-banner:empty,
+.ComposerBody-header > .item-filter-rule-sidebar:empty {
+  display: none !important;
+}
+
+@media @phone {
+  // On mobile, Flarum's top bar layout cannot safely host these items.
+  // FilterRuleBanner.js groups them into the main 'banner' host instead.
+  .ComposerBody-header > .item-filter-rule-header-banner,
+  .ComposerBody-header > .item-filter-rule-sidebar {
+    display: none !important;
+  }
+}
+
 // -------------------------------------------------------------------------
-// Host element created by Composer.oncreate at the .App-composer > .container
-// level — sibling of #composer, sitting above it.
+// Host element
 // -------------------------------------------------------------------------
 
 .FilterRuleManager-host {
-  // Lays out as a normal block element. m.mount() renders nothing inside
-  // when there are no banner-mode alerts, so the host collapses to height 0.
+  // Use width:auto so margin-left/margin-right on desktop actually constrain
+  // the box width rather than being added on top of a fixed 100% width.
+  width: auto;
+
+  // On phone, .Composer is a fixed full-screen overlay that covers the
+  // entire screen from top. Normal-flow elements behind it are hidden.
+  // We use position:fixed to anchor the banner below the composer (which
+  // occupies top:0 with height ~350px + header).
+  @media @phone {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 350px; // below the fixed-height phone composer
+    z-index: var(--zindex-composer);
+    padding: 6px 15px 8px;
+  }
+
+  // On desktop, match .Composer's margins exactly:
+  //   - Index page (.App--index): margin-left: 220px
+  //   - Discussion page (.App--discussion): margin-left: -20px; margin-right: 205px
+  @media @desktop-up {
+    margin-left: 220px;
+
+    .App--discussion & {
+      margin-left: -20px;
+      margin-right: 205px;
+    }
+  }
 }
 
-// Container-level banner: aligned with the editor by negative left margin
-// (escape the .container padding) and positive right margin (clear the
-// avatar gutter). On phones the composer is full-screen so drop the gutter.
 .FilterRuleManager--banner {
-  margin-left: -20px;
-  margin-right: 205px;
-  margin-bottom: 6px;
-
-  @media (max-width: 767px) {
-    margin-left: 0;
-    margin-right: 0;
+  width: 100%;
+  // Remove bottom margin on phone — the strip padding handles spacing.
+  @media @tablet-up {
+    margin-bottom: 6px;
   }
 }
 
@@ -63,24 +117,20 @@
   border-radius: 6px;
   font-size: 13px;
   line-height: 1.4;
-  border-left: 3px solid transparent;
 
   &--info {
     background: @filter-rule-info-bg;
     color: @filter-rule-info-color;
-    border-left-color: darken(@filter-rule-info-color, 5%);
   }
 
   &--warning {
     background: @filter-rule-warning-bg;
     color: @filter-rule-warning-color;
-    border-left-color: darken(@filter-rule-warning-color, 5%);
   }
 
   &--block {
     background: @filter-rule-error-bg;
     color: @filter-rule-error-color;
-    border-left-color: darken(@filter-rule-error-color, 5%);
   }
 
   &-icon {
@@ -97,15 +147,19 @@
 }
 
 // -------------------------------------------------------------------------
-// Sidebar variant — vertical floating card on the right of the composer.
-// Positioned relative to .ComposerBody (made position: relative above).
+// Hint panel variant
 // -------------------------------------------------------------------------
 
-.FilterRuleManager-sidebar {
+// Make Composer-content the anchor for the absolute hint panel.
+.Composer .Composer-content {
+  position: relative;
+}
+
+.FilterRuleManager--sidebar {
   position: absolute;
   top: 12px;
-  right: 16px;
-  width: 260px;
+  right: 0;           // flush with Composer-content right edge (has 20px padding)
+  width: 240px;
   max-width: calc(50% - 24px);
   z-index: 5;
   padding: 10px 12px;
@@ -117,8 +171,7 @@
   flex-direction: column;
   gap: 6px;
 
-  // On narrow screens / mobile, fall back to inline flow so it doesn't
-  // overlap the editor.
+  // On narrow screens / mobile, fall back to inline flow.
   @media (max-width: 768px) {
     position: static;
     width: auto;
@@ -127,7 +180,7 @@
     box-shadow: none;
   }
 
-  &Title {
+  .FilterRuleManager-sidebarTitle {
     display: flex;
     align-items: center;
     gap: 6px;

@@ -16,17 +16,30 @@ import icon from 'flarum/common/helpers/icon';
  * component.
  */
 export default class FilterRuleBanner extends Component {
+  oninit(vnode) {
+    super.oninit(vnode);
+    this.isSidebarClosed = false;
+  }
+
   view() {
     const variant = this.attrs.variant;
     const items = this._matchingItems(variant);
     if (items.length === 0) return null;
 
     if (variant === 'sidebar') {
+      if (this.isSidebarClosed) return null;
       return (
         <aside className="FilterRuleManager FilterRuleManager--sidebar" aria-label="Composer hints">
           <div className="FilterRuleManager-sidebarTitle">
             {icon('fas fa-shield-alt')}
-            <span>Composer hints</span>
+            <span style="flex: 1;">Composer hints</span>
+            <button 
+              className="Button Button--icon Button--link" 
+              onclick={() => this.isSidebarClosed = true}
+              style="padding: 0; min-width: 0; min-height: 0; line-height: 1; color: inherit;"
+            >
+              {icon('fas fa-times')}
+            </button>
           </div>
           {items.map((alert, i) => this._renderItem(alert, i, 'sidebar'))}
         </aside>
@@ -43,15 +56,18 @@ export default class FilterRuleBanner extends Component {
   }
 
   _matchingItems(variant) {
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile && variant !== 'banner') return [];
+    
     const active = filterEngine.activeAlerts
-      .filter((a) => a.ruleset.displayMode === variant)
+      .filter((a) => isMobile ? true : a.ruleset.displayMode === variant)
       .map((a) => ({
         type: a.ruleset.effectType,
         message: a.message,
         key: `rs-${a.ruleset.id}`,
       }));
     const blocks = filterEngine.blockResults
-      .filter((a) => a.displayMode === variant)
+      .filter((a) => isMobile ? true : a.displayMode === variant)
       .map((a, i) => ({
         type: a.effectType,
         message: a.message,
