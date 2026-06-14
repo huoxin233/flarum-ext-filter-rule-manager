@@ -3,8 +3,12 @@ huoxin-filter-rule-manager:
     # ── Page chrome ────────────────────────────────────────────────────────
     tabs:
       rulesets: "Rulesets"
-      providers: "Providers"
+      registry: "Registry"
       settings: "Settings"
+    registry_tabs:
+      providers: "Condition Providers"
+      templates: "Display Templates"
+      modes: "Display Modes"
     add_ruleset: "Add ruleset"
     edit_ruleset: "Edit ruleset"
     no_rulesets: "No rulesets have been created yet. Create one to start showing filter rules."
@@ -41,6 +45,10 @@ huoxin-filter-rule-manager:
       label: "Label"
       runs: "Runs"
       tokens: "Tokens"
+      template: "Template"
+      component: "Component Class"
+      has_settings: "Has Settings UI"
+      identifier: "Identifier"
 
     scope_filters:
       all: "All"

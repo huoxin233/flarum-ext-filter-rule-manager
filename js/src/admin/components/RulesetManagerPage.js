@@ -20,7 +20,8 @@ export default class RulesetManagerPage extends ExtensionPage {
     this.rulesets = [];
     this.providers = [];
     this.reordering = false;
-    this.toggling = new Set();          // ruleset ids currently saving isActive
+    this.toggling = new Set();
+    this.registryFilter = 'providers';
 
     this.loadData();
   }
@@ -42,16 +43,19 @@ export default class RulesetManagerPage extends ExtensionPage {
         .slice()
         .sort((a, b) => (a.priority() || 0) - (b.priority() || 0));
 
-      this.providers = (providersResponse.data || []).slice();
+      this.providers = (providersResponse.data || []).map(p => Object.assign({}, p, { scope: 'backend' }));
       const frontendProviders = app.filterRuleManager
         ? app.filterRuleManager.getRegisteredFrontendTypes()
         : [];
       frontendProviders.forEach((fp) => {
-        if (!this.providers.find((p) => p.provider === fp.provider && p.type === fp.type)) {
+        const existing = this.providers.find((p) => p.provider === fp.provider && p.type === fp.type);
+        if (existing) {
+          existing.scope = 'both';
+        } else {
           this.providers.push({
             provider: fp.provider,
             type: fp.type,
-            label: `${fp.label || fp.type} (frontend only)`,
+            label: fp.label || fp.type,
             scope: 'frontend',
             tokens: [],
           });
@@ -87,12 +91,11 @@ export default class RulesetManagerPage extends ExtensionPage {
               <span className="Button-badge">{this.rulesets.length}</span>
             </Button>
             <Button
-              className={`Button ${this.activeTab === 'providers' ? 'active' : ''}`}
-              onclick={() => { this.activeTab = 'providers'; m.redraw(); }}
+              className={`Button ${this.activeTab === 'registry' ? 'active' : ''}`}
+              onclick={() => { this.activeTab = 'registry'; m.redraw(); }}
             >
               <i className="fas fa-plug"></i>
-              {app.translator.trans('huoxin-filter-rule-manager.admin.tabs.providers')}
-              <span className="Button-badge">{this.providers.length}</span>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.tabs.registry')}
             </Button>
             <Button
               className={`Button ${this.activeTab === 'settings' ? 'active' : ''}`}
@@ -117,7 +120,7 @@ export default class RulesetManagerPage extends ExtensionPage {
 
         <div className="FilterRulePage-content">
           {this.activeTab === 'rulesets' && this.rulesetsTab()}
-          {this.activeTab === 'providers' && this.providersTab()}
+          {this.activeTab === 'registry' && this.registryTab()}
           {this.activeTab === 'settings' && this.settingsTab()}
         </div>
       </div>
@@ -379,9 +382,35 @@ export default class RulesetManagerPage extends ExtensionPage {
     return 'fas fa-info-circle';
   }
 
-  // ── Providers tab ────────────────────────────────────────────────────────
+  // ── Registry tab (sub-tabs + lists) ────────────────────────────────────────────────────────
 
-  providersTab() {
+  registryTab() {
+    const REGISTRY_SCOPES = ['providers', 'templates', 'modes'];
+    return (
+      <div className="RegistryTab">
+        <div className="FilterRulePage-subtabs">
+          {REGISTRY_SCOPES.map((scope) => (
+            <button
+              type="button"
+              key={scope}
+              className={`SubTab ${this.registryFilter === scope ? 'active' : ''}`}
+              onclick={() => { this.registryFilter = scope; m.redraw(); }}
+            >
+              <span className="SubTab-label">
+                {app.translator.trans(`huoxin-filter-rule-manager.admin.registry_tabs.${scope}`)}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {this.registryFilter === 'providers' && this.renderProviders()}
+        {this.registryFilter === 'templates' && this.renderTemplates()}
+        {this.registryFilter === 'modes' && this.renderModes()}
+      </div>
+    );
+  }
+
+  renderProviders() {
     if (this.providers.length === 0) {
       return (
         <div className="EmptyState">
@@ -429,6 +458,65 @@ export default class RulesetManagerPage extends ExtensionPage {
             </div>
           </div>
         ))}
+      </div>
+    );
+  }
+
+  renderTemplates() {
+    const templates = app.filterRuleManager ? app.filterRuleManager.getTemplates() : {};
+    
+    return (
+      <div className="ProvidersList">
+        <div className="ProvidersList-group">
+          <h3 className="ProvidersList-groupTitle">Display Templates</h3>
+          <div className="CardList CardList--two-col">
+            <div className="CardList-header">
+              <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.template')}</span>
+              <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.has_settings')}</span>
+            </div>
+            {Object.keys(templates).map(name => {
+              const settingsComp = app.filterRuleManager.getTemplateSettingsComponent(name);
+              return (
+                <div className="CardList-item" key={name}>
+                  <div className="CardList-item-cell CardList-item-cell--primary" data-label="Template">
+                    <code>{name}</code>
+                  </div>
+                  <div className="CardList-item-cell" data-label="Has Settings UI">
+                    {settingsComp ? <i className="fas fa-check text-success"></i> : <i className="fas fa-times text-muted"></i>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderModes() {
+    const modes = app.filterRuleManager ? app.filterRuleManager.getDisplayModes() : {};
+    
+    return (
+      <div className="ProvidersList">
+        <div className="ProvidersList-group">
+          <h3 className="ProvidersList-groupTitle">Display Modes</h3>
+          <div className="CardList CardList--two-col">
+            <div className="CardList-header">
+              <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.identifier')}</span>
+              <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.label')}</span>
+            </div>
+            {Object.keys(modes).map(mode => (
+              <div className="CardList-item" key={mode}>
+                <div className="CardList-item-cell CardList-item-cell--primary" data-label="Identifier">
+                  <code>{mode}</code>
+                </div>
+                <div className="CardList-item-cell" data-label="Label">
+                  {app.translator.trans(modes[mode])}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

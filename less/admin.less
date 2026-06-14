@@ -336,6 +336,10 @@
 
 .ProvidersList .CardList {
   --grid-cols: 200px 1fr 100px 2fr;
+
+  &--two-col {
+    --grid-cols: 250px 1fr;
+  }
 }
 
 .ProvidersList-group {
@@ -395,6 +399,7 @@
     &--tag          { background: fade(@success-color, 15%); color: darken(@success-color, 12%); }
     &--backend      { background: fade(@info-color, 12%);    color: darken(@info-color, 12%); }
     &--frontend     { background: fade(@success-color, 15%); color: darken(@success-color, 12%); }
+    &--both         { background: fade(@secondary-color, 15%); color: darken(@secondary-color, 12%); }
   }
 
   .StatusBadge {
