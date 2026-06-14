@@ -138,6 +138,8 @@ huoxin-filter-rule-manager:
       warning_help: "Real-time hint shown while typing. Requires user confirmation before the post is submitted."
       block: "Block"
       block_help: "Evaluated server-side at submit. The post is rejected and the user sees the message."
+      silent: "Silent"
+      silent_help: "Does not display anything to the user. Evaluated server-side to generate flags/require approval."
 
     scopes:
       global: "All posts"

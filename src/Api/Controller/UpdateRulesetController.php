@@ -65,7 +65,7 @@ class UpdateRulesetController extends AbstractShowController
             }
         }
 
-        if (isset($attributes['effectType']))   $ruleset->effect_type   = $this->validEnum($attributes['effectType'], ['info', 'warning', 'block'], $ruleset->effect_type);
+        if (isset($attributes['effectType']))   $ruleset->effect_type   = $this->validEnum($attributes['effectType'], ['info', 'warning', 'block', 'silent'], $ruleset->effect_type);
         if (isset($attributes['displayMode']))  $ruleset->display_mode  = $this->validEnum($attributes['displayMode'], ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], $ruleset->display_mode);
         if (isset($attributes['message']))      $ruleset->message       = (string) $attributes['message'];
         if (array_key_exists('flagMessage', $attributes)) $ruleset->flag_message = $attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage'];

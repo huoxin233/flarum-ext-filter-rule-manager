@@ -382,6 +382,7 @@
     &--info    { background: fade(@info-color, 15%);    color: darken(@info-color, 10%); }
     &--warning { background: fade(@warning-color, 15%); color: darken(@warning-color, 10%); }
     &--block   { background: fade(@error-color, 15%);   color: darken(@error-color, 10%); }
+    &--silent  { background: fade(@muted-color, 15%);   color: darken(@muted-color, 10%); }
   }
 
   .ScopeBadge {
@@ -592,6 +593,7 @@
   &--info.active    { border-color: @info-color;    background: fade(@info-color, 10%);    color: darken(@info-color, 10%); }
   &--warning.active { border-color: @warning-color; background: fade(@warning-color, 10%); color: darken(@warning-color, 10%); }
   &--block.active   { border-color: @error-color;   background: fade(@error-color, 10%);   color: darken(@error-color, 10%); }
+  &--silent.active  { border-color: var(--muted-color, @muted-color); background: fade(@muted-color, 10%); color: darken(@muted-color, 10%); }
 }
 
 // Live preview reuses the forum item styles
