@@ -69,7 +69,9 @@ class RuleNodeView extends Component {
     const providerOptions = {};
     providers.forEach((p) => {
       if (p.provider) {
-        providerOptions[p.provider] = p.providerLabel || p.provider;
+        const transKey = `huoxin-filter-rule-manager.admin.providers.${p.provider}`;
+        const translated = app.translator.trans(transKey);
+        providerOptions[p.provider] = (translated !== transKey && translated) ? translated : (p.providerLabel || p.provider);
       }
     });
 

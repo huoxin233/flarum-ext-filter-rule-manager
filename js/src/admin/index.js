@@ -4,6 +4,8 @@ import Model from 'flarum/common/Model';
 import filterEngine from '../common/FilterEngine';
 import RulesetManagerPage from './components/RulesetManagerPage';
 import BuiltinProvider from './providers/BuiltinProvider';
+import BuiltinTemplate from '../common/components/BuiltinTemplate';
+import BuiltinTemplateSettings from './components/BuiltinTemplateSettings';
 
 class Ruleset extends Model {}
 Object.assign(Ruleset.prototype, {
@@ -26,6 +28,7 @@ Object.assign(Ruleset.prototype, {
   requireApproval: Model.attribute('requireApproval'),
   scopeType: Model.attribute('scopeType'),
   scopeTagIds: Model.attribute('scopeTagIds'),
+  displaySettings: Model.attribute('displaySettings'),
 });
 
 export { Ruleset };
@@ -38,10 +41,17 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   // those types to appear in the admin rule builder.
   app.filterRuleManager = filterEngine;
 
-  // Register the admin-side builtin provider so RuleBuilder can mount its
+  filterEngine.registerDisplayMode('banner', 'huoxin-filter-rule-manager.admin.displays.banner');
+  filterEngine.registerDisplayMode('header_banner', 'huoxin-filter-rule-manager.admin.displays.header_banner');
+  filterEngine.registerDisplayMode('sidebar', 'huoxin-filter-rule-manager.admin.displays.sidebar');
+  filterEngine.registerDisplayMode('toast', 'huoxin-filter-rule-manager.admin.displays.toast');
+  filterEngine.registerDisplayMode('modal', 'huoxin-filter-rule-manager.admin.displays.modal');
+
+  // Register the admin-side Builtin provider so RuleBuilder can mount its
   // custom config components (WordsListConfig / PatternsListConfig) instead
   // of the generic JSON fallback.
   filterEngine.registerProvider('builtin', new BuiltinProvider());
+  filterEngine.registerTemplate('builtin', BuiltinTemplate, BuiltinTemplateSettings);
 
   app.store.models['filter-rule-rulesets'] = Ruleset;
 

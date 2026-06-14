@@ -1,3 +1,4 @@
+import app from 'flarum/forum/app';
 import Component from 'flarum/common/Component';
 import filterEngine from '../../common/FilterEngine';
 import icon from 'flarum/common/helpers/icon';
@@ -32,7 +33,7 @@ export default class FilterRuleBanner extends Component {
         <aside className="FilterRuleManager FilterRuleManager--sidebar" aria-label="Composer hints">
           <div className="FilterRuleManager-sidebarTitle">
             {icon('fas fa-shield-alt')}
-            <span style="flex: 1;">Composer hints</span>
+            <span style="flex: 1;">{app.translator.trans('huoxin-filter-rule-manager.forum.sidebar_title') || 'Composer hints'}</span>
             <button 
               className="Button Button--icon Button--link" 
               onclick={() => this.isSidebarClosed = true}
@@ -65,6 +66,7 @@ export default class FilterRuleBanner extends Component {
         type: a.ruleset.effectType,
         message: a.message,
         key: `rs-${a.ruleset.id}`,
+        displaySettings: a.ruleset.displaySettings,
       }));
     const blocks = filterEngine.blockResults
       .filter((a) => isMobile ? true : a.displayMode === variant)
@@ -72,23 +74,24 @@ export default class FilterRuleBanner extends Component {
         type: a.effectType,
         message: a.message,
         key: `block-${i}-${a.message}`,
+        displaySettings: null,
       }));
     return [...active, ...blocks];
   }
 
   _renderItem(alert, i, variant) {
-    const iconName = alert.type === 'block'   ? 'fas fa-times-circle'
-                   : alert.type === 'warning' ? 'fas fa-exclamation-triangle'
-                   :                            'fas fa-info-circle';
+    const templateName = (alert.displaySettings && alert.displaySettings.template) || 'builtin';
+    let TemplateComponent = filterEngine.getTemplate(templateName);
+    
+    // Fallback to builtin if template is unknown
+    if (!TemplateComponent) {
+      TemplateComponent = filterEngine.getTemplate('builtin');
+    }
+
+    if (!TemplateComponent) return null;
 
     return (
-      <div
-        key={alert.key || i}
-        className={`FilterRuleManager-item FilterRuleManager-item--${variant} FilterRuleManager-item--${alert.type}`}
-      >
-        <span className="FilterRuleManager-item-icon">{icon(iconName)}</span>
-        <span className="FilterRuleManager-item-message">{m.trust(alert.message)}</span>
-      </div>
+      <TemplateComponent key={alert.key || i} alert={alert} variant={variant} />
     );
   }
 }

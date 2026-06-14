@@ -54,6 +54,7 @@ class InjectFrontendRulesets
                 'blockCascade'     => $r->block_cascade,
                 'scopeType'        => $r->scope_type,
                 'scopeTagIds'  => $r->scope_tag_ids ?? [],
+                'displaySettings'  => $r->display_settings,
             ])
             ->toArray();
 

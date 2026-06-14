@@ -82,6 +82,9 @@ class UpdateRulesetController extends AbstractShowController
         if (array_key_exists('scopeTagIds', $attributes)) {
             $ruleset->scope_tag_ids = $this->sanitizeTagIds($attributes['scopeTagIds']);
         }
+        if (array_key_exists('displaySettings', $attributes)) {
+            $ruleset->display_settings = is_array($attributes['displaySettings']) ? $attributes['displaySettings'] : null;
+        }
 
         $ruleset->save();
 

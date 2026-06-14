@@ -12,11 +12,19 @@ import RuleDispatcher from './RuleDispatcher';
 import FilterRuleBanner from './components/FilterRuleBanner';
 import FilterRuleWarningModal from './components/FilterRuleWarningModal';
 import BuiltinProvider from './providers/BuiltinProvider';
+import BuiltinTemplate from '../common/components/BuiltinTemplate';
 
 app.initializers.add('huoxin/filter-rule-manager', () => {
   app.filterRuleManager = filterEngine;
 
+  filterEngine.registerDisplayMode('banner', 'huoxin-filter-rule-manager.admin.displays.banner');
+  filterEngine.registerDisplayMode('header_banner', 'huoxin-filter-rule-manager.admin.displays.header_banner');
+  filterEngine.registerDisplayMode('sidebar', 'huoxin-filter-rule-manager.admin.displays.sidebar');
+  filterEngine.registerDisplayMode('toast', 'huoxin-filter-rule-manager.admin.displays.toast');
+  filterEngine.registerDisplayMode('modal', 'huoxin-filter-rule-manager.admin.displays.modal');
+
   filterEngine.registerProvider('builtin', new BuiltinProvider());
+  filterEngine.registerTemplate('builtin', BuiltinTemplate);
   filterEngine.loadRulesets(app.data.filterRuleRulesets || []);
 
   app.filterRuleDispatcher = new RuleDispatcher(filterEngine);

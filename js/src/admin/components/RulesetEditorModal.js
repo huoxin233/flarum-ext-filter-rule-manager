@@ -50,6 +50,26 @@ export default class RulesetEditorModal extends Modal {
     this.requireApproval = Stream(this.ruleset ? this.ruleset.requireApproval() : null);
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
+    this.displaySettings = Stream(this.ruleset ? Object.assign({}, this.ruleset.displaySettings() || {}) : {});
+    this.showIconPicker = false;
+  }
+
+  oncreate(vnode) {
+    super.oncreate(vnode);
+    this.closeIconPickerHandler = (e) => {
+      if (this.showIconPicker && !e.target.closest('.IconPickerInput')) {
+        this.showIconPicker = false;
+        m.redraw();
+      }
+    };
+    document.addEventListener('click', this.closeIconPickerHandler);
+  }
+
+  onremove(vnode) {
+    if (this.closeIconPickerHandler) {
+      document.removeEventListener('click', this.closeIconPickerHandler);
+    }
+    super.onremove(vnode);
   }
 
   className() {
@@ -205,10 +225,26 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
+  displaySetting(key, val) {
+    let settings = this.displaySettings() || {};
+    if (typeof val !== 'undefined') {
+      const newSettings = Object.assign({}, settings);
+      newSettings[key] = val;
+      this.displaySettings(newSettings);
+      return val;
+    }
+    return settings[key];
+  }
+
+
+
   displaySection() {
     const effect = this.effectType();
     const displayMode = this.displayMode();
     const tokens = this.availableTokens();
+    const templateName = this.displaySetting('template') || 'builtin';
+    const templates = app.filterRuleManager.getTemplates();
+    const SettingsComponent = app.filterRuleManager.getTemplateSettingsComponent(templateName);
 
     return (
       <div className="RulesetEditor-section">
@@ -238,24 +274,6 @@ export default class RulesetEditorModal extends Modal {
         </div>
 
         <div className="Form-group">
-          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_mode')}</label>
-          <Select
-            options={{
-              banner: app.translator.trans('huoxin-filter-rule-manager.admin.displays.banner'),
-              header_banner: app.translator.trans('huoxin-filter-rule-manager.admin.displays.header_banner'),
-              sidebar: app.translator.trans('huoxin-filter-rule-manager.admin.displays.sidebar'),
-              toast: app.translator.trans('huoxin-filter-rule-manager.admin.displays.toast'),
-              modal: app.translator.trans('huoxin-filter-rule-manager.admin.displays.modal'),
-            }}
-            value={displayMode}
-            onchange={this.displayMode}
-          />
-          <div className="helpText">
-            {app.translator.trans(`huoxin-filter-rule-manager.admin.displays.${displayMode}_help`)}
-          </div>
-        </div>
-
-        <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message')}</label>
           <textarea
             className="FormControl"
@@ -272,6 +290,69 @@ export default class RulesetEditorModal extends Modal {
           </div>
           {this.tokenChipsBlock(tokens, 'message')}
         </div>
+
+        <hr className="RulesetEditor-divider" />
+
+        <div className="Form-group">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_mode')}</label>
+          <Select
+            options={
+              (app.filterRuleManager && typeof app.filterRuleManager.getDisplayModes === 'function')
+                ? Object.entries(app.filterRuleManager.getDisplayModes()).reduce((acc, [key, translationKey]) => {
+                    acc[key] = app.translator.trans(translationKey);
+                    return acc;
+                  }, {})
+                : { banner: app.translator.trans('huoxin-filter-rule-manager.admin.displays.banner') }
+            }
+            value={displayMode}
+            onchange={this.displayMode}
+          />
+          <div className="helpText">
+            {app.translator.trans(`huoxin-filter-rule-manager.admin.displays.${displayMode}_help`)}
+          </div>
+        </div>
+
+        <div className="Form-group">
+            <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title')}</label>
+            <input 
+              type="text"
+              className="FormControl" 
+              placeholder={app.translator.trans(`huoxin-filter-rule-manager.forum.modal_title_${effect}`)} 
+              value={this.displaySetting('title') || ''} 
+              oninput={(e) => this.displaySetting('title', e.target.value)} 
+            />
+            <div className="helpText">
+              {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_help')}
+            </div>
+          </div>
+
+        <div className="Form-group">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_template')}</label>
+          <Select
+            options={
+              (app.filterRuleManager && typeof app.filterRuleManager.getTemplates === 'function') 
+                ? Object.keys(app.filterRuleManager.getTemplates()).reduce((acc, k) => { 
+                    const transKey = `huoxin-filter-rule-manager.admin.templates.${k}`;
+                    const translated = app.translator.trans(transKey);
+                    acc[k] = (translated !== transKey && translated) ? translated : k;
+                    return acc; 
+                  }, {})
+                : { 'builtin': app.translator.trans('huoxin-filter-rule-manager.admin.templates.builtin') || 'Built-in' }
+            }
+            value={this.displaySetting('template') || 'builtin'}
+            onchange={(val) => this.displaySetting('template', val)}
+          />
+        </div>
+
+        {SettingsComponent && (
+          <SettingsComponent 
+            displaySetting={this.displaySetting.bind(this)} 
+            effectType={effect} 
+            displayMode={displayMode}
+          />
+        )}
+
+        <hr className="RulesetEditor-divider" />
 
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.preview')}</label>
@@ -530,22 +611,42 @@ export default class RulesetEditorModal extends Modal {
   }
 
   previewBlock(effect, message) {
-    const iconName = effect === 'block'   ? 'fas fa-times-circle'
-                   : effect === 'warning' ? 'fas fa-exclamation-triangle'
-                   :                        'fas fa-info-circle';
+    const settings = this.displaySettings() || {};
+    const templateName = settings.template || 'builtin';
+    
+    let TemplateComponent = filterEngine.getTemplate(templateName) || filterEngine.getTemplate('builtin');
 
-    // Sample tokens so admins see something rendered for known names.
-    const sampleTokens = {
-      matched_word: 'spam',
-      matched_pattern: '/sample/',
-      matched_string: 'sample-match',
-    };
+    // Generate sample tokens based on what the providers declare.
+    // e.g. "matched_word" -> "[matched_word]"
+    const sampleTokens = {};
+    const available = this.availableTokens() || [];
+    available.forEach(t => {
+      sampleTokens[t.name] = `[${t.name}]`;
+    });
+    
+    // Add some common fallbacks just in case the ruleset is completely empty
+    if (available.length === 0) {
+      sampleTokens['matched_word'] = '[matched_word]';
+      sampleTokens['matched_pattern'] = '[matched_pattern]';
+      sampleTokens['matched_string'] = '[matched_string]';
+    }
+
     const rendered = filterEngine.interpolate(message, sampleTokens);
 
+    const dummyAlert = {
+      type: effect,
+      message: rendered,
+      displaySettings: settings,
+      key: 'preview-alert',
+    };
+
+    if (!TemplateComponent) {
+      return <div>Loading template...</div>;
+    }
+
     return (
-      <div className={`FilterRuleManager-preview FilterRuleManager-item--${effect}`}>
-        <span className="FilterRuleManager-item-icon">{icon(iconName)}</span>
-        <span className="FilterRuleManager-item-message">{m.trust(rendered)}</span>
+      <div className="FilterRuleManager-preview">
+        <TemplateComponent alert={dummyAlert} variant={this.displayMode()} />
       </div>
     );
   }
@@ -642,6 +743,7 @@ export default class RulesetEditorModal extends Modal {
       requireApproval: this.requireApproval(),
       scopeType: this.scopeType(),
       scopeTagIds: this.scopeTagIds(),
+      displaySettings: this.displaySettings(),
     };
 
     try {

@@ -82,6 +82,20 @@ huoxin-filter-rule-manager:
 
     ruleset_effect_type: "Effect"
     ruleset_display_mode: "Display mode"
+    ruleset_display_template: "Display Template"
+    ruleset_custom_title: "Custom Title"
+    ruleset_custom_title_help: "Optional. Overrides the default translated title for modals and toasts."
+    ruleset_toast_theme: "Toast Theme"
+    ruleset_toast_theme_auto: "Auto (Based on Effect)"
+    ruleset_toast_theme_success: "Success (Green)"
+    ruleset_toast_theme_error: "Error (Red)"
+    ruleset_toast_theme_warning: "Warning (Yellow)"
+    ruleset_custom_icon: "Icon"
+    ruleset_custom_icon_color: "Icon Color"
+    ruleset_custom_text_color: "Text Color"
+    ruleset_custom_bg_color: "Background Color"
+    ruleset_no_icon: "None"
+    ruleset_override_styles_confirm: "You already have custom styles configured. Do you want to override them with the defaults for this effect type?"
     ruleset_scope_type: "Applies to"
     ruleset_scope_tags: "Tag IDs"
     ruleset_scope_tags_help: "Comma-separated integer tag IDs. The ruleset will run when the discussion has any of these tags."
@@ -131,6 +145,12 @@ huoxin-filter-rule-manager:
       private_post: "Private Discussions"
       tag: "Specific tags"
 
+    templates:
+      builtin: "Built-in"
+
+    providers:
+      builtin: "Built-in"
+
     displays:
       banner: "Banner"
       banner_help: "Full-width strip rendered above the entire composer (inside .App-composer > .container, before #composer). Aligns visually with the editor."
@@ -142,9 +162,6 @@ huoxin-filter-rule-manager:
       toast_help: "Transient notification at the top of the page. Re-appears if the user dismisses it while the rule is still firing."
       modal: "Modal"
       modal_help: "Modal dialog interrupting the user. Shown once per ruleset firing — re-opens only after the rule clears and triggers again."
-
-    providers:
-      builtin: "Built-in"
 
     # ── Rule type labels ─────────────────────────────────────────────────
     type_contains_word: "Contains word(s)"
@@ -194,6 +211,9 @@ huoxin-filter-rule-manager:
     modal_title_warning: "Warning"
     modal_title_block: "Post blocked"
     modal_ok: "OK"
+
+    # ── Sidebar ────────────────────────────────────────────────────────────
+    sidebar_title: "Composer hints"
 
     # ── Auto Flag ──────────────────────────────────────────────────────────
     flag_message: "Auto-flagged by Filter Rule Manager. Triggered rulesets: {rulesets}"

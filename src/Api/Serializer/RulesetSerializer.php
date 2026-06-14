@@ -52,6 +52,7 @@ class RulesetSerializer extends AbstractSerializer
             'scopeType'     => $model->scope_type,
             'scopeTagIds'   => $model->scope_tag_ids ?? [],
             'groupIds'      => $model->group_ids ?? [],
+            'displaySettings' => $model->display_settings ?? [],
 
             'createdAt'     => $this->formatDate($model->created_at),
             'updatedAt'     => $this->formatDate($model->updated_at),

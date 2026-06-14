@@ -82,6 +82,7 @@ class EvaluateBlockRulesets
                 'message' => $this->evaluator->interpolate($ruleset->message, $tokens),
                 'tokens' => $tokens,
                 'content' => $targetContent,
+                'display_settings' => $ruleset->display_settings,
             ];
 
             if ($ruleset->block_cascade) {

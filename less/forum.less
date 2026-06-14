@@ -2,12 +2,7 @@
 // Filter Rule Manager — forum styles
 // =========================================================================
 
-@filter-rule-info-bg:    #e8f4f8;
-@filter-rule-info-color: #2b7c93;
-@filter-rule-warning-bg: #fff4e5;
-@filter-rule-warning-color: #8a6d3b;
-@filter-rule-error-bg:   #fde8e8;
-@filter-rule-error-color: #a94442;
+@import "common.less";
 
 // -------------------------------------------------------------------------
 // Wrapper injected as ComposerBody.headerItems entries — Flarum wraps each
@@ -109,42 +104,6 @@
   gap: 6px;
 }
 
-.FilterRuleManager-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  line-height: 1.4;
-
-  &--info {
-    background: @filter-rule-info-bg;
-    color: @filter-rule-info-color;
-  }
-
-  &--warning {
-    background: @filter-rule-warning-bg;
-    color: @filter-rule-warning-color;
-  }
-
-  &--block {
-    background: @filter-rule-error-bg;
-    color: @filter-rule-error-color;
-  }
-
-  &-icon {
-    flex-shrink: 0;
-    font-size: 14px;
-    display: inline-flex;
-  }
-
-  &-message {
-    flex: 1;
-    min-width: 0;
-    word-wrap: break-word;
-  }
-}
 
 // -------------------------------------------------------------------------
 // Hint panel variant

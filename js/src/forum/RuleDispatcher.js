@@ -1,3 +1,4 @@
+import app from 'flarum/forum/app';
 import FilterRuleModal from './components/FilterRuleModal';
 
 /**
@@ -35,15 +36,17 @@ export default class RuleDispatcher {
       const id = `rs-${alert.ruleset.id}`;
       const displayMode = alert.ruleset.displayMode;
       const type = alert.ruleset.effectType === 'warning' ? 'warning' : 'info';
+      const settings = alert.ruleset.displaySettings || {};
       seen.add(id);
-      this._maybeShow(id, displayMode, type, alert.message);
+      this._maybeShow(id, displayMode, type, alert.message, settings);
     }
 
     // 2) server-evaluated (block) alerts
     this.engine.blockResults.forEach((alert, i) => {
       const id = `block-${i}-${alert.message}`;
+      const settings = alert.displaySettings || {};
       seen.add(id);
-      this._maybeShow(id, alert.displayMode, 'block', alert.message);
+      this._maybeShow(id, alert.displayMode, 'block', alert.message, settings);
     });
 
     // 3) tear down anything that's no longer firing
@@ -52,31 +55,33 @@ export default class RuleDispatcher {
     }
   }
 
-  _maybeShow(id, displayMode, type, message) {
+  _maybeShow(id, displayMode, type, message, displaySettings = {}) {
     if (displayMode !== 'toast' && displayMode !== 'modal') return;
 
     const app = window.app;
     const existing = this._displayed.get(id);
 
     if (existing) {
-      // Toasts: if the user dismissed it by hand, app.alerts no longer holds
-      // our key — re-display while the rule is still firing so the alert
-      // stays persistent. Modals: always treat as "still shown" since
-      // re-opening on every poll tick is hostile UX.
-      if (existing.displayMode === 'toast' && this._isToastDismissed(app, existing.alertKey)) {
-        this._displayed.delete(id);
-        // fall through to re-show
-      } else {
-        return;
-      }
+      return;
     }
 
     if (displayMode === 'toast') {
+      const defaultToastType = type === 'block' ? 'error' : type;
+      const alertAttrs = {
+        type: displaySettings.toastTheme || defaultToastType,
+        dismissible: true,
+      };
+
+      if (displaySettings.icon && displaySettings.icon !== 'none') {
+        alertAttrs.icon = displaySettings.icon;
+      }
+      
+      if (displaySettings.title) {
+        alertAttrs.title = app.translator.trans(displaySettings.title);
+      }
+
       const alertKey = app.alerts.show(
-        {
-          type: type === 'block' ? 'error' : type,
-          dismissible: true,
-        },
+        alertAttrs,
         m.trust(message)
       );
       this._displayed.set(id, { displayMode, alertKey });
@@ -84,27 +89,16 @@ export default class RuleDispatcher {
     }
 
     if (displayMode === 'modal') {
-      app.modal.show(FilterRuleModal, { message, type });
+      app.modal.show(FilterRuleModal, { message, type, displaySettings });
       this._displayed.set(id, { displayMode, alertKey: null });
       return;
     }
   }
 
-  /**
-   * Returns true if our previously-shown toast is no longer in the alert
-   * manager's active set (i.e. the user clicked the X). Flarum's
-   * AlertManager exposes `activeAlerts` as an object keyed by id.
-   */
-  _isToastDismissed(app, alertKey) {
-    if (alertKey == null) return false;
-    if (!app.alerts || !app.alerts.activeAlerts) return false;
-    return !Object.prototype.hasOwnProperty.call(app.alerts.activeAlerts, alertKey);
-  }
-
   _dismiss(id) {
     const info = this._displayed.get(id);
     if (!info) return;
-    const app = (typeof window !== 'undefined' && window.app) || null;
+
     if (info.displayMode === 'toast' && info.alertKey != null && app && app.alerts) {
       try { app.alerts.dismiss(info.alertKey); } catch (e) { /* ignore */ }
     }

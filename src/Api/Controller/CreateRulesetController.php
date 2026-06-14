@@ -73,6 +73,7 @@ class CreateRulesetController extends AbstractCreateController
         $ruleset->require_approval = array_key_exists('requireApproval', $attributes) ? ($attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval']) : null;
         $ruleset->scope_type    = $this->validEnum($attributes['scopeType'] ?? 'global', ['global', 'normal_post', 'private_post', 'tag'], 'global');
         $ruleset->scope_tag_ids = $this->sanitizeTagIds($attributes['scopeTagIds'] ?? null);
+        $ruleset->display_settings = is_array($attributes['displaySettings'] ?? null) ? $attributes['displaySettings'] : null;
         $ruleset->save();
 
         return $ruleset;

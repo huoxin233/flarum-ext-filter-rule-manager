@@ -25,6 +25,8 @@ class FilterEngine {
   constructor() {
     this.rulesets = [];
     this.providers = {};
+    this.templates = {};
+    this.displayModes = {};
     this.activeAlerts = [];
     this.blockResults = [];
     this.intervalId = null;
@@ -87,6 +89,58 @@ class FilterEngine {
     return this.providers[name] || null;
   }
 
+  /**
+   * Register a display template component.
+   */
+  registerTemplate(name, component, settingsComponent = null) {
+    this.templates[name] = {
+      component,
+      settingsComponent,
+    };
+  }
+
+  /**
+   * Get a registered display template component.
+   */
+  getTemplate(name) {
+    return this.templates[name] ? this.templates[name].component : null;
+  }
+
+  /**
+   * Get a registered display template settings component.
+   */
+  getTemplateSettingsComponent(name) {
+    return this.templates[name] ? this.templates[name].settingsComponent : null;
+  }
+
+  /**
+   * Get all registered templates.
+   */
+  getTemplates() {
+    // Return just the components for backwards compatibility with Object.keys() / values()
+    const result = {};
+    for (const [name, data] of Object.entries(this.templates)) {
+      result[name] = data.component;
+    }
+    return result;
+  }
+
+  /**
+   * Register a display mode placement option.
+   * @param {string} key - The unique identifier for the mode
+   * @param {string} translationKey - The translation key for the UI label
+   */
+  registerDisplayMode(key, translationKey) {
+    this.displayModes[key] = translationKey;
+  }
+
+  /**
+   * Get all registered display modes.
+   */
+  getDisplayModes() {
+    return this.displayModes;
+  }
+
   getRegisteredFrontendTypes() {
     const types = [];
     for (const [name, provider] of Object.entries(this.providers)) {
@@ -139,6 +193,7 @@ class FilterEngine {
       displayMode: alert.display_mode,
       message: alert.message, // already interpolated server-side
       tokens: alert.tokens || {},
+      displaySettings: alert.display_settings || {},
       isBlock: true,
     }));
     this.hasAlerts = this.activeAlerts.length > 0 || this.blockResults.length > 0;

@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property array|null $group_ids
  * @property bool|null $auto_flag
  * @property bool|null $require_approval
+ * @property array|null $display_settings
  */
 class Ruleset extends AbstractModel
 {
@@ -54,6 +55,7 @@ class Ruleset extends AbstractModel
         'require_approval'   => 'boolean',
         'scope_tag_ids'      => 'array',
         'group_ids'          => 'array',
+        'display_settings'   => 'array',
     ];
 
 
