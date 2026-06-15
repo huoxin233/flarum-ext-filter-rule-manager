@@ -405,7 +405,7 @@ export default class RulesetEditorModal extends Modal {
           this.evasionActive
         )}
 
-        {this.evasionActive() !== false ? (
+        {this.evasionActive() === true ? (
           <div className="Form-group">
             <div className="RulesetEditor-inline-inputs">
               <div className="RulesetEditor-inline-input">
