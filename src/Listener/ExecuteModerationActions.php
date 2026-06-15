@@ -135,7 +135,7 @@ class ExecuteModerationActions
             $globalEvasionTimeout = (int) $this->settings->get('huoxin-filter.global_evasion_timeout', 5);
             $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter.global_evasion_threshold', 2);
 
-            $evasionRulesets = Ruleset::where(function ($query) use ($globalEvasionActive) {
+            $evasionRulesets = Ruleset::active()->where(function ($query) use ($globalEvasionActive) {
                 if ($globalEvasionActive) {
                     $query->where('evasion_active', true)->orWhereNull('evasion_active');
                 } else {
