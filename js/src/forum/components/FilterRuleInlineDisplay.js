@@ -13,10 +13,10 @@ import icon from 'flarum/common/helpers/icon';
  *                        immediately above the textarea.
  *   - `sidebar`        → Vertical floating card pinned to the right.
  *
- * `toast` and `modal` are handled by RuleDispatcher and never reach this
+ * `toast` and `modal` are handled by FilterRulePopupDispatcher and never reach this
  * component.
  */
-export default class FilterRuleBanner extends Component {
+export default class FilterRuleInlineDisplay extends Component {
   oninit(vnode) {
     super.oninit(vnode);
     this.isSidebarClosed = false;

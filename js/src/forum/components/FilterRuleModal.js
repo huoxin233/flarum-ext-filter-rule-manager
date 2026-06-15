@@ -3,7 +3,7 @@ import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 
 /**
- * Generic alert modal used by the RuleDispatcher when a ruleset's
+ * Generic alert modal used by the FilterRulePopupDispatcher when a ruleset's
  * `displayMode` is `modal`. Shown once per ruleset firing — the dispatcher
  * tracks which ruleset IDs are already on screen so it doesn't re-open
  * the modal on every 300ms poll tick.

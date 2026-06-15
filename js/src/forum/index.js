@@ -8,8 +8,8 @@ import EditPostComposer from 'flarum/forum/components/EditPostComposer';
 import CommentPost from 'flarum/forum/components/CommentPost';
 
 import filterEngine from '../common/FilterEngine';
-import RuleDispatcher from './RuleDispatcher';
-import FilterRuleBanner from './components/FilterRuleBanner';
+import FilterRulePopupDispatcher from './FilterRulePopupDispatcher';
+import FilterRuleInlineDisplay from './components/FilterRuleInlineDisplay';
 import FilterRuleWarningModal from './components/FilterRuleWarningModal';
 import BuiltinProvider from './providers/BuiltinProvider';
 import BuiltinTemplate from '../common/components/BuiltinTemplate';
@@ -27,7 +27,7 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   filterEngine.registerTemplate('builtin', BuiltinTemplate);
   filterEngine.loadRulesets(app.data.filterRuleRulesets || []);
 
-  app.filterRuleDispatcher = new RuleDispatcher(filterEngine);
+  app.filterRulePopupDispatcher = new FilterRulePopupDispatcher(filterEngine);
 
   // ── Start/stop polling on composer mount/unmount ─────────────────────────
   extend(ComposerBody.prototype, 'oncreate', function () {
@@ -36,14 +36,14 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
 
   extend(ComposerBody.prototype, 'onremove', function () {
     filterEngine.stop();
-    if (app.filterRuleDispatcher) app.filterRuleDispatcher.dismissAll();
+    if (app.filterRulePopupDispatcher) app.filterRulePopupDispatcher.dismissAll();
   });
 
   // ── `header_banner` and `sidebar` mode: injected via ComposerBody.headerItems ──────────
   extend(ComposerBody.prototype, 'headerItems', function (items) {
     if (!filterEngine.hasAlerts) return;
-    items.add('filter-rule-header-banner', <FilterRuleBanner variant="header_banner" />, -10);
-    items.add('filter-rule-sidebar',       <FilterRuleBanner variant="sidebar"       />, -20);
+    items.add('filter-rule-header-banner', <FilterRuleInlineDisplay variant="header_banner" />, -10);
+    items.add('filter-rule-sidebar',       <FilterRuleInlineDisplay variant="sidebar"       />, -20);
   });
 
   // ── `banner` mode: injected at the top of #composer ─────────────────────
@@ -57,7 +57,7 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
     composerEl.insertBefore(this.alertBannerHost, composerEl.firstChild);
 
     m.mount(this.alertBannerHost, {
-      view: () => m(FilterRuleBanner, { variant: 'banner' }),
+      view: () => m(FilterRuleInlineDisplay, { variant: 'banner' }),
     });
   });
 

@@ -37,7 +37,7 @@ class FilterEngine {
 
   /**
    * Subscribe to alert-state changes (active/block result mutations).
-   * Returns an unsubscribe function. Used by RuleDispatcher to drive
+   * Returns an unsubscribe function. Used by FilterRulePopupDispatcher to drive
    * toast and modal display modes from a single source of truth.
    */
   subscribe(callback) {

@@ -9,10 +9,10 @@ import FilterRuleModal from './components/FilterRuleModal';
  *   - `modal`  → app.modal.show (once per ruleset firing — re-opens only
  *                after the rule clears and triggers again)
  *
- * `banner` and `sidebar` are rendered inline by FilterRuleBanner and
+ * `banner` and `sidebar` are rendered inline by FilterRuleInlineDisplay and
  * don't pass through this dispatcher.
  */
-export default class RuleDispatcher {
+export default class FilterRulePopupDispatcher {
   constructor(engine) {
     this.engine = engine;
     // ruleset id (or block message hash) → { displayMode, alertKey }
