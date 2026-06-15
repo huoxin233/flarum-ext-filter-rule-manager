@@ -1,3 +1,4 @@
+import app from 'flarum/admin/app';
 import Modal from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
@@ -7,6 +8,8 @@ import icon from 'flarum/common/helpers/icon';
 
 import RuleBuilder from './RuleBuilder';
 import filterEngine from '../../common/FilterEngine';
+
+import InlineTagSelector from './InlineTagSelector';
 import { parseExpression } from '../utils/ExpressionParser';
 
 /**
@@ -32,6 +35,20 @@ export default class RulesetEditorModal extends Modal {
     this.providers = this.attrs.providers;
     this.loading = false;
     this.messageTextarea = null;
+    this.showIconPicker = false;
+    this.tagsLoading = false;
+    this.availableTags = [];
+    if (app.initializers.has('flarum-tags')) {
+      this.tagsLoading = true;
+      app.store.find('tags', { include: 'parent' }).then(tags => {
+        this.availableTags = tags || [];
+        this.tagsLoading = false;
+        m.redraw();
+      }).catch(() => {
+        this.tagsLoading = false;
+        m.redraw();
+      });
+    }
 
     this.name = Stream(this.ruleset ? this.ruleset.name() : '');
     this.expression = Stream(this.ruleset ? this.ruleset.expression() : '');
@@ -51,7 +68,6 @@ export default class RulesetEditorModal extends Modal {
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
     this.displaySettings = Stream(this.ruleset ? Object.assign({}, this.ruleset.displaySettings() || {}) : {});
-    this.showIconPicker = false;
   }
 
   oncreate(vnode) {
@@ -205,17 +221,23 @@ export default class RulesetEditorModal extends Modal {
         {this.scopeType() === 'tag' && (
           <div className="Form-group">
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_scope_tags')}</label>
-            <input
-              className="FormControl"
-              value={(this.scopeTagIds() || []).join(', ')}
-              onchange={(e) => this.scopeTagIds(
-                e.target.value
-                  .split(',')
-                  .map((s) => parseInt(s.trim(), 10))
-                  .filter((n) => Number.isInteger(n) && n > 0)
-              )}
-              placeholder="1, 5, 12"
-            />
+            {app.initializers.has('flarum-tags') ? (() => {
+              const getTagsLabel = flarum.core.compat['tags/common/helpers/tagsLabel'];
+              const selectedTags = this.availableTags.filter(t => (this.scopeTagIds() || []).includes(parseInt(t.id(), 10)));
+              
+              return (
+                <div className="RulesetEditor-tagsSelection">
+                  {selectedTags.length > 0 && getTagsLabel && (
+                    <div className="RulesetEditor-tagsSelection-labels" style={{ marginBottom: '10px' }}>
+                      {getTagsLabel(selectedTags)}
+                    </div>
+                  )}
+                  <InlineTagSelector tags={this.availableTags} selectedIds={this.scopeTagIds} />
+                </div>
+              );
+            })() : (
+              <span className="helpText">Flarum Tags extension is required.</span>
+            )}
             <div className="helpText">
               {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_scope_tags_help')}
             </div>
