@@ -95,7 +95,7 @@ class BuiltinProvider implements RuleProviderInterface
             foreach ($patterns as $pattern) {
                 $regex = str_starts_with($pattern, '/')
                     ? $pattern
-                    : '/' . preg_quote($pattern, '/') . '/i';
+                    : '/' . str_replace('/', '\/', $pattern) . '/i';
 
                 if (@preg_match($regex, $content, $matches)) {
                     $matchedPatterns[] = $pattern;
