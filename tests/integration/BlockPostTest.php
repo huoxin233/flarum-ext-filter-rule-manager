@@ -19,7 +19,13 @@ class BlockPostTest extends FilterTestCase
                     'id' => 1,
                     'name' => 'Block Bad Words',
                     'priority' => 0,
-                    'rule_operator' => 'AND',
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule',
+                        'provider' => 'builtin',
+                        'ruleType' => 'contains_word',
+                        'operator' => 'EQUALS',
+                        'value' => ['words' => ['blockword']]
+                    ]),
                     'effect_type' => 'block', // This makes it a block rule
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
@@ -29,16 +35,6 @@ class BlockPostTest extends FilterTestCase
                     'require_approval' => 0,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString()
-                ]
-            ],
-            'filter_rules' => [
-                [
-                    'id' => 1,
-                    'ruleset_id' => 1,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['blockword']]),
-                    'sort_order' => 0
                 ]
             ]
         ]);

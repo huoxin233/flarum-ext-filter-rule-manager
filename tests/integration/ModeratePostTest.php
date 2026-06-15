@@ -14,6 +14,10 @@ class ModeratePostTest extends FilterTestCase
         parent::setUp();
 
         $this->prepareDatabase([
+            'users' => [
+                ['id' => 8, 'username' => 'user8', 'email' => 'user8@machine.local', 'is_email_confirmed' => 1],
+                ['id' => 9, 'username' => 'user9', 'email' => 'user9@machine.local', 'is_email_confirmed' => 1],
+            ],
             'posts' => [
                 // Existing post to test edits
                 ['id' => 2, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Clean post</p></t>', 'is_approved' => 1, 'number' => 2, 'created_at' => Carbon::now()->toDateTimeString()],
@@ -23,7 +27,16 @@ class ModeratePostTest extends FilterTestCase
                     'id' => 1,
                     'name' => 'Both Enabled',
                     'priority' => 0,
-                    'rule_operator' => 'OR', // Change to OR so it triggers if either matches
+                    'compiled_ast' => json_encode([
+                        'type' => 'logical',
+                        'operator' => 'OR',
+                        'left' => [
+                            'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['word_both'], 'scan_all' => true]
+                        ],
+                        'right' => [
+                            'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['apple'], 'scan_all' => true]
+                        ]
+                    ]),
                     'effect_type' => 'warning',
                     'display_mode' => 'banner',
                     'flag_message' => 'Matched custom: {{matched_word}}',
@@ -32,6 +45,8 @@ class ModeratePostTest extends FilterTestCase
                     'is_active' => 1,
                     'auto_flag' => 1,
                     'require_approval' => 1,
+                    'evasion_active' => 1,
+                    'evasion_threshold' => 1,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString()
                 ],
@@ -39,7 +54,9 @@ class ModeratePostTest extends FilterTestCase
                     'id' => 2,
                     'name' => 'Flag Only',
                     'priority' => 1,
-                    'rule_operator' => 'AND',
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['word_flag']]
+                    ]),
                     'effect_type' => 'warning',
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
@@ -53,7 +70,9 @@ class ModeratePostTest extends FilterTestCase
                     'id' => 3,
                     'name' => 'Approval Only',
                     'priority' => 2,
-                    'rule_operator' => 'AND',
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['word_approval']]
+                    ]),
                     'effect_type' => 'warning',
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
@@ -62,40 +81,24 @@ class ModeratePostTest extends FilterTestCase
                     'require_approval' => 1,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString()
-                ]
-            ],
-            'filter_rules' => [
-                [
-                    'id' => 1,
-                    'ruleset_id' => 1,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['word_both'], 'scan_all' => true]),
-                    'sort_order' => 0
                 ],
                 [
                     'id' => 4,
-                    'ruleset_id' => 1,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['apple'], 'scan_all' => true]),
-                    'sort_order' => 1
-                ],
-                [
-                    'id' => 2,
-                    'ruleset_id' => 2,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['word_flag']]),
-                    'sort_order' => 0
-                ],
-                [
-                    'id' => 3,
-                    'ruleset_id' => 3,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['word_approval']]),
-                    'sort_order' => 0
+                    'name' => 'Inactive Evasion',
+                    'priority' => 3,
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['inactive_word']
+                    ]),
+                    'effect_type' => 'block',
+                    'display_mode' => 'banner',
+                    'scope_type' => 'global',
+                    'is_active' => 0, // INACTIVE!
+                    'auto_flag' => 1,
+                    'require_approval' => 1,
+                    'evasion_active' => 1, // BUT EVASION ACTIVE
+                    'evasion_timeout' => 15,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString()
                 ]
             ],
             // For evasion tests
@@ -104,7 +107,19 @@ class ModeratePostTest extends FilterTestCase
                     'id' => 1,
                     'user_id' => 7,
                     'ruleset_id' => 1,
-                    'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString(), // 5 mins ago (within 15 min window)
+                    'created_at' => Carbon::now()->subMinutes(2)->toDateTimeString(), // 2 mins ago (within default 5 min window)
+                ],
+                [
+                    'id' => 2,
+                    'user_id' => 8,
+                    'ruleset_id' => 1,
+                    'created_at' => Carbon::now()->subMinutes(10)->toDateTimeString(), // 10 mins ago (outside default 5 min window)
+                ],
+                [
+                    'id' => 3,
+                    'user_id' => 9,
+                    'ruleset_id' => 4, // Inactive ruleset
+                    'created_at' => Carbon::now()->subMinutes(2)->toDateTimeString(), // 2 mins ago
                 ]
             ]
         ]);
@@ -144,9 +159,9 @@ class ModeratePostTest extends FilterTestCase
         // Assert is_approved is 0
         $this->assertEquals(0, $post->is_approved, 'Post should be unapproved (0)');
 
-        // Assert flag is created and type is 'approval'
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'approval')->first();
-        $this->assertNotNull($flag, 'Approval flag should be created');
+        // Assert flag is created and type is 'autoMod'
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $this->assertNotNull($flag, 'autoMod flag should be created');
 
         // Assert the custom aggregated flag message!
         $this->assertEquals('Matched custom: word_both, apple', $flag->reason_detail);
@@ -215,7 +230,7 @@ class ModeratePostTest extends FilterTestCase
         $post = $this->database()->table('posts')->where('id', 2)->first();
         $this->assertEquals(0, $post->is_approved, 'Edited post should become unapproved');
 
-        $flag = $this->database()->table('flags')->where('post_id', 2)->where('type', 'approval')->first();
+        $flag = $this->database()->table('flags')->where('post_id', 2)->where('type', 'autoMod')->first();
         $this->assertNotNull($flag, 'Flag should be created for edited post');
     }
 
@@ -270,10 +285,42 @@ class ModeratePostTest extends FilterTestCase
         // Evasion should force the post into approval queue
         $this->assertEquals(0, $post->is_approved, 'Post should be unapproved due to evasion');
 
-        // Evasion should force the creation of an approval flag
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'approval')->first();
-        $this->assertNotNull($flag, 'Approval flag should be created due to evasion');
+        // Evasion should force the creation of an autoMod flag
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $this->assertNotNull($flag, 'autoMod flag should be created due to evasion');
 
         $this->assertStringContainsString('evasion', $flag->reason_detail, 'Flag reason should mention filter evasion');
+    }
+
+    /**
+     * @test
+     */
+    public function evasion_detection_ignores_expired_timeout()
+    {
+        // User 8 was blocked 10 mins ago, but default global timeout is 5 mins.
+        $response = $this->submitReply('I promise this is a clean post.', 8);
+
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+        $post = $this->database()->table('posts')->where('id', $postId)->first();
+
+        $this->assertEquals(1, $post->is_approved, 'Post should be approved because evasion timeout expired');
+    }
+
+    /**
+     * @test
+     */
+    public function evasion_detection_ignores_inactive_rulesets()
+    {
+        // User 9 was blocked 2 mins ago by Ruleset 4. Ruleset 4 is inactive, so evasion should not trigger.
+        $response = $this->submitReply('I promise this is a clean post.', 9);
+
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+        $post = $this->database()->table('posts')->where('id', $postId)->first();
+
+        $this->assertEquals(1, $post->is_approved, 'Post should be approved because evasion ruleset is inactive');
     }
 }

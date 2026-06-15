@@ -19,7 +19,16 @@ class RuleOperatorTest extends FilterTestCase
                     'id' => 1,
                     'name' => 'AND Logic Ruleset',
                     'priority' => 0,
-                    'rule_operator' => 'AND',
+                    'compiled_ast' => json_encode([
+                        'type' => 'logical',
+                        'operator' => 'AND',
+                        'left' => [
+                            'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['apple']]
+                        ],
+                        'right' => [
+                            'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['banana']]
+                        ]
+                    ]),
                     'effect_type' => 'block', // Use block for easier assertions
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
@@ -34,7 +43,16 @@ class RuleOperatorTest extends FilterTestCase
                     'id' => 2,
                     'name' => 'OR Logic Ruleset',
                     'priority' => 1,
-                    'rule_operator' => 'OR',
+                    'compiled_ast' => json_encode([
+                        'type' => 'logical',
+                        'operator' => 'OR',
+                        'left' => [
+                            'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['cat']]
+                        ],
+                        'right' => [
+                            'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['dog']]
+                        ]
+                    ]),
                     'effect_type' => 'block', // Use block for easier assertions
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
@@ -44,42 +62,33 @@ class RuleOperatorTest extends FilterTestCase
                     'require_approval' => 0,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString()
-                ]
-            ],
-            'filter_rules' => [
-                // Rules for AND logic
-                [
-                    'id' => 1,
-                    'ruleset_id' => 1,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['apple']]),
-                    'sort_order' => 0
                 ],
-                [
-                    'id' => 2,
-                    'ruleset_id' => 1,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['banana']]),
-                    'sort_order' => 1
-                ],
-                // Rules for OR logic
                 [
                     'id' => 3,
-                    'ruleset_id' => 2,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['cat']]),
-                    'sort_order' => 0
-                ],
-                [
-                    'id' => 4,
-                    'ruleset_id' => 2,
-                    'provider' => 'builtin',
-                    'type' => 'contains_word',
-                    'config' => json_encode(['words' => ['dog']]),
-                    'sort_order' => 1
+                    'name' => 'NOT Logic Ruleset',
+                    'priority' => 2,
+                    'compiled_ast' => json_encode([
+                        'type' => 'logical',
+                        'operator' => 'AND',
+                        'left' => [
+                            'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['bird']]
+                        ],
+                        'right' => [
+                            'type' => 'not',
+                            'node' => [
+                                'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['cage']]
+                            ]
+                        ]
+                    ]),
+                    'effect_type' => 'block',
+                    'display_mode' => 'banner',
+                    'scope_type' => 'global',
+                    'message' => 'Blocked by NOT',
+                    'is_active' => 1,
+                    'auto_flag' => 0,
+                    'require_approval' => 0,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString()
                 ]
             ]
         ]);
@@ -117,5 +126,22 @@ class RuleOperatorTest extends FilterTestCase
         // Contains the other OR rule
         $response = $this->submitReply('I have a dog.', 5);
         $this->assertEquals(422, $response->getStatusCode(), 'Should block because dog is present');
+    }
+
+    /**
+     * @test
+     */
+    public function not_logic_inverts_rule_matching()
+    {
+        // Contains bird but also cage (should NOT block)
+        $response = $this->submitReply('I have a bird in a cage.', 6);
+        $this->assertEquals(201, $response->getStatusCode(), 'Should not block because cage is present (NOT logic)');
+
+        // Contains bird without cage (should block)
+        $response = $this->submitReply('I have a bird flying free.', 7);
+        $this->assertEquals(422, $response->getStatusCode(), 'Should block because bird is present and cage is NOT present');
+
+        $body = json_decode($response->getBody()->getContents(), true);
+        $this->assertEquals('Blocked by NOT', $body['errors'][0]['detail']);
     }
 }

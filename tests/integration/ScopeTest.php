@@ -40,7 +40,9 @@ class ScopeTest extends FilterTestCase
                     'id' => 1,
                     'name' => 'Private Only Ruleset',
                     'priority' => 0,
-                    'rule_operator' => 'AND',
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['secret']]
+                    ]),
                     'effect_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'private_post',
@@ -55,7 +57,9 @@ class ScopeTest extends FilterTestCase
                     'id' => 2,
                     'name' => 'Normal Only Ruleset',
                     'priority' => 1,
-                    'rule_operator' => 'AND',
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['publicword']]
+                    ]),
                     'effect_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'normal_post',
@@ -70,7 +74,9 @@ class ScopeTest extends FilterTestCase
                     'id' => 3,
                     'name' => 'Tag Scoped Ruleset',
                     'priority' => 2,
-                    'rule_operator' => 'AND',
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['gameword']]
+                    ]),
                     'effect_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'tag',
@@ -81,17 +87,6 @@ class ScopeTest extends FilterTestCase
                     'require_approval' => 0,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString()
-                ]
-            ],
-            'filter_rules' => [
-                [
-                    'id' => 1, 'ruleset_id' => 1, 'provider' => 'builtin', 'type' => 'contains_word', 'config' => json_encode(['words' => ['secret']]), 'sort_order' => 0
-                ],
-                [
-                    'id' => 2, 'ruleset_id' => 2, 'provider' => 'builtin', 'type' => 'contains_word', 'config' => json_encode(['words' => ['publicword']]), 'sort_order' => 0
-                ],
-                [
-                    'id' => 3, 'ruleset_id' => 3, 'provider' => 'builtin', 'type' => 'contains_word', 'config' => json_encode(['words' => ['gameword']]), 'sort_order' => 0
                 ]
             ]
         ]);
