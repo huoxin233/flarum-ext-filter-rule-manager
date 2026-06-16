@@ -1,9 +1,34 @@
-import app from 'flarum/common/app';
-import Component from 'flarum/common/Component';
-import icon from 'flarum/common/helpers/icon';
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
 
-export default class BuiltinTemplate extends Component {
-  view() {
+import app from 'flarum/common/app';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
+import icon from 'flarum/common/helpers/icon';
+import type Mithril from 'mithril';
+
+export interface BuiltinTemplateAttrs extends ComponentAttrs {
+  alert: {
+    type?: string;
+    message: string;
+    displaySettings?: {
+      icon?: string;
+      textColor?: string;
+      backgroundColor?: string;
+      iconColor?: string;
+      title?: string;
+    };
+  };
+  variant: string;
+}
+
+export default class BuiltinTemplate extends Component<BuiltinTemplateAttrs> {
+  view(vnode: Mithril.Vnode<BuiltinTemplateAttrs, this>): Mithril.Children {
     const { alert, variant } = this.attrs;
     const settings = alert.displaySettings || {};
 
@@ -14,11 +39,12 @@ export default class BuiltinTemplate extends Component {
                :                            'fas fa-info-circle';
     }
 
-    const style = {};
+    // Use React.CSSProperties-like typing or just any for React/Mithril inline styles
+    const style: any = {};
     if (settings.textColor) style.color = settings.textColor;
     if (settings.backgroundColor) style.backgroundColor = settings.backgroundColor;
 
-    const iconStyle = {};
+    const iconStyle: any = {};
     if (settings.iconColor) iconStyle.color = settings.iconColor;
 
     return (
@@ -41,3 +67,4 @@ export default class BuiltinTemplate extends Component {
     );
   }
 }
+

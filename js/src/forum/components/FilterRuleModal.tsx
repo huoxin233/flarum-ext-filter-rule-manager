@@ -1,6 +1,22 @@
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 import app from 'flarum/forum/app';
-import Modal from 'flarum/common/components/Modal';
+import Modal, { ModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
+import type Mithril from 'mithril';
+
+export interface FilterRuleModalAttrs extends ModalAttrs {
+  type: string;
+  message: string;
+  displaySettings?: any;
+}
 
 /**
  * Generic alert modal used by the FilterRulePopupDispatcher when a ruleset's
@@ -8,7 +24,7 @@ import Button from 'flarum/common/components/Button';
  * tracks which ruleset IDs are already on screen so it doesn't re-open
  * the modal on every 300ms poll tick.
  */
-export default class FilterRuleModal extends Modal {
+export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
   className() {
     const type = this.attrs.type || 'info';
     return `FilterRuleModal Modal--small FilterRuleModal--${type}`;
@@ -32,7 +48,7 @@ export default class FilterRuleModal extends Modal {
                : 'fas fa-info-circle';
     }
 
-    const style = {};
+    const style: any = {};
     if (settings.textColor && settings.textColor !== 'transparent') style.color = settings.textColor;
     if (settings.backgroundColor && settings.backgroundColor !== 'transparent') style.backgroundColor = settings.backgroundColor;
     if (settings.backgroundColor === 'transparent') {
@@ -41,7 +57,7 @@ export default class FilterRuleModal extends Modal {
       style.border = 'none';
     }
 
-    const iconStyle = {};
+    const iconStyle: any = {};
     if (settings.iconColor && settings.iconColor !== 'transparent') iconStyle.color = settings.iconColor;
 
     return (
@@ -50,7 +66,7 @@ export default class FilterRuleModal extends Modal {
           {settings.icon !== 'none' && (
             <i className={`FilterRuleModal-icon ${iconClass}`} style={iconStyle}></i>
           )}
-          <span className="FilterRuleModal-text">{m.trust(this.attrs.message)}</span>
+          <span className="FilterRuleModal-text">{(window as any).m.trust(this.attrs.message)}</span>
         </div>
         <div className="Form-group FilterRuleModal-actions">
           <Button className="Button Button--primary" onclick={() => this.hide()}>
@@ -61,3 +77,4 @@ export default class FilterRuleModal extends Modal {
     );
   }
 }
+

@@ -1,3 +1,13 @@
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
+import app from 'flarum/admin/app';
 import WordsListConfig from '../components/config/WordsListConfig';
 import PatternsListConfig from '../components/config/PatternsListConfig';
 
@@ -26,18 +36,18 @@ import PatternsListConfig from '../components/config/PatternsListConfig';
  *       Returning null falls back to the JSON textarea.
  */
 export default class BuiltinProvider {
-  getSupportedTypes() {
+  getSupportedTypes(): string[] {
     return ['contains_word', 'regex'];
   }
 
-  getTypeLabels() {
+  getTypeLabels(): Record<string, string> {
     return {
-      contains_word: app.translator.trans('huoxin-filter-rule-manager.admin.type_contains_word'),
-      regex: app.translator.trans('huoxin-filter-rule-manager.admin.type_regex'),
+      contains_word: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_contains_word')),
+      regex: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_regex')),
     };
   }
 
-  getConfigComponent(type) {
+  getConfigComponent(type: string): any {
     if (type === 'contains_word') return WordsListConfig;
     if (type === 'regex') return PatternsListConfig;
     return null;
@@ -48,7 +58,7 @@ export default class BuiltinProvider {
    * Returning [{ name, description }] makes them discoverable in the
    * RulesetEditorModal token-hint panel.
    */
-  getProvidedTokens(type) {
+  getProvidedTokens(type: string): { name: string; description: string }[] {
     if (type === 'contains_word') {
       return [
         { name: 'matched_word', description: 'The first listed word that was found in the post content.' },
@@ -63,3 +73,4 @@ export default class BuiltinProvider {
     return [];
   }
 }
+

@@ -1,3 +1,12 @@
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
 import Composer from 'flarum/forum/components/Composer';
@@ -6,6 +15,8 @@ import DiscussionComposer from 'flarum/forum/components/DiscussionComposer';
 import ReplyComposer from 'flarum/forum/components/ReplyComposer';
 import EditPostComposer from 'flarum/forum/components/EditPostComposer';
 import CommentPost from 'flarum/forum/components/CommentPost';
+import ItemList from 'flarum/common/utils/ItemList';
+import type Mithril from 'mithril';
 
 import filterEngine from '../common/FilterEngine';
 import FilterRulePopupDispatcher from './FilterRulePopupDispatcher';
@@ -25,7 +36,9 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
 
   filterEngine.registerProvider('builtin', new BuiltinProvider());
   filterEngine.registerTemplate('builtin', BuiltinTemplate);
-  filterEngine.loadRulesets(app.data.filterRuleRulesets || []);
+  
+  const rulesets = Array.isArray(app.data.filterRuleRulesets) ? app.data.filterRuleRulesets : [];
+  filterEngine.loadRulesets(rulesets as any[]);
 
   app.filterRulePopupDispatcher = new FilterRulePopupDispatcher(filterEngine);
 
@@ -40,30 +53,29 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   });
 
   // ── `header_banner` and `sidebar` mode: injected via ComposerBody.headerItems ──────────
-  extend(ComposerBody.prototype, 'headerItems', function (items) {
+  extend(ComposerBody.prototype, 'headerItems', function (items: ItemList<Mithril.Children>) {
     if (!filterEngine.hasAlerts) return;
     items.add('filter-rule-header-banner', <FilterRuleInlineDisplay variant="header_banner" />, -10);
     items.add('filter-rule-sidebar',       <FilterRuleInlineDisplay variant="sidebar"       />, -20);
   });
 
   // ── `banner` mode: injected at the top of #composer ─────────────────────
-  extend(Composer.prototype, 'oncreate', function () {
+  extend(Composer.prototype, 'oncreate', function (this: any) {
     const composerEl = document.getElementById('composer');
     if (!composerEl || this.alertBannerHost) return;
 
     this.alertBannerHost = document.createElement('div');
     this.alertBannerHost.className = 'FilterRuleManager-host';
-    // Insert at the very beginning of #composer, above the .Composer card
     composerEl.insertBefore(this.alertBannerHost, composerEl.firstChild);
 
-    m.mount(this.alertBannerHost, {
-      view: () => m(FilterRuleInlineDisplay, { variant: 'banner' }),
+    (window as any).m.mount(this.alertBannerHost, {
+      view: () => (window as any).m(FilterRuleInlineDisplay, { variant: 'banner' }),
     });
   });
 
-  extend(Composer.prototype, 'onremove', function () {
+  extend(Composer.prototype, 'onremove', function (this: any) {
     if (!this.alertBannerHost) return;
-    try { m.mount(this.alertBannerHost, null); } catch (e) { /* ignore */ }
+    try { (window as any).m.mount(this.alertBannerHost, null); } catch (e) { /* ignore */ }
     if (this.alertBannerHost.parentNode) {
       this.alertBannerHost.parentNode.removeChild(this.alertBannerHost);
     }
@@ -71,10 +83,8 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   });
 
   // ── Warning confirmation on submit ───────────────────────────────────────
-  [DiscussionComposer, ReplyComposer, EditPostComposer].forEach((Cls) => {
-    override(Cls.prototype, 'onsubmit', function (original) {
-      // Clear OUR previous block result so a stale 422 from a prior attempt
-      // doesn't linger. The textarea content is never touched here.
+  [DiscussionComposer, ReplyComposer, EditPostComposer].forEach((Cls: any) => {
+    override(Cls.prototype, 'onsubmit', function (this: any, original: Function) {
       filterEngine.clearBlockResults();
 
       const warnings = filterEngine.activeAlerts.filter(
@@ -101,7 +111,7 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   });
 
   // ── Intercept filter_rule_block errors via the documented hook ──────────────
-  override(app, 'requestErrorCatch', function (original, error) {
+  override(app, 'requestErrorCatch', function (original: Function, error: any) {
     const errors = error && error.response && error.response.errors;
     if (Array.isArray(errors) && errors[0] && errors[0].code === 'filter_rule_block') {
       const filterRules =
@@ -115,8 +125,8 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
     return original(error);
   });
 
-  if ('flarum-flags' in flarum.extensions) {
-    override(CommentPost.prototype, 'flagReason', function (original, flag) {
+  if ('flarum-flags' in (window as any).flarum.extensions) {
+    override(CommentPost.prototype, 'flagReason', function (original: Function, flag: any) {
       if (flag.type() === 'autoMod') {
         const detail = flag.reasonDetail();
         return [app.translator.trans('huoxin-filter-rule-manager.forum.flagger_name'), detail ? <span className="Post-flagged-detail">{detail}</span> : ''];
@@ -125,3 +135,4 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
     });
   }
 }, -20);
+

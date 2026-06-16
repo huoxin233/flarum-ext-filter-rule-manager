@@ -1,3 +1,12 @@
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 import app from 'flarum/admin/app';
 import Model from 'flarum/common/Model';
 
@@ -34,11 +43,6 @@ Object.assign(Ruleset.prototype, {
 export { Ruleset };
 
 app.initializers.add('huoxin/filter-rule-manager', () => {
-  // Expose the engine in admin too so the rule builder can list frontend-only
-  // rule types registered by provider extensions (e.g. bbcode-intellisense).
-  // Each bundle gets its own engine instance — provider extensions must register
-  // their type metadata in BOTH their forum and admin entry points if they want
-  // those types to appear in the admin rule builder.
   app.filterRuleManager = filterEngine;
 
   filterEngine.registerDisplayMode('banner', 'huoxin-filter-rule-manager.admin.displays.banner');
@@ -47,9 +51,6 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   filterEngine.registerDisplayMode('toast', 'huoxin-filter-rule-manager.admin.displays.toast');
   filterEngine.registerDisplayMode('modal', 'huoxin-filter-rule-manager.admin.displays.modal');
 
-  // Register the admin-side Builtin provider so RuleBuilder can mount its
-  // custom config components (WordsListConfig / PatternsListConfig) instead
-  // of the generic JSON fallback.
   filterEngine.registerProvider('builtin', new BuiltinProvider());
   filterEngine.registerTemplate('builtin', BuiltinTemplate, BuiltinTemplateSettings);
 

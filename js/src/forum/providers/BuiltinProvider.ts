@@ -1,25 +1,36 @@
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
+import type { FilterRuleProvider } from '../../common/FilterEngine';
+
 /**
  * Forum-side BuiltinProvider — handles real-time evaluation against the
  * composer content. Supports two rule types:
  *
- *   contains_word  — config: { words: string[] }   (legacy: { word: string })
- *   regex          — config: { patterns: string[] } (legacy: { pattern: string })
+ *   contains_word  — config: { words: string[] }
+ *   regex          — config: { patterns: string[] }
  *
  * For each type, the rule triggers if ANY of the listed entries matches.
  * The first match's value is exposed as a token for message interpolation.
  */
-export default class BuiltinProvider {
-  getSupportedTypes() {
+export default class BuiltinProvider implements FilterRuleProvider {
+  getSupportedTypes(): string[] {
     return ['contains_word', 'regex'];
   }
 
-  evaluate(type, content, config) {
+  evaluate(type: string, content: string, config: any): Record<string, string> | null {
     const scanAll = config.scan_all || false;
     if (type === 'contains_word') {
-      const words = this.normalizeList(config, 'words', 'word');
+      const words = this.normalizeList(config, 'words');
       if (words.length === 0) return null;
       const lowered = String(content).toLowerCase();
-      const matches = [];
+      const matches: string[] = [];
       for (const w of words) {
         if (lowered.includes(w.toLowerCase())) {
           matches.push(w);
@@ -30,10 +41,10 @@ export default class BuiltinProvider {
     }
 
     if (type === 'regex') {
-      const patterns = this.normalizeList(config, 'patterns', 'pattern');
+      const patterns = this.normalizeList(config, 'patterns');
       if (patterns.length === 0) return null;
-      const matchedPatterns = [];
-      const matchedStrings = [];
+      const matchedPatterns: string[] = [];
+      const matchedStrings: string[] = [];
       for (const pattern of patterns) {
         try {
           let body = pattern;
@@ -68,20 +79,17 @@ export default class BuiltinProvider {
   }
 
   /**
-   * Normalise either `{ plural: string[] }` (new) or `{ singular: string }`
-   * (legacy) into a clean, trimmed, non-empty string array.
+   * Normalise `{ plural: string[] }` into a clean, trimmed, non-empty string array.
    */
-  normalizeList(config, plural, singular) {
+  normalizeList(config: any, plural: string): string[] {
     const cfg = config || {};
     if (Array.isArray(cfg[plural])) {
       return cfg[plural]
-        .map((v) => (typeof v === 'string' ? v : String(v)))
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
-    }
-    if (typeof cfg[singular] === 'string' && cfg[singular].trim() !== '') {
-      return [cfg[singular].trim()];
+        .map((v: any) => (typeof v === 'string' ? v : String(v)))
+        .map((s: string) => s.trim())
+        .filter((s: string) => s.length > 0);
     }
     return [];
   }
 }
+

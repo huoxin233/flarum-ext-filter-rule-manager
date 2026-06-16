@@ -1,7 +1,21 @@
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 import app from 'flarum/forum/app';
-import Component from 'flarum/common/Component';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import filterEngine from '../../common/FilterEngine';
 import icon from 'flarum/common/helpers/icon';
+import type Mithril from 'mithril';
+
+export interface FilterRuleInlineDisplayAttrs extends ComponentAttrs {
+  variant: string;
+}
 
 /**
  * Renders a single class of inline alert. Accepts `attrs.variant`:
@@ -16,13 +30,15 @@ import icon from 'flarum/common/helpers/icon';
  * `toast` and `modal` are handled by FilterRulePopupDispatcher and never reach this
  * component.
  */
-export default class FilterRuleInlineDisplay extends Component {
-  oninit(vnode) {
+export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineDisplayAttrs> {
+  isSidebarClosed: boolean = false;
+
+  oninit(vnode: Mithril.Vnode<FilterRuleInlineDisplayAttrs, this>) {
     super.oninit(vnode);
     this.isSidebarClosed = false;
   }
 
-  view() {
+  view(vnode: Mithril.Vnode<FilterRuleInlineDisplayAttrs, this>): Mithril.Children {
     const variant = this.attrs.variant;
     const items = this._matchingItems(variant);
     if (items.length === 0) return null;
@@ -33,11 +49,11 @@ export default class FilterRuleInlineDisplay extends Component {
         <aside className="FilterRuleManager FilterRuleManager--sidebar" aria-label="Composer hints">
           <div className="FilterRuleManager-sidebarTitle">
             {icon('fas fa-shield-alt')}
-            <span style="flex: 1;">{app.translator.trans('huoxin-filter-rule-manager.forum.sidebar_title') || 'Composer hints'}</span>
+            <span style={{ flex: 1 }}>{app.translator.trans('huoxin-filter-rule-manager.forum.sidebar_title') || 'Composer hints'}</span>
             <button 
               className="Button Button--icon Button--link" 
               onclick={() => this.isSidebarClosed = true}
-              style="padding: 0; min-width: 0; min-height: 0; line-height: 1; color: inherit;"
+              style={{ padding: '0', minWidth: '0', minHeight: '0', lineHeight: '1', color: 'inherit' }}
             >
               {icon('fas fa-times')}
             </button>
@@ -56,7 +72,7 @@ export default class FilterRuleInlineDisplay extends Component {
     );
   }
 
-  _matchingItems(variant) {
+  _matchingItems(variant: string): any[] {
     const isMobile = window.innerWidth <= 768;
     if (isMobile && variant !== 'banner') return [];
     
@@ -79,7 +95,7 @@ export default class FilterRuleInlineDisplay extends Component {
     return [...active, ...blocks];
   }
 
-  _renderItem(alert, i, variant) {
+  _renderItem(alert: any, i: number, variant: string): Mithril.Children {
     const templateName = (alert.displaySettings && alert.displaySettings.template) || 'builtin';
     let TemplateComponent = filterEngine.getTemplate(templateName);
     
@@ -95,3 +111,4 @@ export default class FilterRuleInlineDisplay extends Component {
     );
   }
 }
+

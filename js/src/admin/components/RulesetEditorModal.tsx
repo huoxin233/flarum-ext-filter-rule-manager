@@ -1,16 +1,32 @@
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 import app from 'flarum/admin/app';
-import Modal from 'flarum/common/components/Modal';
+import Modal, { ModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
 import Select from 'flarum/common/components/Select';
 import Stream from 'flarum/common/utils/Stream';
 import icon from 'flarum/common/helpers/icon';
+import type Mithril from 'mithril';
 
 import RuleBuilder from './RuleBuilder';
 import filterEngine from '../../common/FilterEngine';
 
 import InlineTagSelector from './InlineTagSelector';
 import { parseExpression } from '../utils/ExpressionParser';
+
+export interface RulesetEditorModalAttrs extends ModalAttrs {
+  ruleset?: any;
+  providers: any[];
+  onsave?: () => void;
+}
 
 /**
  * Sectioned editor for a ruleset:
@@ -27,26 +43,56 @@ import { parseExpression } from '../utils/ExpressionParser';
  * in `this.providers`. Clicking a chip inserts `{{token}}` at the textarea
  * cursor.
  */
-export default class RulesetEditorModal extends Modal {
-  oninit(vnode) {
+export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
+  ruleset: any;
+  providers!: any[];
+  loading: boolean = false;
+  messageTextarea: HTMLTextAreaElement | null = null;
+  flagMessageTextarea: HTMLTextAreaElement | null = null;
+  showIconPicker: boolean = false;
+  tagsLoading: boolean = false;
+  availableTags: any[] = [];
+  closeIconPickerHandler: any;
+
+  name!: Stream<string>;
+  expression!: Stream<string>;
+  effectType!: Stream<string>;
+  displayMode!: Stream<string>;
+  message!: Stream<string>;
+  flagMessage!: Stream<string>;
+  evaluateAllRules!: Stream<boolean>;
+  evaluateTitle!: Stream<boolean | null>;
+  evasionActive!: Stream<boolean | null>;
+  evasionTimeout!: Stream<number | null>;
+  evasionThreshold!: Stream<number | null>;
+  blockCascade!: Stream<boolean>;
+  isActive!: Stream<boolean>;
+  autoFlag!: Stream<boolean | null>;
+  requireApproval!: Stream<boolean | null>;
+  scopeType!: Stream<string>;
+  scopeTagIds!: Stream<number[]>;
+  displaySettings!: Stream<any>;
+
+  oninit(vnode: Mithril.Vnode<RulesetEditorModalAttrs, this>) {
     super.oninit(vnode);
 
     this.ruleset = this.attrs.ruleset;
     this.providers = this.attrs.providers;
     this.loading = false;
     this.messageTextarea = null;
+    this.flagMessageTextarea = null;
     this.showIconPicker = false;
     this.tagsLoading = false;
     this.availableTags = [];
     if (app.initializers.has('flarum-tags')) {
       this.tagsLoading = true;
-      app.store.find('tags', { include: 'parent' }).then(tags => {
+      app.store.find('tags', { include: 'parent' }).then((tags: any) => {
         this.availableTags = tags || [];
         this.tagsLoading = false;
-        m.redraw();
+        (window as any).m.redraw();
       }).catch(() => {
         this.tagsLoading = false;
-        m.redraw();
+        (window as any).m.redraw();
       });
     }
 
@@ -70,18 +116,18 @@ export default class RulesetEditorModal extends Modal {
     this.displaySettings = Stream(this.ruleset ? Object.assign({}, this.ruleset.displaySettings() || {}) : {});
   }
 
-  oncreate(vnode) {
+  oncreate(vnode: Mithril.VnodeDOM<RulesetEditorModalAttrs, this>) {
     super.oncreate(vnode);
-    this.closeIconPickerHandler = (e) => {
-      if (this.showIconPicker && !e.target.closest('.IconPickerInput')) {
+    this.closeIconPickerHandler = (e: MouseEvent) => {
+      if (this.showIconPicker && !(e.target as Element).closest('.IconPickerInput')) {
         this.showIconPicker = false;
-        m.redraw();
+        (window as any).m.redraw();
       }
     };
     document.addEventListener('click', this.closeIconPickerHandler);
   }
 
-  onremove(vnode) {
+  onremove(vnode: Mithril.VnodeDOM<RulesetEditorModalAttrs, this>) {
     if (this.closeIconPickerHandler) {
       document.removeEventListener('click', this.closeIconPickerHandler);
     }
@@ -98,7 +144,7 @@ export default class RulesetEditorModal extends Modal {
       : app.translator.trans('huoxin-filter-rule-manager.admin.add_ruleset');
   }
 
-  content() {
+  content(): Mithril.Children {
     return (
       <div className="Modal-body">
         <div className="Form">
@@ -114,9 +160,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  // ── Sections ─────────────────────────────────────────────────────────────
-
-  nullableBooleanSelect(labelKey, helpKey, stream) {
+  nullableBooleanSelect(labelKey: string, helpKey: string, stream: Stream<boolean | null>): Mithril.Children {
     const val = stream();
     return (
       <div className="Form-group">
@@ -127,19 +171,19 @@ export default class RulesetEditorModal extends Modal {
             type="button"
             className={`segmented-option ${val === null ? 'active' : ''}`} 
             onclick={() => stream(null)}>
-            {icon('fas fa-globe')} {app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default', {}, 'Inherit Global')}
+            {icon('fas fa-globe')} {app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default')}
           </button>
           <button 
             type="button"
             className={`segmented-option ${val === true ? 'active-enabled' : ''}`} 
             onclick={() => stream(true)}>
-            {icon('fas fa-check')} {app.translator.trans('huoxin-filter-rule-manager.admin.force_enabled', {}, 'Force Enabled')}
+            {icon('fas fa-check')} {app.translator.trans('huoxin-filter-rule-manager.admin.force_enabled')}
           </button>
           <button 
             type="button"
             className={`segmented-option ${val === false ? 'active-disabled' : ''}`} 
             onclick={() => stream(false)}>
-            {icon('fas fa-times')} {app.translator.trans('huoxin-filter-rule-manager.admin.force_disabled', {}, 'Disabled')}
+            {icon('fas fa-times')} {app.translator.trans('huoxin-filter-rule-manager.admin.force_disabled')}
           </button>
         </div>
 
@@ -150,7 +194,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  generalSection() {
+  generalSection(): Mithril.Children {
     return (
       <div className="RulesetEditor-section">
         <div className="RulesetEditor-section-header RulesetEditor-section-header--with-toggle">
@@ -158,7 +202,7 @@ export default class RulesetEditorModal extends Modal {
             <i className="fas fa-info-circle"></i>
             <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_general')}</h4>
           </div>
-          <Switch state={this.isActive()} onchange={this.isActive}>
+          <Switch state={this.isActive()} onchange={(v: boolean) => this.isActive(v)}>
             {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_is_active')}
           </Switch>
         </div>
@@ -168,15 +212,15 @@ export default class RulesetEditorModal extends Modal {
           <input
             className="FormControl"
             value={this.name()}
-            oninput={(e) => this.name(e.target.value)}
-            placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_name_placeholder')}
+            oninput={(e: any) => this.name(e.target.value)}
+            placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_name_placeholder'))}
             required
           />
         </div>
 
 
         <div className="Form-group">
-          <Switch state={this.blockCascade()} onchange={this.blockCascade}>
+          <Switch state={this.blockCascade()} onchange={(v: boolean) => this.blockCascade(v)}>
             {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade')}
           </Switch>
           <div className="helpText">
@@ -185,7 +229,7 @@ export default class RulesetEditorModal extends Modal {
         </div>
 
         <div className="Form-group">
-          <Switch state={this.evaluateAllRules()} onchange={this.evaluateAllRules}>
+          <Switch state={this.evaluateAllRules()} onchange={(v: boolean) => this.evaluateAllRules(v)}>
             {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules')}
           </Switch>
           <div className="helpText">
@@ -196,7 +240,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  scopeSection() {
+  scopeSection(): Mithril.Children {
     return (
       <div className="RulesetEditor-section">
         <div className="RulesetEditor-section-header">
@@ -214,7 +258,7 @@ export default class RulesetEditorModal extends Modal {
               tag: app.translator.trans('huoxin-filter-rule-manager.admin.scopes.tag'),
             }}
             value={this.scopeType()}
-            onchange={this.scopeType}
+            onchange={(v: string) => this.scopeType(v)}
           />
         </div>
 
@@ -222,7 +266,7 @@ export default class RulesetEditorModal extends Modal {
           <div className="Form-group">
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_scope_tags')}</label>
             {app.initializers.has('flarum-tags') ? (() => {
-              const getTagsLabel = flarum.core.compat['tags/common/helpers/tagsLabel'];
+              const getTagsLabel = (window as any).flarum.core.compat['tags/common/helpers/tagsLabel'];
               const selectedTags = this.availableTags.filter(t => (this.scopeTagIds() || []).includes(parseInt(t.id(), 10)));
               
               return (
@@ -247,7 +291,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  displaySetting(key, val) {
+  displaySetting(key: string, val?: any): any {
     let settings = this.displaySettings() || {};
     if (typeof val !== 'undefined') {
       const newSettings = Object.assign({}, settings);
@@ -258,15 +302,13 @@ export default class RulesetEditorModal extends Modal {
     return settings[key];
   }
 
-
-
-  displaySection() {
+  displaySection(): Mithril.Children {
     const effect = this.effectType();
     const displayMode = this.displayMode();
     const tokens = this.availableTokens();
     const templateName = this.displaySetting('template') || 'builtin';
-    const templates = app.filterRuleManager.getTemplates();
-    const SettingsComponent = app.filterRuleManager.getTemplateSettingsComponent(templateName);
+    const templates = (app as any).filterRuleManager.getTemplates();
+    const SettingsComponent = (app as any).filterRuleManager.getTemplateSettingsComponent(templateName);
 
     return (
       <div className="RulesetEditor-section">
@@ -306,11 +348,11 @@ export default class RulesetEditorModal extends Modal {
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message')}</label>
               <textarea
                 className="FormControl"
-                oncreate={(vnode) => { this.messageTextarea = vnode.dom; }}
+                oncreate={(vnode) => { this.messageTextarea = vnode.dom as HTMLTextAreaElement; }}
                 onremove={() => { this.messageTextarea = null; }}
                 value={this.message()}
-                oninput={(e) => this.message(e.target.value)}
-                placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message_placeholder')}
+                oninput={(e: any) => this.message(e.target.value)}
+                placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message_placeholder'))}
                 rows={2}
                 required
               ></textarea>
@@ -326,15 +368,15 @@ export default class RulesetEditorModal extends Modal {
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_mode')}</label>
               <Select
                 options={
-                  (app.filterRuleManager && typeof app.filterRuleManager.getDisplayModes === 'function')
-                    ? Object.entries(app.filterRuleManager.getDisplayModes()).reduce((acc, [key, translationKey]) => {
-                        acc[key] = app.translator.trans(translationKey);
+                  ((app as any).filterRuleManager && typeof (app as any).filterRuleManager.getDisplayModes === 'function')
+                    ? Object.entries((app as any).filterRuleManager.getDisplayModes()).reduce((acc: any, [key, translationKey]: [string, any]) => {
+                        acc[key] = String(app.translator.trans(translationKey));
                         return acc;
                       }, {})
-                    : { banner: app.translator.trans('huoxin-filter-rule-manager.admin.displays.banner') }
+                    : { banner: String(app.translator.trans('huoxin-filter-rule-manager.admin.displays.banner')) }
                 }
                 value={displayMode}
-                onchange={this.displayMode}
+                onchange={(v: string) => this.displayMode(v)}
               />
               <div className="helpText">
                 {app.translator.trans(`huoxin-filter-rule-manager.admin.displays.${displayMode}_help`)}
@@ -346,9 +388,9 @@ export default class RulesetEditorModal extends Modal {
                 <input 
                   type="text"
                   className="FormControl" 
-                  placeholder={app.translator.trans(`huoxin-filter-rule-manager.forum.modal_title_${effect}`)} 
+                  placeholder={String(app.translator.trans(`huoxin-filter-rule-manager.forum.modal_title_${effect}`))} 
                   value={this.displaySetting('title') || ''} 
-                  oninput={(e) => this.displaySetting('title', e.target.value)} 
+                  oninput={(e: any) => this.displaySetting('title', e.target.value)} 
                 />
                 <div className="helpText">
                   {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_help')}
@@ -359,17 +401,17 @@ export default class RulesetEditorModal extends Modal {
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_template')}</label>
               <Select
                 options={
-                  (app.filterRuleManager && typeof app.filterRuleManager.getTemplates === 'function') 
-                    ? Object.keys(app.filterRuleManager.getTemplates()).reduce((acc, k) => { 
+                  ((app as any).filterRuleManager && typeof (app as any).filterRuleManager.getTemplates === 'function') 
+                    ? Object.keys((app as any).filterRuleManager.getTemplates()).reduce((acc: any, k) => { 
                         const transKey = `huoxin-filter-rule-manager.admin.templates.${k}`;
-                        const translated = app.translator.trans(transKey);
+                        const translated = String(app.translator.trans(transKey));
                         acc[k] = (translated !== transKey && translated) ? translated : k;
                         return acc; 
                       }, {})
-                    : { 'builtin': app.translator.trans('huoxin-filter-rule-manager.admin.templates.builtin') || 'Built-in' }
+                    : { 'builtin': String(app.translator.trans('huoxin-filter-rule-manager.admin.templates.builtin')) || 'Built-in' }
                 }
                 value={this.displaySetting('template') || 'builtin'}
-                onchange={(val) => this.displaySetting('template', val)}
+                onchange={(val: string) => this.displaySetting('template', val)}
               />
             </div>
 
@@ -385,7 +427,7 @@ export default class RulesetEditorModal extends Modal {
 
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.preview')}</label>
-              {this.previewBlock(effect, this.message() || app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder'))}
+              {this.previewBlock(effect, this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder')))}
             </div>
           </div>
         )}
@@ -393,7 +435,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  moderationSection() {
+  moderationSection(): Mithril.Children {
     return (
       <div className="RulesetEditor-section">
         <div className="RulesetEditor-section-header">
@@ -437,12 +479,12 @@ export default class RulesetEditorModal extends Modal {
                   type="number"
                   min="0"
                   step="1"
-                  value={this.evasionTimeout() === null ? '' : this.evasionTimeout()}
-                  oninput={(e) => {
+                  value={this.evasionTimeout() === null ? '' : this.evasionTimeout()!}
+                  oninput={(e: any) => {
                     const val = e.target.value;
                     this.evasionTimeout(val === '' ? null : Math.max(0, parseInt(val, 10)) || 0);
                   }}
-                  placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default', {}, 'Inherit Global Default')}
+                  placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default'))}
                 />
                 <div className="helpText">
                   {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout_help')}
@@ -455,12 +497,12 @@ export default class RulesetEditorModal extends Modal {
                   type="number"
                   min="1"
                   step="1"
-                  value={this.evasionThreshold() === null ? '' : this.evasionThreshold()}
-                  oninput={(e) => {
+                  value={this.evasionThreshold() === null ? '' : this.evasionThreshold()!}
+                  oninput={(e: any) => {
                     const val = e.target.value;
                     this.evasionThreshold(val === '' ? null : Math.max(1, parseInt(val, 10)) || 1);
                   }}
-                  placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default', {}, 'Inherit Global Default')}
+                  placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default'))}
                 />
                 <div className="helpText">
                   {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold_help')}
@@ -477,11 +519,11 @@ export default class RulesetEditorModal extends Modal {
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message')}</label>
             <textarea
               className="FormControl"
-              oncreate={(vnode) => { this.flagMessageTextarea = vnode.dom; }}
+              oncreate={(vnode) => { this.flagMessageTextarea = vnode.dom as HTMLTextAreaElement; }}
               onremove={() => { this.flagMessageTextarea = null; }}
               value={this.flagMessage()}
-              oninput={(e) => this.flagMessage(e.target.value)}
-              placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_placeholder')}
+              oninput={(e: any) => this.flagMessage(e.target.value)}
+              placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_placeholder'))}
               rows={2}
             ></textarea>
             <div className="helpText">
@@ -494,7 +536,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  rulesSection() {
+  rulesSection(): Mithril.Children {
     return (
       <div className="RulesetEditor-section">
         <div className="RulesetEditor-section-header">
@@ -504,7 +546,7 @@ export default class RulesetEditorModal extends Modal {
 
         <RuleBuilder
           expression={this.expression()}
-          onchange={this.expression}
+          onchange={(v: string) => this.expression(v)}
           providers={this.providers}
         />
 
@@ -515,25 +557,11 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  // ── Bits ─────────────────────────────────────────────────────────────────
-
-  /**
-   * Returns the merged set of tokens exposed by every rule currently in the
-   * ruleset. Each token is `{ name, description, source }`.
-   *
-   * Resolution order per rule:
-   *   1. Frontend provider object (registered into FilterEngine in this bundle)
-   *      via `getProvidedTokens(type)` — covers JS-only providers
-   *   2. Backend provider metadata (the `tokens` field on `this.providers`
-   *      rows, served by ListProvidersController) — covers PHP-only providers
-   *
-   * Tokens dedupe by name; first source wins.
-   */
   availableTokens() {
     const seen = new Set();
-    const out = [];
+    const out: any[] = [];
 
-    const push = (token, source) => {
+    const push = (token: any, source: string) => {
       if (!token || !token.name || seen.has(token.name)) return;
       seen.add(token.name);
       out.push({
@@ -550,8 +578,8 @@ export default class RulesetEditorModal extends Modal {
       // Ignore parse errors, user might be typing
     }
 
-    const activeRules = [];
-    const traverse = (node) => {
+    const activeRules: any[] = [];
+    const traverse = (node: any) => {
       if (!node) return;
       if (node.type === 'rule' && node.provider && node.ruleType) {
         activeRules.push(node);
@@ -565,17 +593,15 @@ export default class RulesetEditorModal extends Modal {
     traverse(ast);
 
     for (const rule of activeRules) {
-      // 1) Frontend provider
-      const fp = (app.filterRuleManager && typeof app.filterRuleManager.getProvider === 'function')
-        ? app.filterRuleManager.getProvider(rule.provider)
+      const fp = ((app as any).filterRuleManager && typeof (app as any).filterRuleManager.getProvider === 'function')
+        ? (app as any).filterRuleManager.getProvider(rule.provider)
         : null;
       if (fp && typeof fp.getProvidedTokens === 'function') {
         const ftokens = fp.getProvidedTokens(rule.ruleType) || [];
-        ftokens.forEach((t) => push(t, `${rule.provider}/${rule.ruleType}`));
+        ftokens.forEach((t: any) => push(t, `${rule.provider}/${rule.ruleType}`));
         continue;
       }
 
-      // 2) Backend metadata
       const meta = (this.providers || []).find(
         (p) => p.provider === rule.provider && p.type === rule.ruleType
       );
@@ -586,7 +612,7 @@ export default class RulesetEditorModal extends Modal {
     return out;
   }
 
-  tokenChipsBlock(tokens, targetField) {
+  tokenChipsBlock(tokens: any[], targetField: string): Mithril.Children {
     if (!tokens || tokens.length === 0) {
       return (
         <div className="TokenHints TokenHints--empty">
@@ -618,7 +644,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  insertToken(name, targetField) {
+  insertToken(name: string, targetField: string) {
     const insertion = `{{${name}}}`;
     const stream = targetField === 'flagMessage' ? this.flagMessage : this.message;
     const ref = targetField === 'flagMessage' ? this.flagMessageTextarea : this.messageTextarea;
@@ -641,21 +667,18 @@ export default class RulesetEditorModal extends Modal {
     try { ref.setSelectionRange(cursor, cursor); } catch (e) { /* ignore */ }
   }
 
-  previewBlock(effect, message) {
+  previewBlock(effect: string, message: string): Mithril.Children {
     const settings = this.displaySettings() || {};
     const templateName = settings.template || 'builtin';
     
     let TemplateComponent = filterEngine.getTemplate(templateName) || filterEngine.getTemplate('builtin');
 
-    // Generate sample tokens based on what the providers declare.
-    // e.g. "matched_word" -> "[matched_word]"
-    const sampleTokens = {};
+    const sampleTokens: any = {};
     const available = this.availableTokens() || [];
     available.forEach(t => {
       sampleTokens[t.name] = `[${t.name}]`;
     });
     
-    // Add some common fallbacks just in case the ruleset is completely empty
     if (available.length === 0) {
       sampleTokens['matched_word'] = '[matched_word]';
       sampleTokens['matched_pattern'] = '[matched_pattern]';
@@ -682,7 +705,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  validationBlock() {
+  validationBlock(): Mithril.Children {
     const err = this.validationError();
     if (!err) return null;
     return (
@@ -694,7 +717,7 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  actionsBlock() {
+  actionsBlock(): Mithril.Children {
     return (
       <div className="Form-group RulesetEditor-actions">
         <Button
@@ -712,14 +735,12 @@ export default class RulesetEditorModal extends Modal {
     );
   }
 
-  effectIcon(effect) {
+  effectIcon(effect: string) {
     if (effect === 'block')   return 'fas fa-ban';
     if (effect === 'warning') return 'fas fa-exclamation-triangle';
     if (effect === 'silent')  return 'fas fa-user-secret';
     return 'fas fa-info-circle';
   }
-
-  // ── Save flow ────────────────────────────────────────────────────────────
 
   canSave() {
     if (this.loading) return false;
@@ -742,7 +763,7 @@ export default class RulesetEditorModal extends Modal {
     return null;
   }
 
-  onsubmit(e) {
+  onsubmit(e: any) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     this.save();
   }
@@ -751,7 +772,7 @@ export default class RulesetEditorModal extends Modal {
     if (!this.canSave()) return;
 
     this.loading = true;
-    m.redraw();
+    (window as any).m.redraw();
 
     const data = {
       name: this.name(),
@@ -795,7 +816,8 @@ export default class RulesetEditorModal extends Modal {
         app.translator.trans('huoxin-filter-rule-manager.admin.save_error')
       );
       this.loading = false;
-      m.redraw();
+      (window as any).m.redraw();
     }
   }
 }
+

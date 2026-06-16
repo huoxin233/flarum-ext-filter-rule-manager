@@ -1,22 +1,41 @@
-import Component from 'flarum/common/Component';
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
+import app from 'flarum/admin/app';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import Stream from 'flarum/common/utils/Stream';
 import Switch from 'flarum/common/components/Switch';
+import type Mithril from 'mithril';
+
+export interface PatternsListConfigAttrs extends ComponentAttrs {
+  config?: any;
+  type: string;
+  onchange: (newConfig: any) => void;
+}
 
 /**
  * Config UI for the builtin `regex` rule type.
  *
  * Rule config shape: { patterns: string[] }
- * Backward compatible with the legacy single-value shape { pattern: string }.
  *
  * Patterns may use bare regex syntax (`foo.*bar`) or PCRE-delimited form
  * (`/foo.*bar/i`) — the evaluator detects which.
  */
-export default class PatternsListConfig extends Component {
-  oninit(vnode) {
+export default class PatternsListConfig extends Component<PatternsListConfigAttrs> {
+  text!: Stream<string>;
+  scanAll!: Stream<boolean>;
+
+  oninit(vnode: Mithril.Vnode<PatternsListConfigAttrs, this>) {
     super.oninit(vnode);
 
     const cfg = this.attrs.config || {};
-    let initial = [];
+    let initial: string[] = [];
     if (Array.isArray(cfg.patterns)) initial = cfg.patterns;
     else if (Array.isArray(cfg.value)) initial = cfg.value;
     else if (typeof cfg.value === 'string' && cfg.value !== '') initial = [cfg.value];
@@ -26,16 +45,16 @@ export default class PatternsListConfig extends Component {
     this.scanAll = Stream(cfg.scan_all || false);
   }
 
-  view() {
+  view(): Mithril.Children {
     return (
       <div className="FilterRuleManager-ConfigForm">
         <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_label')}</label>
         <textarea
           className="FormControl FilterRuleManager-LinesInput"
-          rows="5"
+          rows={5}
           value={this.text()}
-          oninput={(e) => this.handleInput(e.target.value)}
-          placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_placeholder')}
+          oninput={(e: any) => this.handleInput(e.target.value)}
+          placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_placeholder'))}
         ></textarea>
         <div className="helpText">
           {app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_help')}
@@ -43,7 +62,7 @@ export default class PatternsListConfig extends Component {
         <div className="Form-group">
           <Switch
             state={this.scanAll()}
-            onchange={(val) => {
+            onchange={(val: boolean) => {
               this.scanAll(val);
               this.attrs.onchange({ ...(this.attrs.config || {}), scan_all: val });
             }}
@@ -58,7 +77,7 @@ export default class PatternsListConfig extends Component {
     );
   }
 
-  handleInput(raw) {
+  handleInput(raw: string) {
     this.text(raw);
     const patterns = raw
       .split(/\r?\n/)
@@ -70,3 +89,4 @@ export default class PatternsListConfig extends Component {
     this.attrs.onchange(newCfg);
   }
 }
+

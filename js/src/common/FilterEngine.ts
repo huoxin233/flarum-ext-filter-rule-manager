@@ -1,18 +1,61 @@
 /*
  * This file is part of huoxin/filter-rule-manager.
  *
- * FilterEngine — shared between forum and admin bundles.
+ * Copyright (c) 2026 huoxin.
  *
- * The forum bundle uses the full surface (polling, scope evaluation, etc).
- * The admin bundle only uses provider registration (`registerProvider`) and
- * `getRegisteredFrontendTypes()` so that the rule builder can list types
- * contributed by frontend-only provider extensions.
- *
- * `app` and `m` are accessed via the global scope rather than imported,
- * because `flarum/forum/app` is not resolvable from the admin bundle.
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
  */
 
-function escapeHtml(str) {
+
+import type Mithril from 'mithril';
+
+export interface FilterRuleProvider {
+  getSupportedTypes(): string[];
+  getTypeLabels?(): Record<string, string>;
+  getProviderLabel?(): string;
+  evaluate?(ruleType: string, content: string, config: any): Record<string, string> | null;
+  getConfigComponent?(type: string): any;
+}
+
+export interface Ruleset {
+  id: string | number;
+  effectType: string;
+  displayMode: string;
+  message: string;
+  scopeType: string;
+  scopeTagIds?: (string | number)[];
+  evaluateTitle?: boolean;
+  evaluateAllRules?: boolean | (() => boolean);
+  blockCascade?: boolean;
+  compiledAst?: () => any;
+  compiled_ast?: any;
+  displaySettings?: any;
+}
+
+export interface ActiveAlert {
+  ruleset: Ruleset;
+  tokens: Record<string, string>;
+  message: string;
+}
+
+export interface BlockResult {
+  effectType: string;
+  displayMode: string;
+  message: string;
+  tokens: Record<string, string>;
+  displaySettings: any;
+  isBlock: boolean;
+}
+
+export interface EngineState {
+  activeAlerts: ActiveAlert[];
+  blockResults: BlockResult[];
+}
+
+export type SubscriberCallback = (state: EngineState) => void;
+
+function escapeHtml(str: string): string {
   return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -21,26 +64,25 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-class FilterEngine {
-  constructor() {
-    this.rulesets = [];
-    this.providers = {};
-    this.templates = {};
-    this.displayModes = {};
-    this.activeAlerts = [];
-    this.blockResults = [];
-    this.intervalId = null;
-    this.hasAlerts = false;
-    this._lastContent = null;
-    this._subscribers = [];
-  }
+export class FilterEngine {
+  public rulesets: Ruleset[] = [];
+  public providers: Record<string, FilterRuleProvider> = {};
+  public templates: Record<string, { component: any; settingsComponent: any }> = {};
+  public displayModes: Record<string, string> = {};
+  public activeAlerts: ActiveAlert[] = [];
+  public blockResults: BlockResult[] = [];
+  public intervalId: number | null = null;
+  public hasAlerts: boolean = false;
+  
+  private _lastStateKey: string | null = null;
+  private _subscribers: SubscriberCallback[] = [];
 
   /**
    * Subscribe to alert-state changes (active/block result mutations).
    * Returns an unsubscribe function. Used by FilterRulePopupDispatcher to drive
    * toast and modal display modes from a single source of truth.
    */
-  subscribe(callback) {
+  subscribe(callback: SubscriberCallback): () => void {
     if (typeof callback !== 'function') return () => {};
     this._subscribers.push(callback);
     return () => {
@@ -48,7 +90,7 @@ class FilterEngine {
     };
   }
 
-  _notify() {
+  private _notify(): void {
     for (const cb of this._subscribers) {
       try {
         cb({ activeAlerts: this.activeAlerts, blockResults: this.blockResults });
@@ -77,7 +119,7 @@ class FilterEngine {
    * has its own engine instance, so the forum-side object can implement
    * `evaluate` while the admin-side object implements the UI hooks.
    */
-  registerProvider(name, provider) {
+  registerProvider(name: string, provider: FilterRuleProvider): void {
     this.providers[name] = provider;
   }
 
@@ -85,14 +127,14 @@ class FilterEngine {
    * Look up a registered provider by name. Returns null if unknown.
    * Used by the admin RuleBuilder to find a provider's `getConfigComponent`.
    */
-  getProvider(name) {
+  getProvider(name: string): FilterRuleProvider | null {
     return this.providers[name] || null;
   }
 
   /**
    * Register a display template component.
    */
-  registerTemplate(name, component, settingsComponent = null) {
+  registerTemplate(name: string, component: any, settingsComponent: any = null): void {
     this.templates[name] = {
       component,
       settingsComponent,
@@ -102,23 +144,22 @@ class FilterEngine {
   /**
    * Get a registered display template component.
    */
-  getTemplate(name) {
+  getTemplate(name: string): any {
     return this.templates[name] ? this.templates[name].component : null;
   }
 
   /**
    * Get a registered display template settings component.
    */
-  getTemplateSettingsComponent(name) {
+  getTemplateSettingsComponent(name: string): any {
     return this.templates[name] ? this.templates[name].settingsComponent : null;
   }
 
   /**
    * Get all registered templates.
    */
-  getTemplates() {
-    // Return just the components for backwards compatibility with Object.keys() / values()
-    const result = {};
+  getTemplates(): Record<string, any> {
+    const result: Record<string, any> = {};
     for (const [name, data] of Object.entries(this.templates)) {
       result[name] = data.component;
     }
@@ -130,19 +171,23 @@ class FilterEngine {
    * @param {string} key - The unique identifier for the mode
    * @param {string} translationKey - The translation key for the UI label
    */
-  registerDisplayMode(key, translationKey) {
+  registerDisplayMode(key: string, translationKey: string): void {
     this.displayModes[key] = translationKey;
   }
 
   /**
    * Get all registered display modes.
    */
-  getDisplayModes() {
+  getDisplayModes(): Record<string, string> {
     return this.displayModes;
   }
 
-  getRegisteredFrontendTypes() {
-    const types = [];
+  getRegisteredFrontendTypes(): { provider: string; providerLabel: string; type: string; label: string }[] {
+    const types: { provider: string; providerLabel: string; type: string; label: string }[] = [];
+    
+    // Use window.app for translation if available
+    const app = (typeof window !== 'undefined' && (window as any).app) || null;
+
     for (const [name, provider] of Object.entries(this.providers)) {
       if (typeof provider.getSupportedTypes !== 'function') continue;
       const supported = provider.getSupportedTypes();
@@ -151,11 +196,11 @@ class FilterEngine {
       let providerLabel = name;
       if (typeof provider.getProviderLabel === 'function') {
         providerLabel = provider.getProviderLabel();
-      } else {
+      } else if (app && app.translator) {
         const transKey = `huoxin-filter-rule-manager.admin.providers.${name}`;
         const translated = app.translator.trans(transKey);
         const isTranslated = Array.isArray(translated) ? translated[0] !== transKey : translated !== transKey;
-        if (isTranslated) providerLabel = translated;
+        if (isTranslated) providerLabel = String(Array.isArray(translated) ? translated[0] : translated);
       }
 
       supported.forEach((type) => {
@@ -165,63 +210,62 @@ class FilterEngine {
     return types;
   }
 
-  loadRulesets(rulesets) {
+  loadRulesets(rulesets: Ruleset[]): void {
     this.rulesets = rulesets || [];
   }
 
-  start() {
+  start(): void {
     if (this.intervalId) return;
     setTimeout(() => this.evaluate(), 0);
-    this.intervalId = setInterval(() => this.evaluate(), 300);
+    this.intervalId = window.setInterval(() => this.evaluate(), 300);
   }
 
-  stop() {
+  stop(): void {
     if (this.intervalId) {
-      clearInterval(this.intervalId);
+      window.clearInterval(this.intervalId);
       this.intervalId = null;
     }
     this.activeAlerts = [];
     this.blockResults = [];
     this.hasAlerts = false;
-    this._lastContent = null;
+    this._lastStateKey = null;
     this._notify();
   }
 
-  setBlockResults(filterRules) {
+  setBlockResults(filterRules: any[]): void {
     this.blockResults = (filterRules || []).map((alert) => ({
       effectType: alert.effect_type,
       displayMode: alert.display_mode,
-      message: alert.message, // already interpolated server-side
+      message: alert.message,
       tokens: alert.tokens || {},
       displaySettings: alert.display_settings || {},
       isBlock: true,
     }));
     this.hasAlerts = this.activeAlerts.length > 0 || this.blockResults.length > 0;
     this._notify();
-    if (typeof m !== 'undefined') m.redraw();
+    if (typeof (window as any).m !== 'undefined') (window as any).m.redraw();
   }
 
-  clearBlockResults() {
+  clearBlockResults(): void {
     this.blockResults = [];
     this.hasAlerts = this.activeAlerts.length > 0;
     this._notify();
-    if (typeof m !== 'undefined') m.redraw();
+    if (typeof (window as any).m !== 'undefined') (window as any).m.redraw();
   }
 
-  evaluate() {
-    const application = (typeof window !== 'undefined' && window.app) || null;
+  evaluate(): void {
+    const application = (typeof window !== 'undefined' && (window as any).app) || null;
     const composer = application && application.composer;
     if (!composer || typeof composer.isVisible !== 'function' || !composer.isVisible()) return;
 
     const content = (composer.fields && composer.fields.content && composer.fields.content()) || '';
     const title = (composer.fields && composer.fields.title && composer.fields.title()) || '';
 
-    // Short-circuit when content and title have not changed since the last tick.
     const stateKey = `${title}\n\n${content}`;
     if (stateKey === this._lastStateKey) return;
     this._lastStateKey = stateKey;
 
-    const activeAlerts = [];
+    const activeAlerts: ActiveAlert[] = [];
 
     for (const ruleset of this.rulesets) {
       if (!this.scopeMatches(ruleset, composer, application)) continue;
@@ -248,19 +292,18 @@ class FilterEngine {
 
     if (changed) {
       this._notify();
-      if (typeof m !== 'undefined') m.redraw();
+      if (typeof (window as any).m !== 'undefined') (window as any).m.redraw();
     }
   }
 
-  evaluateRuleset(ruleset, content) {
-    // Both Ruleset model (compiledAst()) and raw object (compiled_ast) might be passed depending on usage.
+  evaluateRuleset(ruleset: Ruleset, content: string): Record<string, string> | null {
     const ast = typeof ruleset.compiledAst === 'function' ? ruleset.compiledAst() : ruleset.compiled_ast;
     if (!ast) return null;
 
     return this.evaluateAST(ast, content, ruleset);
   }
 
-  evaluateAST(node, content, ruleset) {
+  evaluateAST(node: any, content: string, ruleset: Ruleset): Record<string, string> | null {
     if (!node) return null;
 
     if (node.type === 'logical') {
@@ -295,8 +338,8 @@ class FilterEngine {
     return null;
   }
 
-  mergeResults(results) {
-    let merged = {};
+  mergeResults(results: Record<string, string>[]): Record<string, string> {
+    let merged: Record<string, string> = {};
     for (const r of results) {
       if (r !== null) {
         for (const [key, val] of Object.entries(r)) {
@@ -313,7 +356,7 @@ class FilterEngine {
     return merged;
   }
 
-  evaluateRuleNode(node, content) {
+  evaluateRuleNode(node: any, content: string): Record<string, string> | null {
     const provider = this.providers[node.provider];
     if (!provider || typeof provider.evaluate !== 'function') return null;
     if (!provider.getSupportedTypes().includes(node.ruleType)) return null;
@@ -340,9 +383,9 @@ class FilterEngine {
     return result;
   }
 
-  scopeMatches(ruleset, composer, application) {
+  scopeMatches(ruleset: Ruleset, composer: any, application: any): boolean {
     let isPrivate = false;
-    let tagIds = [];
+    let tagIds: (string | number)[] = [];
 
     let discussion = null;
     if (composer.body && composer.body.attrs) {
@@ -354,7 +397,6 @@ class FilterEngine {
     }
 
     if (discussion) {
-      // Replying or Editing
       const recipientUsers = discussion.recipientUsers && discussion.recipientUsers();
       const recipientGroups = discussion.recipientGroups && discussion.recipientGroups();
       const isPrivateAttr = (discussion.isPrivate && discussion.isPrivate()) ||
@@ -364,16 +406,14 @@ class FilterEngine {
       
       isPrivate = !!isPrivateAttr || (recipientUsers && recipientUsers.length > 0) || (recipientGroups && recipientGroups.length > 0);
       tagIds = (discussion.tags && discussion.tags())
-        ? discussion.tags().map((t) => t.id())
+        ? discussion.tags().map((t: any) => t.id())
         : [];
     } else {
-      // New Discussion
-      const resolveField = (val) => typeof val === 'function' ? val() : val;
+      const resolveField = (val: any) => typeof val === 'function' ? val() : val;
       
       let recipientUsers = resolveField(composer.fields.recipientUsers) || [];
       let recipientGroups = resolveField(composer.fields.recipientGroups) || [];
       
-      // Byobu stores recipients in composer.fields.recipients as an ItemList
       const recipientsField = resolveField(composer.fields.recipients);
       const recipientsArray = recipientsField && typeof recipientsField.toArray === 'function' ? recipientsField.toArray() : (Array.isArray(recipientsField) ? recipientsField : []);
       
@@ -383,7 +423,7 @@ class FilterEngine {
       isPrivate = !!fieldsIsPrivate || hasRecipients;
       
       tagIds = resolveField(composer.fields.tags)
-        ? resolveField(composer.fields.tags).map((t) => t.id())
+        ? resolveField(composer.fields.tags).map((t: any) => t.id())
         : [];
     }
 
@@ -393,7 +433,7 @@ class FilterEngine {
       case 'private_post': return isPrivate;
       case 'tag':
         if (!ruleset.scopeTagIds || ruleset.scopeTagIds.length === 0) return false;
-        return tagIds.some((id) => ruleset.scopeTagIds.includes(id));
+        return tagIds.some((id) => ruleset.scopeTagIds!.includes(id));
       default:
         return false;
     }
@@ -407,7 +447,7 @@ class FilterEngine {
    * admin-authored and therefore trusted, so callers can safely render the
    * result with `m.trust(...)` for admin-supplied formatting like <br>.
    */
-  interpolate(template, tokens) {
+  interpolate(template: string | string[], tokens: Record<string, string> | undefined): string {
     if (!template) return '';
     const strTemplate = Array.isArray(template) ? template.join('') : String(template);
     return strTemplate.replace(/\{\{(\w+)\}\}/g, (match, key) => {
@@ -416,11 +456,10 @@ class FilterEngine {
     });
   }
 
-  alertsChanged(oldAlerts, newAlerts) {
+  alertsChanged(oldAlerts: ActiveAlert[], newAlerts: ActiveAlert[]): boolean {
     if (oldAlerts.length !== newAlerts.length) return true;
     for (let i = 0; i < oldAlerts.length; i++) {
       if (oldAlerts[i].ruleset.id !== newAlerts[i].ruleset.id) return true;
-      // Comparing the rendered message catches token-value changes too.
       if (oldAlerts[i].message !== newAlerts[i].message) return true;
     }
     return false;

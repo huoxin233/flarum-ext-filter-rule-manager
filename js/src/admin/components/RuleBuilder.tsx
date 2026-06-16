@@ -1,13 +1,24 @@
-import Component from 'flarum/common/Component';
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
+import app from 'flarum/admin/app';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
 import icon from 'flarum/common/helpers/icon';
 import { parseExpression, stringifyExpression } from '../utils/ExpressionParser';
+import type Mithril from 'mithril';
 
 let nodeIdCounter = 1;
 
-function ensureKeys(node) {
+function ensureKeys(node: any) {
   if (!node) return;
   if (!node._key) node._key = nodeIdCounter++;
   if (node.left) ensureKeys(node.left);
@@ -15,13 +26,19 @@ function ensureKeys(node) {
   if (node.node) ensureKeys(node.node);
 }
 
-function createEmptyRule(providers) {
+function createEmptyRule(providers: any[]) {
   const first = providers[0];
   return { _key: nodeIdCounter++, type: 'rule', provider: first ? first.provider : '', ruleType: first ? first.type : '', operator: 'eq', value: '' };
 }
 
-class LogicalNodeView extends Component {
-  view() {
+interface LogicalNodeViewAttrs extends ComponentAttrs {
+  node: any;
+  onchange: (v: any) => void;
+  providers: any[];
+}
+
+class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
+  view(): Mithril.Children {
     const { node, onchange, providers } = this.attrs;
     const isAnd = node.operator === 'AND';
     const isOr = node.operator === 'OR';
@@ -29,8 +46,8 @@ class LogicalNodeView extends Component {
     return (
       <div className="Expression-LogicalNode" key={node._key}>
         {[
-          <NodeView key={node.left ? node.left._key : 'l'} node={node.left} onchange={v => {
-            if (v === null) onchange(node.right); // collapse
+          <NodeView key={node.left ? node.left._key : 'l'} node={node.left} onchange={(v: any) => {
+            if (v === null) onchange(node.right);
             else onchange({ ...node, left: v });
           }} providers={providers} />,
           
@@ -52,8 +69,8 @@ class LogicalNodeView extends Component {
             </div>
           ) : null,
 
-          <NodeView key={node.right ? node.right._key : 'r'} node={node.right} onchange={v => {
-            if (v === null) onchange(node.left); // collapse
+          <NodeView key={node.right ? node.right._key : 'r'} node={node.right} onchange={(v: any) => {
+            if (v === null) onchange(node.left);
             else onchange({ ...node, right: v });
           }} providers={providers} />
         ].filter(Boolean)}
@@ -62,21 +79,29 @@ class LogicalNodeView extends Component {
   }
 }
 
-class RuleNodeView extends Component {
-  view() {
+interface RuleNodeViewAttrs extends ComponentAttrs {
+  node: any;
+  isNegated: boolean;
+  onchange: (v: any) => void;
+  onNegateChange: (v: boolean) => void;
+  providers: any[];
+}
+
+class RuleNodeView extends Component<RuleNodeViewAttrs> {
+  view(): Mithril.Children {
     const { node, onchange, providers } = this.attrs;
 
-    const providerOptions = {};
+    const providerOptions: Record<string, string> = {};
     providers.forEach((p) => {
       if (p.provider) {
         const transKey = `huoxin-filter-rule-manager.admin.providers.${p.provider}`;
         const translated = app.translator.trans(transKey);
-        providerOptions[p.provider] = (translated !== transKey && translated) ? translated : (p.providerLabel || p.provider);
+        providerOptions[p.provider] = (translated !== transKey && translated) ? String(translated) : (p.providerLabel || p.provider);
       }
     });
 
     const availableTypes = providers.filter((p) => p.provider === node.provider);
-    const typeOptions = availableTypes.reduce((acc, p) => {
+    const typeOptions = availableTypes.reduce((acc: Record<string, string>, p) => {
       acc[p.type] = p.label || p.type;
       return acc;
     }, {});
@@ -87,7 +112,7 @@ class RuleNodeView extends Component {
           <Select
             options={providerOptions}
             value={node.provider}
-            onchange={(val) => {
+            onchange={(val: string) => {
               const firstType = providers.find((p) => p.provider === val);
               onchange({ ...node, provider: val, ruleType: firstType ? firstType.type : '', value: '' });
             }}
@@ -96,7 +121,7 @@ class RuleNodeView extends Component {
           <Select
             options={typeOptions}
             value={node.ruleType}
-            onchange={(val) => onchange({ ...node, ruleType: val, value: '' })}
+            onchange={(val: string) => onchange({ ...node, ruleType: val, value: '' })}
             disabled={!node.provider}
           />
 
@@ -111,7 +136,7 @@ class RuleNodeView extends Component {
               className="Button Button--icon Button--danger" 
               icon="fas fa-times" 
               onclick={() => onchange(null)} 
-              title={app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.delete_rule')} 
+              title={String(app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.delete_rule'))} 
             />
           </div>
         </div>
@@ -123,12 +148,12 @@ class RuleNodeView extends Component {
     );
   }
 
-  renderConfig() {
+  renderConfig(): Mithril.Children {
     const { node, onchange } = this.attrs;
     
-    // Check if the provider has a custom config component
-    const providerInstance = (app.filterRuleManager && typeof app.filterRuleManager.getProvider === 'function')
-      ? app.filterRuleManager.getProvider(node.provider)
+    const filterRuleManager = (app as any).filterRuleManager;
+    const providerInstance = (filterRuleManager && typeof filterRuleManager.getProvider === 'function')
+      ? filterRuleManager.getProvider(node.provider)
       : null;
 
     const ConfigComponent = (providerInstance && typeof providerInstance.getConfigComponent === 'function')
@@ -144,39 +169,43 @@ class RuleNodeView extends Component {
         <ConfigComponent
           config={configObj}
           type={node.ruleType}
-          onchange={(newConfig) => {
+          onchange={(newConfig: any) => {
             onchange({ ...node, value: newConfig });
           }}
         />
       );
     }
 
-    // Fallback simple input
     let valStr = typeof node.value === 'string' ? node.value : JSON.stringify(node.value, null, 2);
     if (valStr === undefined) valStr = '';
 
     return (
       <textarea 
         className="FormControl" 
-        rows="2"
+        rows={2}
         value={valStr} 
-        onchange={e => {
+        onchange={(e: any) => {
           let v = e.target.value;
           const trimmed = v.trim();
-          // Only attempt JSON parsing for objects/arrays to prevent accidental primitive coercion
           if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
             try { v = JSON.parse(trimmed); } catch(e){}
           }
           onchange({ ...node, value: v });
         }} 
-        placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.value_placeholder')} 
+        placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.value_placeholder'))} 
       />
     );
   }
 }
 
-class NodeView extends Component {
-  view() {
+interface NodeViewAttrs extends ComponentAttrs {
+  node: any;
+  onchange: (v: any) => void;
+  providers: any[];
+}
+
+class NodeView extends Component<NodeViewAttrs> {
+  view(): Mithril.Children {
     const { node, onchange, providers } = this.attrs;
     
     if (!node) {
@@ -201,7 +230,7 @@ class NodeView extends Component {
             isNegated={false}
             onchange={onchange} 
             providers={providers}
-            onNegateChange={(v) => {
+            onNegateChange={(v: boolean) => {
               if (v) {
                 onchange({ type: 'not', node: node });
               }
@@ -213,20 +242,19 @@ class NodeView extends Component {
     
     if (node.type === 'not') {
       if (node.node && node.node.type === 'rule') {
-        // Render it as a single RuleNodeView with Negated toggle ON
         return (
           <div className="NodeView-ruleContainer" key={node._key}>
             <RuleNodeView 
               node={node.node}  
               isNegated={true}
-              onchange={v => {
+              onchange={(v: any) => {
                 if (v === null) onchange(null);
                 else onchange({ ...node, node: v });
               }} 
               providers={providers}
-              onNegateChange={(v) => {
+              onNegateChange={(v: boolean) => {
                 if (!v) {
-                  onchange(node.node); // Unwrap
+                  onchange(node.node);
                 }
               }}
             />
@@ -234,13 +262,12 @@ class NodeView extends Component {
         );
       }
 
-      // Fallback for complex NOT nodes (e.g. NOT (A AND B))
       return (
         <div className="Expression-NotNode" key={node._key}>
            <div className="NotNode-label" key="label">
              {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.not')}
            </div>
-           <NodeView key={node.node ? node.node._key : 'n'} node={node.node} onchange={v => {
+           <NodeView key={node.node ? node.node._key : 'n'} node={node.node} onchange={(v: any) => {
              if (v === null) onchange(null);
              else onchange({ ...node, node: v });
            }} providers={providers} />
@@ -252,10 +279,21 @@ class NodeView extends Component {
   }
 }
 
-export default class RuleBuilder extends Component {
-  oninit(vnode) {
+export interface RuleBuilderAttrs extends ComponentAttrs {
+  expression?: string;
+  onchange?: (v: string) => void;
+  providers?: any[];
+}
+
+export default class RuleBuilder extends Component<RuleBuilderAttrs> {
+  mode: string = 'visual';
+  expression: string = '';
+  ast: any = null;
+  parseError: string | null = null;
+
+  oninit(vnode: Mithril.Vnode<RuleBuilderAttrs, this>) {
     super.oninit(vnode);
-    this.mode = 'visual'; // 'visual' or 'editor'
+    this.mode = 'visual';
     this.expression = this.attrs.expression || '';
     this.ast = null;
     this.parseError = null;
@@ -272,7 +310,7 @@ export default class RuleBuilder extends Component {
     try {
       this.ast = parseExpression(this.expression);
       ensureKeys(this.ast);
-    } catch (e) {
+    } catch (e: any) {
       this.parseError = e.message;
       this.mode = 'editor';
     }
@@ -289,7 +327,7 @@ export default class RuleBuilder extends Component {
     }
   }
 
-  view() {
+  view(): Mithril.Children {
     const providers = this.attrs.providers || [];
 
     return (
@@ -329,7 +367,7 @@ export default class RuleBuilder extends Component {
               <NodeView 
                 key={this.ast ? this.ast._key : 'root'}
                 node={this.ast} 
-                onchange={(newAst) => {
+                onchange={(newAst: any) => {
                   this.ast = newAst;
                   this.syncToEditor();
                 }} 
@@ -356,12 +394,12 @@ export default class RuleBuilder extends Component {
             <textarea 
               className="FormControl RuleBuilder-textarea" 
               value={this.expression} 
-              oninput={e => {
+              oninput={(e: any) => {
                  this.expression = e.target.value;
                  this.emit();
               }}
-              placeholder={app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_placeholder')}
-              rows="6"
+              placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_placeholder'))}
+              rows={6}
             />
             <div className="helpText RuleBuilder-editorHelp">
                {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_help')}
@@ -372,3 +410,4 @@ export default class RuleBuilder extends Component {
     );
   }
 }
+

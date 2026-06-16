@@ -1,8 +1,24 @@
-import app from 'flarum/forum/app';
-import Modal from 'flarum/common/components/Modal';
-import Button from 'flarum/common/components/Button';
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
 
-export default class FilterRuleWarningModal extends Modal {
+import app from 'flarum/forum/app';
+import Modal, { ModalAttrs } from 'flarum/common/components/Modal';
+import Button from 'flarum/common/components/Button';
+import type Mithril from 'mithril';
+
+export interface FilterRuleWarningModalAttrs extends ModalAttrs {
+  alerts: any[];
+  onconfirm: () => void;
+  oncancel: () => void;
+}
+
+export default class FilterRuleWarningModal extends Modal<FilterRuleWarningModalAttrs> {
   className() {
     return 'FilterRuleWarningModal Modal--small';
   }
@@ -19,7 +35,7 @@ export default class FilterRuleWarningModal extends Modal {
         <p>{app.translator.trans('huoxin-filter-rule-manager.forum.warning_modal_text')}</p>
         <ul className="FilterRuleWarningModal-list">
           {alerts.map((alert, i) => (
-            <li key={i}>{m.trust(alert.message)}</li>
+            <li key={i}>{(window as any).m.trust(alert.message)}</li>
           ))}
         </ul>
         <div className="Form-group">
@@ -34,3 +50,4 @@ export default class FilterRuleWarningModal extends Modal {
     );
   }
 }
+

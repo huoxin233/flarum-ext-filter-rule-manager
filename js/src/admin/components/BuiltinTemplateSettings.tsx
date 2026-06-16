@@ -1,7 +1,17 @@
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 import app from 'flarum/admin/app';
-import Component from 'flarum/common/Component';
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import icon from 'flarum/common/helpers/icon';
 import Select from 'flarum/common/components/Select';
+import type Mithril from 'mithril';
 
 const COMMON_ICONS = [
   'fas fa-info-circle', 'fas fa-exclamation-circle', 'fas fa-exclamation-triangle',
@@ -12,8 +22,15 @@ const COMMON_ICONS = [
   'fas fa-eye', 'fas fa-volume-mute', 'fas fa-radiation'
 ];
 
-class ColorPickerInput extends Component {
-  view() {
+interface ColorPickerInputAttrs extends ComponentAttrs {
+  label: string;
+  value: string;
+  defaultColor: string;
+  onchange: (val: string) => void;
+}
+
+class ColorPickerInput extends Component<ColorPickerInputAttrs> {
+  view(): Mithril.Children {
     const { label, value, defaultColor, onchange } = this.attrs;
     return (
       <div className="Form-group">
@@ -23,7 +40,7 @@ class ColorPickerInput extends Component {
             type="color"
             className={value === 'transparent' ? 'is-transparent' : ''}
             value={value && value !== 'transparent' ? value : defaultColor} 
-            oninput={(e) => onchange(e.target.value)} 
+            oninput={(e: any) => onchange(e.target.value)} 
           />
           <div className="ColorPickerInput-input">
             <input 
@@ -31,7 +48,7 @@ class ColorPickerInput extends Component {
               className="FormControl" 
               placeholder={defaultColor} 
               value={value || ''} 
-              oninput={(e) => onchange(e.target.value)} 
+              oninput={(e: any) => onchange(e.target.value)} 
             />
             <div className="ColorPicker-actions">
               <div 
@@ -56,20 +73,28 @@ class ColorPickerInput extends Component {
   }
 }
 
-export default class BuiltinTemplateSettings extends Component {
-  oninit(vnode) {
+export interface BuiltinTemplateSettingsAttrs extends ComponentAttrs {
+  displaySetting: (key: string, value?: any) => any;
+  effectType: string;
+  displayMode: string;
+}
+
+export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSettingsAttrs> {
+  showIconPicker: boolean = false;
+
+  oninit(vnode: Mithril.Vnode<BuiltinTemplateSettingsAttrs, this>) {
     super.oninit(vnode);
     this.showIconPicker = false;
   }
 
-  getDefaultStylesForEffect(effect) {
+  getDefaultStylesForEffect(effect: string): { icon: string; iconColor: string; textColor: string; backgroundColor: string } {
     if (effect === 'info') return { icon: 'fas fa-info-circle', iconColor: '#2b7c93', textColor: '#2b7c93', backgroundColor: '#e8f4f8' };
     if (effect === 'warning') return { icon: 'fas fa-exclamation-triangle', iconColor: '#8a6d3b', textColor: '#8a6d3b', backgroundColor: '#fff4e5' };
     if (effect === 'block') return { icon: 'fas fa-times-circle', iconColor: '#a94442', textColor: '#a94442', backgroundColor: '#fde8e8' };
     return { icon: 'fas fa-info-circle', iconColor: '#000000', textColor: '#000000', backgroundColor: '#ffffff' };
   }
 
-  view() {
+  view(): Mithril.Children {
     const { displaySetting, effectType, displayMode } = this.attrs;
     const isToast = displayMode === 'toast';
     const defaultStyles = this.getDefaultStylesForEffect(effectType);
@@ -90,7 +115,7 @@ export default class BuiltinTemplateSettings extends Component {
                 className="FormControl" 
                 placeholder={defaultStyles.icon} 
                 value={displaySetting('icon')} 
-                oninput={(e) => displaySetting('icon', e.target.value)} 
+                oninput={(e: any) => displaySetting('icon', e.target.value)} 
               />
               <div className="IconPicker-actions">
                 <div 
@@ -115,7 +140,7 @@ export default class BuiltinTemplateSettings extends Component {
                       }}
                       title="No Icon"
                     >
-                      {icon('fas fa-ban')} {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_no_icon') || 'None'}
+                      {icon('fas fa-ban')} {String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_no_icon')) || 'None'}
                     </button>
                     {COMMON_ICONS.map(iconClass => (
                       <button 
@@ -137,19 +162,19 @@ export default class BuiltinTemplateSettings extends Component {
         </div>
         {!isToast ? [
             <ColorPickerInput 
-              label={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon_color')}
+              label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon_color'))}
               value={displaySetting('iconColor')}
               defaultColor={defaultStyles.iconColor}
               onchange={(val) => displaySetting('iconColor', val)}
             />,
             <ColorPickerInput 
-              label={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_text_color')}
+              label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_text_color'))}
               value={displaySetting('textColor')}
               defaultColor={defaultStyles.textColor}
               onchange={(val) => displaySetting('textColor', val)}
             />,
             <ColorPickerInput 
-              label={app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_bg_color')}
+              label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_bg_color'))}
               value={displaySetting('backgroundColor')}
               defaultColor={defaultStyles.backgroundColor}
               onchange={(val) => displaySetting('backgroundColor', val)}
@@ -159,13 +184,13 @@ export default class BuiltinTemplateSettings extends Component {
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme')}</label>
             <Select
               options={{
-                '': app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_auto'),
-                'success': app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_success'),
-                'error': app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_error'),
-                'warning': app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_warning'),
+                '': String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_auto')),
+                'success': String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_success')),
+                'error': String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_error')),
+                'warning': String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_warning')),
               }}
               value={displaySetting('toastTheme') || ''}
-              onchange={(val) => displaySetting('toastTheme', val)}
+              onchange={(val: string) => displaySetting('toastTheme', val)}
             />
           </div>
         )}

@@ -1,15 +1,34 @@
-import Component from 'flarum/common/Component';
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
+import Component, { ComponentAttrs } from 'flarum/common/Component';
 import icon from 'flarum/common/helpers/icon';
 import classList from 'flarum/common/utils/classList';
+import Stream from 'flarum/common/utils/Stream';
+import type Mithril from 'mithril';
 
-export default class InlineTagSelector extends Component {
-  oninit(vnode) {
+export interface InlineTagSelectorAttrs extends ComponentAttrs {
+  tags?: any[];
+  selectedIds: Stream<number[]>;
+}
+
+export default class InlineTagSelector extends Component<InlineTagSelectorAttrs> {
+  tags: any[] = [];
+  selectedIds!: Stream<number[]>;
+
+  oninit(vnode: Mithril.Vnode<InlineTagSelectorAttrs, this>) {
     super.oninit(vnode);
     this.tags = this.attrs.tags || [];
-    this.selectedIds = this.attrs.selectedIds; // Stream
+    this.selectedIds = this.attrs.selectedIds;
   }
 
-  view() {
+  view(): Mithril.Children {
     const tags = this.attrs.tags || [];
     const primaryTags = tags.filter(t => t.position() !== null && t.position() !== undefined && !t.isChild()).sort((a, b) => a.position() - b.position());
     const secondaryTags = tags.filter(t => t.position() === null || t.position() === undefined).sort((a, b) => a.name().localeCompare(b.name()));
@@ -37,7 +56,7 @@ export default class InlineTagSelector extends Component {
     );
   }
 
-  renderTag(tag, children) {
+  renderTag(tag: any, children: any[]): Mithril.Children {
     const id = parseInt(tag.id(), 10);
     const selected = (this.selectedIds() || []).includes(id);
 
@@ -47,7 +66,7 @@ export default class InlineTagSelector extends Component {
           <input 
             type="checkbox" 
             checked={selected}
-            onchange={(e) => this.toggleTag(id, e.target.checked)}
+            onchange={(e: any) => this.toggleTag(id, e.target.checked)}
           />
           <span className="InlineTagSelector-icon" style={{ backgroundColor: tag.color() }}>
             {tag.icon() && icon(tag.icon())}
@@ -63,9 +82,8 @@ export default class InlineTagSelector extends Component {
     );
   }
 
-  toggleTag(id, checked) {
+  toggleTag(id: number, checked: boolean) {
     let ids = this.selectedIds() || [];
-    // Ensure we clone the array to trigger redraws properly if needed
     ids = [...ids];
     if (checked) {
       if (!ids.includes(id)) ids.push(id);
