@@ -52,14 +52,38 @@ class Lexer {
         continue;
       }
 
-      if (char === '(') { tokens.push({ type: T_LPAREN, value: '(', position: this.position++ }); continue; }
-      if (char === ')') { tokens.push({ type: T_RPAREN, value: ')', position: this.position++ }); continue; }
-      if (char === '[') { tokens.push({ type: T_LBRACKET, value: '[', position: this.position++ }); continue; }
-      if (char === ']') { tokens.push({ type: T_RBRACKET, value: ']', position: this.position++ }); continue; }
-      if (char === '{') { tokens.push({ type: T_LBRACE, value: '{', position: this.position++ }); continue; }
-      if (char === '}') { tokens.push({ type: T_RBRACE, value: '}', position: this.position++ }); continue; }
-      if (char === ':') { tokens.push({ type: T_COLON, value: ':', position: this.position++ }); continue; }
-      if (char === ',') { tokens.push({ type: T_COMMA, value: ',', position: this.position++ }); continue; }
+      if (char === '(') {
+        tokens.push({ type: T_LPAREN, value: '(', position: this.position++ });
+        continue;
+      }
+      if (char === ')') {
+        tokens.push({ type: T_RPAREN, value: ')', position: this.position++ });
+        continue;
+      }
+      if (char === '[') {
+        tokens.push({ type: T_LBRACKET, value: '[', position: this.position++ });
+        continue;
+      }
+      if (char === ']') {
+        tokens.push({ type: T_RBRACKET, value: ']', position: this.position++ });
+        continue;
+      }
+      if (char === '{') {
+        tokens.push({ type: T_LBRACE, value: '{', position: this.position++ });
+        continue;
+      }
+      if (char === '}') {
+        tokens.push({ type: T_RBRACE, value: '}', position: this.position++ });
+        continue;
+      }
+      if (char === ':') {
+        tokens.push({ type: T_COLON, value: ':', position: this.position++ });
+        continue;
+      }
+      if (char === ',') {
+        tokens.push({ type: T_COMMA, value: ',', position: this.position++ });
+        continue;
+      }
 
       if (char === '"' || char === "'") {
         tokens.push(this.readString(char));
@@ -78,9 +102,13 @@ class Lexer {
         if (lower === 'and') token.type = T_AND;
         else if (lower === 'or') token.type = T_OR;
         else if (lower === 'not') token.type = T_NOT;
-        else if (lower === 'true') { token.type = T_BOOLEAN; token.value = true; }
-        else if (lower === 'false') { token.type = T_BOOLEAN; token.value = false; }
-        else if (['eq', 'neq', 'gt', 'lt', 'lte', 'gte', 'in', 'contains', 'matches', 'contains_word', 'contains_regex'].includes(lower)) {
+        else if (lower === 'true') {
+          token.type = T_BOOLEAN;
+          token.value = true;
+        } else if (lower === 'false') {
+          token.type = T_BOOLEAN;
+          token.value = false;
+        } else if (['eq', 'neq', 'gt', 'lt', 'lte', 'gte', 'in', 'contains', 'matches', 'contains_word', 'contains_regex'].includes(lower)) {
           token.type = T_OP;
           token.value = lower;
         } else {
@@ -92,7 +120,10 @@ class Lexer {
 
       if (['=', '!', '<', '>'].includes(char)) {
         const op = this.readOperator();
-        if (op) { tokens.push(op); continue; }
+        if (op) {
+          tokens.push(op);
+          continue;
+        }
       }
 
       throw new Error(`Unexpected character '${char}' at position ${this.position}`);
@@ -124,13 +155,19 @@ class Lexer {
   readNumber(): Token {
     const start = this.position;
     let value = '';
-    if (this.input[this.position] === '-') { value += '-'; this.position++; }
+    if (this.input[this.position] === '-') {
+      value += '-';
+      this.position++;
+    }
     let hasDot = false;
     while (this.position < this.length) {
       const char = this.input[this.position];
-      if (/[0-9]/.test(char)) { value += char; }
-      else if (char === '.' && !hasDot) { hasDot = true; value += char; }
-      else break;
+      if (/[0-9]/.test(char)) {
+        value += char;
+      } else if (char === '.' && !hasDot) {
+        hasDot = true;
+        value += char;
+      } else break;
       this.position++;
     }
     return { type: T_NUMBER, value: Number(value), position: start };
@@ -141,8 +178,10 @@ class Lexer {
     let value = '';
     while (this.position < this.length) {
       const char = this.input[this.position];
-      if (/[a-zA-Z0-9_.]/.test(char)) { value += char; this.position++; }
-      else break;
+      if (/[a-zA-Z0-9_.]/.test(char)) {
+        value += char;
+        this.position++;
+      } else break;
     }
     return { type: T_FIELD, value, position: start };
   }
@@ -152,12 +191,25 @@ class Lexer {
     const char = this.input[this.position];
     const next = this.position + 1 < this.length ? this.input[this.position + 1] : '';
     let op = null;
-    if (char === '=' && next === '=') { op = 'eq'; this.position += 2; }
-    else if (char === '!' && next === '=') { op = 'neq'; this.position += 2; }
-    else if (char === '<' && next === '=') { op = 'lte'; this.position += 2; }
-    else if (char === '>' && next === '=') { op = 'gte'; this.position += 2; }
-    else if (char === '<') { op = 'lt'; this.position++; }
-    else if (char === '>') { op = 'gt'; this.position++; }
+    if (char === '=' && next === '=') {
+      op = 'eq';
+      this.position += 2;
+    } else if (char === '!' && next === '=') {
+      op = 'neq';
+      this.position += 2;
+    } else if (char === '<' && next === '=') {
+      op = 'lte';
+      this.position += 2;
+    } else if (char === '>' && next === '=') {
+      op = 'gte';
+      this.position += 2;
+    } else if (char === '<') {
+      op = 'lt';
+      this.position++;
+    } else if (char === '>') {
+      op = 'gt';
+      this.position++;
+    }
 
     return op ? { type: T_OP, value: op, position: start } : null;
   }
@@ -214,7 +266,7 @@ export class Parser {
   }
 
   parseRule(): any {
-    const fieldToken = this.consume(T_FIELD, "Expected field identifier (e.g. provider.type)");
+    const fieldToken = this.consume(T_FIELD, 'Expected field identifier (e.g. provider.type)');
     const parts = fieldToken.value.split('.');
     if (parts.length !== 2) throw new Error(`Field '${fieldToken.value}' must be in format provider.type`);
     const [provider, ruleType] = parts;
@@ -237,7 +289,9 @@ export class Parser {
     if (this.match(T_LBRACKET)) {
       const arr: any[] = [];
       if (!this.check(T_RBRACKET)) {
-        do { arr.push(this.parseValue()); } while (this.match(T_COMMA));
+        do {
+          arr.push(this.parseValue());
+        } while (this.match(T_COMMA));
       }
       this.consume(T_RBRACKET, "Expected ']' after array elements.");
       return arr;
@@ -246,7 +300,7 @@ export class Parser {
       const obj: Record<string, any> = {};
       if (!this.check(T_RBRACE)) {
         do {
-          const keyToken = this.consume(T_STRING, "Expected string key in object");
+          const keyToken = this.consume(T_STRING, 'Expected string key in object');
           this.consume(T_COLON, "Expected ':' after object key");
           const val = this.parseValue();
           obj[keyToken.value] = val;
@@ -261,7 +315,10 @@ export class Parser {
 
   match(...types: string[]): boolean {
     for (const type of types) {
-      if (this.check(type)) { this.advance(); return true; }
+      if (this.check(type)) {
+        this.advance();
+        return true;
+      }
     }
     return false;
   }
@@ -281,9 +338,15 @@ export class Parser {
     return this.previous();
   }
 
-  isAtEnd(): boolean { return this.peek().type === T_EOF; }
-  peek(): Token { return this.tokens[this.position]; }
-  previous(): Token { return this.tokens[this.position - 1]; }
+  isAtEnd(): boolean {
+    return this.peek().type === T_EOF;
+  }
+  peek(): Token {
+    return this.tokens[this.position];
+  }
+  previous(): Token {
+    return this.tokens[this.position - 1];
+  }
 }
 
 export function parseExpression(expression: string | null | undefined): any {
@@ -306,13 +369,25 @@ export function stringifyExpression(ast: any): string {
   if (ast.type === 'rule') {
     let valStr = '';
     if (typeof ast.value === 'string') valStr = `"${ast.value.replace(/"/g, '\\"')}"`;
-    else if (Array.isArray(ast.value)) valStr = `[${ast.value.map(v => typeof v === 'string' ? `"${v.replace(/"/g, '\\"')}"` : v).join(', ')}]`;
+    else if (Array.isArray(ast.value)) valStr = `[${ast.value.map((v) => (typeof v === 'string' ? `"${v.replace(/"/g, '\\"')}"` : v)).join(', ')}]`;
     else if (typeof ast.value === 'object' && ast.value !== null) {
-      valStr = `{` + Object.entries(ast.value).map(([k, v]) => `"${k}": ${typeof v === 'string' ? `"${(v as string).replace(/"/g, '\\"')}"` : (Array.isArray(v) ? `[${v.map(item => typeof item === 'string' ? `"${item.replace(/"/g, '\\"')}"` : item).join(', ')}]` : v)}`).join(', ') + `}`;
-    }
-    else valStr = ast.value;
+      valStr =
+        `{` +
+        Object.entries(ast.value)
+          .map(
+            ([k, v]) =>
+              `"${k}": ${
+                typeof v === 'string'
+                  ? `"${(v as string).replace(/"/g, '\\"')}"`
+                  : Array.isArray(v)
+                  ? `[${v.map((item) => (typeof item === 'string' ? `"${item.replace(/"/g, '\\"')}"` : item)).join(', ')}]`
+                  : v
+              }`
+          )
+          .join(', ') +
+        `}`;
+    } else valStr = ast.value;
     return `${ast.provider}.${ast.ruleType} ${ast.operator} ${valStr}`;
   }
   return '';
 }
-

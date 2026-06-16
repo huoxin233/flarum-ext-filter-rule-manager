@@ -56,7 +56,5 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
 
   app.store.models['filter-rule-rulesets'] = Ruleset;
 
-  app.extensionData
-    .for('huoxin-filter-rule-manager')
-    .registerPage(RulesetManagerPage);
+  app.extensionData.for('huoxin-filter-rule-manager').registerPage(RulesetManagerPage);
 });

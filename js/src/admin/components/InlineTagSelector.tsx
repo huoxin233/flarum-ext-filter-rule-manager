@@ -30,9 +30,11 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
 
   view(): Mithril.Children {
     const tags = this.attrs.tags || [];
-    const primaryTags = tags.filter(t => t.position() !== null && t.position() !== undefined && !t.isChild()).sort((a, b) => a.position() - b.position());
-    const secondaryTags = tags.filter(t => t.position() === null || t.position() === undefined).sort((a, b) => a.name().localeCompare(b.name()));
-    const childTags = tags.filter(t => t.isChild());
+    const primaryTags = tags
+      .filter((t) => t.position() !== null && t.position() !== undefined && !t.isChild())
+      .sort((a, b) => a.position() - b.position());
+    const secondaryTags = tags.filter((t) => t.position() === null || t.position() === undefined).sort((a, b) => a.name().localeCompare(b.name()));
+    const childTags = tags.filter((t) => t.isChild());
 
     return (
       <div className="InlineTagSelector">
@@ -40,16 +42,19 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
           <div className="InlineTagSelector-group">
             <label className="InlineTagSelector-groupLabel">Primary Tags</label>
             <div className="InlineTagSelector-list">
-              {primaryTags.map(tag => this.renderTag(tag, childTags.filter(c => c.parent() === tag)))}
+              {primaryTags.map((tag) =>
+                this.renderTag(
+                  tag,
+                  childTags.filter((c) => c.parent() === tag)
+                )
+              )}
             </div>
           </div>
         )}
         {secondaryTags.length > 0 && (
           <div className="InlineTagSelector-group">
             <label className="InlineTagSelector-groupLabel">Secondary Tags</label>
-            <div className="InlineTagSelector-list">
-              {secondaryTags.map(tag => this.renderTag(tag, []))}
-            </div>
+            <div className="InlineTagSelector-list">{secondaryTags.map((tag) => this.renderTag(tag, []))}</div>
           </div>
         )}
       </div>
@@ -63,21 +68,13 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
     return (
       <div className="InlineTagSelector-itemContainer" key={id}>
         <label className={classList('InlineTagSelector-item', { active: selected })}>
-          <input 
-            type="checkbox" 
-            checked={selected}
-            onchange={(e: any) => this.toggleTag(id, e.target.checked)}
-          />
+          <input type="checkbox" checked={selected} onchange={(e: any) => this.toggleTag(id, e.target.checked)} />
           <span className="InlineTagSelector-icon" style={{ backgroundColor: tag.color() }}>
             {tag.icon() && icon(tag.icon())}
           </span>
           <span className="InlineTagSelector-name">{tag.name()}</span>
         </label>
-        {children && children.length > 0 && (
-          <div className="InlineTagSelector-children">
-            {children.map(child => this.renderTag(child, []))}
-          </div>
-        )}
+        {children && children.length > 0 && <div className="InlineTagSelector-children">{children.map((child) => this.renderTag(child, []))}</div>}
       </div>
     );
   }
@@ -88,7 +85,7 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
     if (checked) {
       if (!ids.includes(id)) ids.push(id);
     } else {
-      ids = ids.filter(i => i !== id);
+      ids = ids.filter((i) => i !== id);
     }
     this.selectedIds(ids);
   }

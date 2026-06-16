@@ -90,15 +90,12 @@ export default class FilterRulePopupDispatcher {
       if (displaySettings.icon && displaySettings.icon !== 'none') {
         alertAttrs.icon = displaySettings.icon;
       }
-      
+
       if (displaySettings.title) {
         alertAttrs.title = application.translator.trans(displaySettings.title);
       }
 
-      const alertKey = application.alerts.show(
-        alertAttrs,
-        (window as any).m.trust(message)
-      );
+      const alertKey = application.alerts.show(alertAttrs, (window as any).m.trust(message));
       this._displayed.set(id, { displayMode, alertKey });
       return;
     }
@@ -117,7 +114,11 @@ export default class FilterRulePopupDispatcher {
     const application = (window as any).app;
 
     if (info.displayMode === 'toast' && info.alertKey != null && application && application.alerts) {
-      try { application.alerts.dismiss(info.alertKey); } catch (e) { /* ignore */ }
+      try {
+        application.alerts.dismiss(info.alertKey);
+      } catch (e) {
+        /* ignore */
+      }
     }
     this._displayed.delete(id);
   }
@@ -126,4 +127,3 @@ export default class FilterRulePopupDispatcher {
     for (const id of Array.from(this._displayed.keys())) this._dismiss(id);
   }
 }
-

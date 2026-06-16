@@ -60,17 +60,14 @@ export default class BuiltinProvider {
    */
   getProvidedTokens(type: string): { name: string; description: string }[] {
     if (type === 'contains_word') {
-      return [
-        { name: 'matched_word', description: 'The first listed word that was found in the post content.' },
-      ];
+      return [{ name: 'matched_word', description: 'The first listed word that was found in the post content.' }];
     }
     if (type === 'regex') {
       return [
         { name: 'matched_pattern', description: 'The first listed regex pattern that matched.' },
-        { name: 'matched_string',  description: 'The substring of the post content that matched.' },
+        { name: 'matched_string', description: 'The substring of the post content that matched.' },
       ];
     }
     return [];
   }
 }
-

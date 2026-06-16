@@ -70,7 +70,7 @@ export default class BuiltinProvider implements FilterRuleProvider {
       if (matchedPatterns.length > 0) {
         return {
           matched_pattern: matchedPatterns.join(', '),
-          matched_string: matchedStrings.join(', ')
+          matched_string: matchedStrings.join(', '),
         };
       }
     }
@@ -92,4 +92,3 @@ export default class BuiltinProvider implements FilterRuleProvider {
     return [];
   }
 }
-

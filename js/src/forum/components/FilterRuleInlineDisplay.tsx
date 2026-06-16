@@ -50,9 +50,9 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
           <div className="FilterRuleManager-sidebarTitle">
             {icon('fas fa-shield-alt')}
             <span style={{ flex: 1 }}>{app.translator.trans('huoxin-filter-rule-manager.forum.sidebar_title') || 'Composer hints'}</span>
-            <button 
-              className="Button Button--icon Button--link" 
-              onclick={() => this.isSidebarClosed = true}
+            <button
+              className="Button Button--icon Button--link"
+              onclick={() => (this.isSidebarClosed = true)}
               style={{ padding: '0', minWidth: '0', minHeight: '0', lineHeight: '1', color: 'inherit' }}
             >
               {icon('fas fa-times')}
@@ -65,9 +65,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
 
     return (
       <div className={`FilterRuleManager FilterRuleManager--${variant}`}>
-        <div className="FilterRuleManager-banners">
-          {items.map((alert, i) => this._renderItem(alert, i, variant))}
-        </div>
+        <div className="FilterRuleManager-banners">{items.map((alert, i) => this._renderItem(alert, i, variant))}</div>
       </div>
     );
   }
@@ -75,9 +73,9 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
   _matchingItems(variant: string): any[] {
     const isMobile = window.innerWidth <= 768;
     if (isMobile && variant !== 'banner') return [];
-    
+
     const active = filterEngine.activeAlerts
-      .filter((a) => isMobile ? true : a.ruleset.displayMode === variant)
+      .filter((a) => (isMobile ? true : a.ruleset.displayMode === variant))
       .map((a) => ({
         type: a.ruleset.effectType,
         message: a.message,
@@ -85,7 +83,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
         displaySettings: a.ruleset.displaySettings,
       }));
     const blocks = filterEngine.blockResults
-      .filter((a) => isMobile ? true : a.displayMode === variant)
+      .filter((a) => (isMobile ? true : a.displayMode === variant))
       .map((a, i) => ({
         type: a.effectType,
         message: a.message,
@@ -98,7 +96,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
   _renderItem(alert: any, i: number, variant: string): Mithril.Children {
     const templateName = (alert.displaySettings && alert.displaySettings.template) || 'builtin';
     let TemplateComponent = filterEngine.getTemplate(templateName);
-    
+
     // Fallback to builtin if template is unknown
     if (!TemplateComponent) {
       TemplateComponent = filterEngine.getTemplate('builtin');
@@ -106,9 +104,6 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
 
     if (!TemplateComponent) return null;
 
-    return (
-      <TemplateComponent key={alert.key || i} alert={alert} variant={variant} />
-    );
+    return <TemplateComponent key={alert.key || i} alert={alert} variant={variant} />;
   }
 }
-

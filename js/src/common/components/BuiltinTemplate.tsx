@@ -34,9 +34,7 @@ export default class BuiltinTemplate extends Component<BuiltinTemplateAttrs> {
 
     let iconName = settings.icon;
     if (!iconName) {
-      iconName = alert.type === 'block'   ? 'fas fa-times-circle'
-               : alert.type === 'warning' ? 'fas fa-exclamation-triangle'
-               :                            'fas fa-info-circle';
+      iconName = alert.type === 'block' ? 'fas fa-times-circle' : alert.type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle';
     }
 
     // Use React.CSSProperties-like typing or just any for React/Mithril inline styles
@@ -48,12 +46,11 @@ export default class BuiltinTemplate extends Component<BuiltinTemplateAttrs> {
     if (settings.iconColor) iconStyle.color = settings.iconColor;
 
     return (
-      <div
-        className={`FilterRuleManager-item FilterRuleManager-item--${variant} FilterRuleManager-item--${alert.type}`}
-        style={style}
-      >
+      <div className={`FilterRuleManager-item FilterRuleManager-item--${variant} FilterRuleManager-item--${alert.type}`} style={style}>
         {iconName !== 'none' && (
-          <span className="FilterRuleManager-item-icon" style={iconStyle}>{icon(iconName)}</span>
+          <span className="FilterRuleManager-item-icon" style={iconStyle}>
+            {icon(iconName)}
+          </span>
         )}
         <div className="FilterRuleManager-item-content">
           {settings.title && (
@@ -67,4 +64,3 @@ export default class BuiltinTemplate extends Component<BuiltinTemplateAttrs> {
     );
   }
 }
-

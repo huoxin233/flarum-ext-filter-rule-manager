@@ -7,7 +7,6 @@
  * file that was distributed with this source code.
  */
 
-
 import type Mithril from 'mithril';
 
 export interface FilterRuleProvider {
@@ -56,12 +55,7 @@ export interface EngineState {
 export type SubscriberCallback = (state: EngineState) => void;
 
 function escapeHtml(str: string): string {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 export class FilterEngine {
@@ -73,7 +67,7 @@ export class FilterEngine {
   public blockResults: BlockResult[] = [];
   public intervalId: number | null = null;
   public hasAlerts: boolean = false;
-  
+
   private _lastStateKey: string | null = null;
   private _subscribers: SubscriberCallback[] = [];
 
@@ -184,7 +178,7 @@ export class FilterEngine {
 
   getRegisteredFrontendTypes(): { provider: string; providerLabel: string; type: string; label: string }[] {
     const types: { provider: string; providerLabel: string; type: string; label: string }[] = [];
-    
+
     // Use window.app for translation if available
     const app = (typeof window !== 'undefined' && (window as any).app) || null;
 
@@ -192,7 +186,7 @@ export class FilterEngine {
       if (typeof provider.getSupportedTypes !== 'function') continue;
       const supported = provider.getSupportedTypes();
       const labels = typeof provider.getTypeLabels === 'function' ? provider.getTypeLabels() : {};
-      
+
       let providerLabel = name;
       if (typeof provider.getProviderLabel === 'function') {
         providerLabel = provider.getProviderLabel();
@@ -308,11 +302,11 @@ export class FilterEngine {
 
     if (node.type === 'logical') {
       const left = this.evaluateAST(node.left, content, ruleset);
-      
+
       if (node.operator === 'OR') {
         const evaluateAll = typeof ruleset.evaluateAllRules === 'function' ? ruleset.evaluateAllRules() : ruleset.evaluateAllRules;
         if (left !== null && !evaluateAll) return left;
-        
+
         const right = this.evaluateAST(node.right, content, ruleset);
         if (left !== null && right !== null) return this.mergeResults([left, right]);
         return left !== null ? left : right;
@@ -364,10 +358,8 @@ export class FilterEngine {
     let result = null;
     try {
       const isObject = typeof node.value === 'object' && node.value !== null && !Array.isArray(node.value);
-      let config = isObject 
-        ? { ...node.value, operator: node.operator }
-        : { operator: node.operator, value: node.value };
-      
+      let config = isObject ? { ...node.value, operator: node.operator } : { operator: node.operator, value: node.value };
+
       if (node.provider === 'builtin' && !isObject) {
         let val = Array.isArray(node.value) ? node.value : [node.value];
         if (node.ruleType === 'contains_word') config = { words: val };
@@ -399,38 +391,43 @@ export class FilterEngine {
     if (discussion) {
       const recipientUsers = discussion.recipientUsers && discussion.recipientUsers();
       const recipientGroups = discussion.recipientGroups && discussion.recipientGroups();
-      const isPrivateAttr = (discussion.isPrivate && discussion.isPrivate()) ||
-                            (discussion.isPrivateDiscussion && discussion.isPrivateDiscussion()) ||
-                            discussion.attribute('isPrivate') ||
-                            discussion.attribute('is_private');
-      
+      const isPrivateAttr =
+        (discussion.isPrivate && discussion.isPrivate()) ||
+        (discussion.isPrivateDiscussion && discussion.isPrivateDiscussion()) ||
+        discussion.attribute('isPrivate') ||
+        discussion.attribute('is_private');
+
       isPrivate = !!isPrivateAttr || (recipientUsers && recipientUsers.length > 0) || (recipientGroups && recipientGroups.length > 0);
-      tagIds = (discussion.tags && discussion.tags())
-        ? discussion.tags().map((t: any) => t.id())
-        : [];
+      tagIds = discussion.tags && discussion.tags() ? discussion.tags().map((t: any) => t.id()) : [];
     } else {
-      const resolveField = (val: any) => typeof val === 'function' ? val() : val;
-      
+      const resolveField = (val: any) => (typeof val === 'function' ? val() : val);
+
       let recipientUsers = resolveField(composer.fields.recipientUsers) || [];
       let recipientGroups = resolveField(composer.fields.recipientGroups) || [];
-      
+
       const recipientsField = resolveField(composer.fields.recipients);
-      const recipientsArray = recipientsField && typeof recipientsField.toArray === 'function' ? recipientsField.toArray() : (Array.isArray(recipientsField) ? recipientsField : []);
-      
+      const recipientsArray =
+        recipientsField && typeof recipientsField.toArray === 'function'
+          ? recipientsField.toArray()
+          : Array.isArray(recipientsField)
+          ? recipientsField
+          : [];
+
       const fieldsIsPrivate = resolveField(composer.fields.isPrivate);
-      
+
       const hasRecipients = recipientUsers.length > 0 || recipientGroups.length > 0 || recipientsArray.length > 0;
       isPrivate = !!fieldsIsPrivate || hasRecipients;
-      
-      tagIds = resolveField(composer.fields.tags)
-        ? resolveField(composer.fields.tags).map((t: any) => t.id())
-        : [];
+
+      tagIds = resolveField(composer.fields.tags) ? resolveField(composer.fields.tags).map((t: any) => t.id()) : [];
     }
 
     switch (ruleset.scopeType) {
-      case 'global':       return true;
-      case 'normal_post':  return !isPrivate;
-      case 'private_post': return isPrivate;
+      case 'global':
+        return true;
+      case 'normal_post':
+        return !isPrivate;
+      case 'private_post':
+        return isPrivate;
       case 'tag':
         if (!ruleset.scopeTagIds || ruleset.scopeTagIds.length === 0) return false;
         return tagIds.some((id) => ruleset.scopeTagIds!.includes(id));

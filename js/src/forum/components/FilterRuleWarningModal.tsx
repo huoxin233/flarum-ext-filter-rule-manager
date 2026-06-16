@@ -50,4 +50,3 @@ export default class FilterRuleWarningModal extends Modal<FilterRuleWarningModal
     );
   }
 }
-

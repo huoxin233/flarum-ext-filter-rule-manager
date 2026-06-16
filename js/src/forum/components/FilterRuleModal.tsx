@@ -43,9 +43,7 @@ export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
 
     let iconClass = settings.icon;
     if (!iconClass) {
-      iconClass = type === 'block' ? 'fas fa-times-circle'
-               : type === 'warning' ? 'fas fa-exclamation-triangle'
-               : 'fas fa-info-circle';
+      iconClass = type === 'block' ? 'fas fa-times-circle' : type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle';
     }
 
     const style: any = {};
@@ -63,9 +61,7 @@ export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
     return (
       <div className="Modal-body">
         <div className={`FilterRuleModal-message FilterRuleModal-message--${type}`} style={style}>
-          {settings.icon !== 'none' && (
-            <i className={`FilterRuleModal-icon ${iconClass}`} style={iconStyle}></i>
-          )}
+          {settings.icon !== 'none' && <i className={`FilterRuleModal-icon ${iconClass}`} style={iconStyle}></i>}
           <span className="FilterRuleModal-text">{(window as any).m.trust(this.attrs.message)}</span>
         </div>
         <div className="Form-group FilterRuleModal-actions">
@@ -77,4 +73,3 @@ export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
     );
   }
 }
-

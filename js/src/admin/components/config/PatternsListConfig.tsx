@@ -56,9 +56,7 @@ export default class PatternsListConfig extends Component<PatternsListConfigAttr
           oninput={(e: any) => this.handleInput(e.target.value)}
           placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_placeholder'))}
         ></textarea>
-        <div className="helpText">
-          {app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_help')}
-        </div>
+        <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_help')}</div>
         <div className="Form-group">
           <Switch
             state={this.scanAll()}
@@ -69,9 +67,7 @@ export default class PatternsListConfig extends Component<PatternsListConfigAttr
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all')}
           </Switch>
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all_help')}
-          </div>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all_help')}</div>
         </div>
       </div>
     );
@@ -89,4 +85,3 @@ export default class PatternsListConfig extends Component<PatternsListConfigAttr
     this.attrs.onchange(newCfg);
   }
 }
-

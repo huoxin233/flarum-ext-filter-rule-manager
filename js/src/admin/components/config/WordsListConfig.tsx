@@ -58,9 +58,7 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
           oninput={(e: any) => this.handleInput(e.target.value)}
           placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_words_placeholder'))}
         ></textarea>
-        <div className="helpText">
-          {app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}
-        </div>
+        <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}</div>
         <div className="Form-group">
           <Switch
             state={this.scanAll()}
@@ -71,9 +69,7 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all')}
           </Switch>
-          <div className="helpText">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all_help')}
-          </div>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all_help')}</div>
         </div>
       </div>
     );
@@ -81,11 +77,13 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
 
   handleInput(val: string) {
     this.text(val);
-    const words = val.split('\n').map((w) => w.trim()).filter((w) => w.length > 0);
+    const words = val
+      .split('\n')
+      .map((w) => w.trim())
+      .filter((w) => w.length > 0);
     const newCfg = { ...(this.attrs.config || {}), words };
     delete newCfg.value;
     delete newCfg.word;
     this.attrs.onchange(newCfg);
   }
 }
-
