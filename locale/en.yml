@@ -130,9 +130,7 @@ huoxin-filter-rule-manager:
     ruleset_evaluate_all_rules_help: "If enabled, the engine will evaluate every rule in this ruleset even if a match is already found. This allows you to gather tokens from multiple rules for your custom flag message. If disabled, the ruleset stops evaluating as soon as its condition is met, improving performance."
     rule_scan_all: "Find all matches"
     rule_scan_all_help: "If enabled, this rule will gather every matched word or pattern in your list. If disabled, it returns quickly on the first match to save processing time."
-    ruleset_rule_operator: "Combine rules using"
-    rule_operator_and: "AND — all rules must match"
-    rule_operator_or: "OR — any rule matches"
+
     message_help: "Use {{token}} to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like <br>."
     rule_regex_warning: "Regex patterns run server-side on every post save. Avoid catastrophic backtracking (e.g. nested quantifiers like (a+)+) — keep patterns simple and well-anchored."
     preview: "Preview"
@@ -188,9 +186,7 @@ huoxin-filter-rule-manager:
     # ── Validation messages ────────────────────────────────────────────────
     validation:
       name_required: "Please give the ruleset a name."
-      message_required: "Please write the alert message that users will see."
       tags_required: "Tag scope is selected — list at least one tag ID."
-      rules_required: "Add at least one rule, otherwise the ruleset can never trigger."
       expression_required: "An expression is required."
 
     rule_builder:

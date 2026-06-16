@@ -724,7 +724,6 @@ export default class RulesetEditorModal extends Modal {
   canSave() {
     if (this.loading) return false;
     if (!this.name() || !this.name().trim()) return false;
-    if (this.effectType() !== 'silent' && (!this.message() || !this.message().trim())) return false;
     if (this.scopeType() === 'tag' && (!this.scopeTagIds() || this.scopeTagIds().length === 0)) return false;
     if (!this.expression() || !this.expression().trim()) return false;
     return true;
@@ -733,9 +732,6 @@ export default class RulesetEditorModal extends Modal {
   validationError() {
     if (!this.name() || !this.name().trim()) {
       return app.translator.trans('huoxin-filter-rule-manager.admin.validation.name_required');
-    }
-    if (this.effectType() !== 'silent' && (!this.message() || !this.message().trim())) {
-      return app.translator.trans('huoxin-filter-rule-manager.admin.validation.message_required');
     }
     if (this.scopeType() === 'tag' && (!this.scopeTagIds() || this.scopeTagIds().length === 0)) {
       return app.translator.trans('huoxin-filter-rule-manager.admin.validation.tags_required');
