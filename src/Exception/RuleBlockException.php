@@ -24,7 +24,7 @@ class RuleBlockException extends RuntimeException
     /**
      * @param array $alerts  Array of triggered alert data:
      *   [
-     *     ['display_mode' => 'modal', 'effect_type' => 'block', 'message' => '...', 'tokens' => [...]]
+     *     ['display_mode' => 'modal', 'intervention_type' => 'block', 'message' => '...', 'tokens' => [...]]
      *   ]
      */
     public function __construct(public readonly array $alerts)

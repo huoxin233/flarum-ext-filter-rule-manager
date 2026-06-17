@@ -43,7 +43,7 @@ class ScopeTest extends FilterTestCase
                     'compiled_ast' => json_encode([
                         'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['secret']]
                     ]),
-                    'effect_type' => 'block',
+                    'intervention_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'private_post',
                     'message' => 'Blocked by Private',
@@ -60,7 +60,7 @@ class ScopeTest extends FilterTestCase
                     'compiled_ast' => json_encode([
                         'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['publicword']]
                     ]),
-                    'effect_type' => 'block',
+                    'intervention_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'normal_post',
                     'message' => 'Blocked by Normal',
@@ -77,7 +77,7 @@ class ScopeTest extends FilterTestCase
                     'compiled_ast' => json_encode([
                         'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['gameword']]
                     ]),
-                    'effect_type' => 'block',
+                    'intervention_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'tag',
                     'scope_tag_ids' => json_encode(['2']), // Tag ID 2 (Gaming)

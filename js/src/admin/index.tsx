@@ -22,7 +22,7 @@ Object.assign(Ruleset.prototype, {
   priority: Model.attribute('priority'),
   expression: Model.attribute('expression'),
   compiledAst: Model.attribute('compiledAst'),
-  effectType: Model.attribute('effectType'),
+  interventionType: Model.attribute('interventionType'),
   displayMode: Model.attribute('displayMode'),
   message: Model.attribute('message'),
   flagMessage: Model.attribute('flagMessage'),

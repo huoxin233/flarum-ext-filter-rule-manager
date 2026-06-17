@@ -65,7 +65,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
     const active = filterEngine.activeAlerts
       .filter((a) => (isMobile ? true : a.ruleset.displayMode === variant))
       .map((a) => ({
-        type: a.ruleset.effectType,
+        type: a.ruleset.interventionType,
         message: a.message,
         key: `rs-${a.ruleset.id}`,
         displaySettings: a.displaySettings,
@@ -73,7 +73,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
     const blocks = filterEngine.blockResults
       .filter((a) => (isMobile ? true : a.displayMode === variant))
       .map((a, i) => ({
-        type: a.effectType,
+        type: a.interventionType,
         message: a.message,
         key: `block-${i}-${a.message}`,
         displaySettings: null,

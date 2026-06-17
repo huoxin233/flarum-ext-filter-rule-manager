@@ -299,7 +299,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           <div className="CardList-header">
             <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.order')}</span>
             <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.name')}</span>
-            <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.effect')}</span>
+            <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.intervention')}</span>
             <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.scope')}</span>
             <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.display')}</span>
             <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.rules')}</span>
@@ -316,7 +316,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     const isActive = ruleset.isActive();
     const isFirst = filteredIndex === 0;
     const isLast = filteredIndex === filteredList.length - 1;
-    const effect = ruleset.effectType();
+    const intervention = ruleset.interventionType();
     const scope = ruleset.scopeType();
     const display = ruleset.displayMode();
     const isTogglingThis = this.toggling.has(ruleset.id() as string);
@@ -348,10 +348,10 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           {ruleset.name()}
         </div>
 
-        <div className="CardList-item-cell" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.effect')}>
-          <span className={`EffectBadge EffectBadge--${effect}`}>
-            {icon(this.effectIcon(effect))}
-            {app.translator.trans(`huoxin-filter-rule-manager.admin.effects.${effect}`)}
+        <div className="CardList-item-cell" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.intervention')}>
+          <span className={`InterventionBadge InterventionBadge--${intervention}`}>
+            {icon(this.interventionIcon(intervention))}
+            {app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}`)}
           </span>
         </div>
 
@@ -410,9 +410,9 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     return 0;
   }
 
-  effectIcon(effect: string) {
-    if (effect === 'block') return 'fas fa-ban';
-    if (effect === 'warning') return 'fas fa-exclamation-triangle';
+  interventionIcon(intervention: string) {
+    if (intervention === 'block') return 'fas fa-ban';
+    if (intervention === 'warning') return 'fas fa-exclamation-triangle';
     return 'fas fa-info-circle';
   }
 

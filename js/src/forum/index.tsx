@@ -94,7 +94,7 @@ app.initializers.add(
       override(Cls.prototype as any, 'onsubmit', function (this: any, original: Function) {
         filterEngine.clearBlockResults();
 
-        const warnings = filterEngine.activeAlerts.filter((a) => a.ruleset.effectType === 'warning');
+        const warnings = filterEngine.activeAlerts.filter((a) => a.ruleset.interventionType === 'warning');
 
         if (warnings.length === 0) {
           return original();

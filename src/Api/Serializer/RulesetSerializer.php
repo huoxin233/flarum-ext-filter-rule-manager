@@ -36,7 +36,7 @@ class RulesetSerializer extends AbstractSerializer
             'priority'      => (int) $model->priority,
             'expression'    => $model->expression,
             'compiledAst'   => $model->compiled_ast ?? [],
-            'effectType'    => $model->effect_type,
+            'interventionType'    => $model->intervention_type,
             'displayMode'      => $model->display_mode,
             'message'          => $model->message,
             'flagMessage'      => $model->flag_message,

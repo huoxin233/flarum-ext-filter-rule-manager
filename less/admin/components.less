@@ -6,7 +6,7 @@
 }
 
 .FilterRulePage {
-  .EffectBadge,
+  .InterventionBadge,
   .ScopeBadge,
   .StatusBadge {
     display: inline-block;
@@ -25,7 +25,7 @@
     i { font-size: 10px; margin-right: 4px; }
   }
 
-  .EffectBadge {
+  .InterventionBadge {
     &--info    { background: fade(@info-color, 15%);    color: darken(@info-color, 10%); }
     &--warning { background: fade(@warning-color, 15%); color: darken(@warning-color, 10%); }
     &--block   { background: fade(@error-color, 15%);   color: darken(@error-color, 10%); }
@@ -122,14 +122,14 @@
   }
 }
 
-// Segmented control for effect type
-.RulesetEditor-effectSelector {
+// Segmented control for intervention type
+.RulesetEditor-interventionSelector {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
 }
 
-.RulesetEditor-effectOption {
+.RulesetEditor-interventionOption {
   flex: 1;
   min-width: 100px;
   display: inline-flex;

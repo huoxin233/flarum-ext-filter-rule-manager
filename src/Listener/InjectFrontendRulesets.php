@@ -46,7 +46,7 @@ class InjectFrontendRulesets
                 'name'         => $r->name,
                 'priority'     => $r->priority,
                 'compiled_ast' => $r->compiled_ast,
-                'effectType'   => $r->effect_type,
+                'interventionType'   => $r->intervention_type,
                 'evaluateAllRules' => $r->evaluate_all_rules,
                 'displayMode'  => $r->display_mode,
                 'message'      => $r->message,

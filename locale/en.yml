@@ -35,7 +35,7 @@ huoxin-filter-rule-manager:
     headers:
       order: "Order"
       name: "Name"
-      effect: "Effect"
+      intervention: "Intervention"
       scope: "Scope"
       display: "Display"
       rules: "Rules"
@@ -88,13 +88,13 @@ huoxin-filter-rule-manager:
     ruleset_name: "Name"
     ruleset_name_placeholder: "e.g. Block spam keywords"
 
-    ruleset_effect_type: "Effect"
+    ruleset_intervention_type: "Intervention"
     ruleset_display_mode: "Display mode"
     ruleset_display_template: "Display Template"
     ruleset_custom_title: "Custom Title"
     ruleset_custom_title_help: "Optional. Overrides the default translated title for modals and toasts."
     ruleset_toast_theme: "Toast Theme"
-    ruleset_toast_theme_auto: "Auto (Based on Effect)"
+    ruleset_toast_theme_auto: "Auto (Based on Intervention)"
     ruleset_toast_theme_success: "Success (Green)"
     ruleset_toast_theme_error: "Error (Red)"
     ruleset_toast_theme_warning: "Warning (Yellow)"
@@ -115,7 +115,7 @@ huoxin-filter-rule-manager:
     ruleset_require_approval_help: "If enabled, the post will be hidden until approved by a moderator. (Requires flarum/approval)"
     ruleset_approval_without_flag_warning: "Requiring approval without auto-flagging means the post will be hidden, but moderators will not be notified via the flag queue."
     ruleset_block_cascade: "Stop evaluating subsequent rulesets when this one triggers"
-    ruleset_block_cascade_help: "Applies to all effect types. Use to short-circuit a chain of related rulesets."
+    ruleset_block_cascade_help: "Applies to all intervention types. Use to short-circuit a chain of related rulesets."
     ruleset_evasion_active: "Enable Evasion Detection"
     ruleset_evasion_active_help: "If enabled, subsequent clean posts made shortly after this ruleset blocks the user will be flagged for review."
     ruleset_evasion_timeout: "Evasion Timeout (minutes)"
@@ -135,8 +135,8 @@ huoxin-filter-rule-manager:
     preview: "Preview"
     preview_placeholder: "Your message will appear here."
 
-    # ── Effect / scope / display labels ────────────────────────────────────
-    effects:
+    # ── Intervention / scope / display labels ────────────────────────────────────
+    interventions:
       info: "Info"
       info_help: "Real-time hint shown while typing. Doesn't block submitting."
       warning: "Warning"

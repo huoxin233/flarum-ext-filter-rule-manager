@@ -52,7 +52,7 @@ export default class FilterRulePopupDispatcher {
     for (const alert of this.engine.activeAlerts) {
       const id = `rs-${alert.ruleset.id}`;
       const displayMode = alert.ruleset.displayMode;
-      const type = alert.ruleset.effectType === 'warning' ? 'warning' : 'info';
+      const type = alert.ruleset.interventionType === 'warning' ? 'warning' : 'info';
       const settings = alert.displaySettings || {};
       seen.add(id);
       this._maybeShow(id, displayMode, type, alert.message, settings);

@@ -20,8 +20,8 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int    $priority
  * @property string|null $expression
  * @property array|null $compiled_ast
- * @property string $effect_type    info|warning|block
- * @property string $display_mode   banner|toast|modal|sidebar
+ * @property string $intervention_type    info|warning|block|silent
+ * @property string $display_mode   banner|header_banner|toast|modal|sidebar
  * @property string $message
  * @property string|null $flag_message
  * @property bool   $evaluate_all_rules
@@ -67,12 +67,12 @@ class Ruleset extends AbstractModel
 
     public function scopeBlock(Builder $query): Builder
     {
-        return $query->where('effect_type', 'block');
+        return $query->where('intervention_type', 'block');
     }
 
     public function scopeFrontend(Builder $query): Builder
     {
-        return $query->whereIn('effect_type', ['info', 'warning']);
+        return $query->whereIn('intervention_type', ['info', 'warning']);
     }
 
     public function scopeOrdered(Builder $query): Builder

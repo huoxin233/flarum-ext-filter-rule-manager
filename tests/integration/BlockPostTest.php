@@ -26,7 +26,7 @@ class BlockPostTest extends FilterTestCase
                         'operator' => 'EQUALS',
                         'value' => ['words' => ['blockword']]
                     ]),
-                    'effect_type' => 'block', // This makes it a block rule
+                    'intervention_type' => 'block', // This makes it a block rule
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
                     'message' => 'Blocked word: {{matched_word}}',

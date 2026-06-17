@@ -58,7 +58,7 @@ class CreateRulesetController extends AbstractCreateController
             $ruleset->compiled_ast = null;
         }
 
-        $ruleset->effect_type   = $this->validEnum($attributes['effectType'] ?? 'info', ['info', 'warning', 'block', 'silent'], 'info');
+        $ruleset->intervention_type   = $this->validEnum($attributes['interventionType'] ?? 'info', ['info', 'warning', 'block', 'silent'], 'info');
         $ruleset->display_mode  = $this->validEnum($attributes['displayMode'] ?? 'banner', ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], 'banner');
         $ruleset->message       = (string) ($attributes['message'] ?? '');
         $ruleset->flag_message  = array_key_exists('flagMessage', $attributes) ? ($attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage']) : null;

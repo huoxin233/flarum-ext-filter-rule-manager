@@ -78,7 +78,7 @@ class EvaluateBlockRulesets
             $triggered[] = [
                 'ruleset_id' => $ruleset->id,
                 'display_mode' => $ruleset->display_mode,
-                'effect_type' => 'block',
+                'intervention_type' => 'block',
                 'message' => $this->evaluator->interpolate($ruleset->message, $tokens),
                 'tokens' => $tokens,
                 'content' => $targetContent,

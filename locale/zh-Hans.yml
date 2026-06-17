@@ -35,7 +35,7 @@ huoxin-filter-rule-manager:
     headers:
       order: "排序"
       name: "名称"
-      effect: "干预方式"
+      intervention: "干预方式"
       scope: "应用范围"
       display: "提示方式"
       rules: "规则"
@@ -88,7 +88,7 @@ huoxin-filter-rule-manager:
     ruleset_name: "名称"
     ruleset_name_placeholder: "例如：拦截垃圾广告词"
 
-    ruleset_effect_type: "干预方式"
+    ruleset_intervention_type: "干预方式"
     ruleset_display_mode: "显示模式"
     ruleset_display_template: "显示模板"
     ruleset_custom_title: "自定义标题"
@@ -135,8 +135,8 @@ huoxin-filter-rule-manager:
     preview: "预览"
     preview_placeholder: "提示内容将显示在这里。"
 
-    # ── Effect / scope / display labels ────────────────────────────────────
-    effects:
+    # ── Intervention / scope / display labels ────────────────────────────────────
+    interventions:
       info: "提示 (Info)"
       info_help: "用户输入时实时显示的提示信息。不会阻止发帖。"
       warning: "警告 (Warning)"

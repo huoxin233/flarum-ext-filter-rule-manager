@@ -37,7 +37,7 @@ class ModeratePostTest extends FilterTestCase
                             'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['apple'], 'scan_all' => true]
                         ]
                     ]),
-                    'effect_type' => 'warning',
+                    'intervention_type' => 'warning',
                     'display_mode' => 'banner',
                     'flag_message' => 'Matched custom: {{matched_word}}',
                     'evaluate_all_rules' => 1,
@@ -57,7 +57,7 @@ class ModeratePostTest extends FilterTestCase
                     'compiled_ast' => json_encode([
                         'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['word_flag']]
                     ]),
-                    'effect_type' => 'warning',
+                    'intervention_type' => 'warning',
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
                     'is_active' => 1,
@@ -73,7 +73,7 @@ class ModeratePostTest extends FilterTestCase
                     'compiled_ast' => json_encode([
                         'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['word_approval']]
                     ]),
-                    'effect_type' => 'warning',
+                    'intervention_type' => 'warning',
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
                     'is_active' => 1,
@@ -89,7 +89,7 @@ class ModeratePostTest extends FilterTestCase
                     'compiled_ast' => json_encode([
                         'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['inactive_word']
                     ]),
-                    'effect_type' => 'block',
+                    'intervention_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
                     'is_active' => 0, // INACTIVE!

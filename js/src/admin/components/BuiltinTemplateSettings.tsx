@@ -83,7 +83,7 @@ class ColorPickerInput extends Component<ColorPickerInputAttrs> {
 
 export interface BuiltinTemplateSettingsAttrs extends ComponentAttrs {
   displaySetting: (key: string, value?: string) => string;
-  effectType: string;
+  interventionType: string;
   displayMode: string;
 }
 
@@ -96,17 +96,17 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
     this.showIconPicker = false;
   }
 
-  getDefaultStylesForEffect(effect: string): { icon: string; iconColor: string; textColor: string; backgroundColor: string } {
-    if (effect === 'info') return { icon: 'fas fa-info-circle', iconColor: '#2b7c93', textColor: '#2b7c93', backgroundColor: '#e8f4f8' };
-    if (effect === 'warning') return { icon: 'fas fa-exclamation-triangle', iconColor: '#8a6d3b', textColor: '#8a6d3b', backgroundColor: '#fff4e5' };
-    if (effect === 'block') return { icon: 'fas fa-times-circle', iconColor: '#a94442', textColor: '#a94442', backgroundColor: '#fde8e8' };
+  getDefaultStylesForIntervention(intervention: string): { icon: string; iconColor: string; textColor: string; backgroundColor: string } {
+    if (intervention === 'info') return { icon: 'fas fa-info-circle', iconColor: '#2b7c93', textColor: '#2b7c93', backgroundColor: '#e8f4f8' };
+    if (intervention === 'warning') return { icon: 'fas fa-exclamation-triangle', iconColor: '#8a6d3b', textColor: '#8a6d3b', backgroundColor: '#fff4e5' };
+    if (intervention === 'block') return { icon: 'fas fa-times-circle', iconColor: '#a94442', textColor: '#a94442', backgroundColor: '#fde8e8' };
     return { icon: 'fas fa-info-circle', iconColor: '#000000', textColor: '#000000', backgroundColor: '#ffffff' };
   }
 
   view(): Mithril.Children {
-    const { displaySetting, effectType, displayMode, tokens, tokenChipsBlock } = this.attrs as any;
+    const { displaySetting, interventionType, displayMode, tokens, tokenChipsBlock } = this.attrs as any;
     const isToast = displayMode === 'toast';
-    const defaultStyles = this.getDefaultStylesForEffect(effectType);
+    const defaultStyles = this.getDefaultStylesForIntervention(interventionType);
 
     return (
       <div className="RulesetEditor-customStyles">

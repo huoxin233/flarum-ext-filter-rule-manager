@@ -29,7 +29,7 @@ class RuleOperatorTest extends FilterTestCase
                             'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['banana']]
                         ]
                     ]),
-                    'effect_type' => 'block', // Use block for easier assertions
+                    'intervention_type' => 'block', // Use block for easier assertions
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
                     'message' => 'Blocked by AND',
@@ -53,7 +53,7 @@ class RuleOperatorTest extends FilterTestCase
                             'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['dog']]
                         ]
                     ]),
-                    'effect_type' => 'block', // Use block for easier assertions
+                    'intervention_type' => 'block', // Use block for easier assertions
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
                     'message' => 'Blocked by OR',
@@ -80,7 +80,7 @@ class RuleOperatorTest extends FilterTestCase
                             ]
                         ]
                     ]),
-                    'effect_type' => 'block',
+                    'intervention_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
                     'message' => 'Blocked by NOT',

@@ -32,7 +32,7 @@ export interface FilterRuleProvider {
 
 export interface Ruleset {
   id: string | number;
-  effectType: string;
+  interventionType: string;
   displayMode: string;
   message: string;
   scopeType: string;
@@ -53,7 +53,7 @@ export interface ActiveAlert {
 }
 
 export interface BlockResult {
-  effectType: string;
+  interventionType: string;
   displayMode: string;
   message: string;
   tokens: Record<string, string>;
@@ -259,7 +259,7 @@ export class FilterEngine {
       }
 
       return {
-        effectType: alert.effect_type as string,
+        interventionType: alert.intervention_type as string,
         displayMode: alert.display_mode as string,
         message: alert.message as string,
         tokens,

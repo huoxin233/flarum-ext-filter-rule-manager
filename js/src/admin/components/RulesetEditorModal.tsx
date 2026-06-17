@@ -35,7 +35,7 @@ export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
  *
  *   1. General   — name, priority, active toggle
  *   2. Scope    — global/normal/private/tag (+ tag IDs when applicable)
- *   3. Display  — effect, display mode, message + token hint chips + preview
+ *   3. Display  — intervention, display mode, message + token hint chips + preview
  *   4. Rules    — operator + RuleBuilder
  *
  * Token hints below the message textarea are discovered from each configured
@@ -58,7 +58,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
   name!: Stream<string>;
   expression!: Stream<string>;
-  effectType!: Stream<string>;
+  interventionType!: Stream<string>;
   displayMode!: Stream<string>;
   message!: Stream<string>;
   flagMessage!: Stream<string>;
@@ -103,7 +103,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
     this.name = Stream(this.ruleset ? this.ruleset.name() : '');
     this.expression = Stream(this.ruleset ? this.ruleset.expression() : '');
-    this.effectType = Stream(this.ruleset ? this.ruleset.effectType() : 'info');
+    this.interventionType = Stream(this.ruleset ? this.ruleset.interventionType() : 'info');
     this.displayMode = Stream(this.ruleset ? this.ruleset.displayMode() : 'banner');
     this.message = Stream(this.ruleset ? this.ruleset.message() : '');
     this.flagMessage = Stream(this.ruleset ? this.ruleset.flagMessage() : '');
@@ -292,7 +292,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   }
 
   displaySection(): Mithril.Children {
-    const effect = this.effectType();
+    const intervention = this.interventionType();
     const displayMode = this.displayMode();
     const tokens = this.availableTokens();
     const templateName = this.displaySetting('template') || 'builtin';
@@ -307,31 +307,31 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
         </div>
 
         <div className="Form-group">
-          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_effect_type')}</label>
-          <div className="RulesetEditor-effectSelector">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_intervention_type')}</label>
+          <div className="RulesetEditor-interventionSelector">
             {['info', 'warning', 'block', 'silent'].map((value) => (
               <button
                 type="button"
                 key={value}
-                className={`RulesetEditor-effectOption RulesetEditor-effectOption--${value} ${effect === value ? 'active' : ''}`}
+                className={`RulesetEditor-interventionOption RulesetEditor-interventionOption--${value} ${intervention === value ? 'active' : ''}`}
                 onclick={() => {
-                  this.effectType(value);
+                  this.interventionType(value);
                   if (value === 'silent' && !this.message()) {
                     this.message('Silent Rule');
                   }
                 }}
               >
-                {icon(this.effectIcon(value))}
-                <span>{app.translator.trans(`huoxin-filter-rule-manager.admin.effects.${value}`)}</span>
+                {icon(this.interventionIcon(value))}
+                <span>{app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${value}`)}</span>
               </button>
             ))}
           </div>
-          <div className="helpText">{app.translator.trans(`huoxin-filter-rule-manager.admin.effects.${effect}_help`)}</div>
+          <div className="helpText">{app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}_help`)}</div>
         </div>
 
         <hr className="RulesetEditor-divider" />
 
-        {effect !== 'silent' && (
+        {intervention !== 'silent' && (
           <div>
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_mode')}</label>
@@ -374,7 +374,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
             {SettingsComponent && (
               <SettingsComponent
                 displaySetting={this.displaySetting.bind(this)}
-                effectType={effect}
+                interventionType={intervention}
                 displayMode={displayMode}
                 tokens={tokens}
                 tokenChipsBlock={this.tokenChipsBlock.bind(this)}
@@ -407,7 +407,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.preview')}</label>
-              {this.previewBlock(effect, this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder')))}
+              {this.previewBlock(intervention, this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder')))}
             </div>
           </div>
         )}
@@ -642,7 +642,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     }
   }
 
-  previewBlock(effect: string, message: string): Mithril.Children {
+  previewBlock(intervention: string, message: string): Mithril.Children {
     const settings = this.displaySettings() || {};
     const templateName = settings.template || 'builtin';
 
@@ -668,7 +668,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     }
 
     const dummyAlert = {
-      type: effect,
+      type: intervention,
       message: renderedMessage,
       displaySettings: previewSettings,
       key: 'preview-alert',
@@ -711,10 +711,10 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     );
   }
 
-  effectIcon(effect: string) {
-    if (effect === 'block') return 'fas fa-ban';
-    if (effect === 'warning') return 'fas fa-exclamation-triangle';
-    if (effect === 'silent') return 'fas fa-user-secret';
+  interventionIcon(intervention: string) {
+    if (intervention === 'block') return 'fas fa-ban';
+    if (intervention === 'warning') return 'fas fa-exclamation-triangle';
+    if (intervention === 'silent') return 'fas fa-user-secret';
     return 'fas fa-info-circle';
   }
 
@@ -753,7 +753,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     const data = {
       name: this.name(),
       expression: this.expression(),
-      effectType: this.effectType(),
+      interventionType: this.interventionType(),
       displayMode: this.displayMode(),
       message: this.message(),
       flagMessage: this.flagMessage(),
