@@ -89,6 +89,7 @@ export interface BuiltinTemplateSettingsAttrs extends ComponentAttrs {
 
 export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSettingsAttrs> {
   showIconPicker: boolean = false;
+  titleInput: HTMLInputElement | null = null;
 
   oninit(vnode: Mithril.Vnode<BuiltinTemplateSettingsAttrs, this>) {
     super.oninit(vnode);
@@ -103,7 +104,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
   }
 
   view(): Mithril.Children {
-    const { displaySetting, effectType, displayMode } = this.attrs;
+    const { displaySetting, effectType, displayMode, tokens, tokenChipsBlock } = this.attrs as any;
     const isToast = displayMode === 'toast';
     const defaultStyles = this.getDefaultStylesForEffect(effectType);
 
@@ -114,9 +115,41 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
           <input
             className="FormControl"
             value={displaySetting('title') || ''}
+            oncreate={(vnode) => {
+              this.titleInput = vnode.dom as HTMLInputElement;
+            }}
+            onupdate={(vnode) => {
+              this.titleInput = vnode.dom as HTMLInputElement;
+            }}
+            onremove={() => {
+              this.titleInput = null;
+            }}
             oninput={(e: Event) => displaySetting('title', (e.target as HTMLInputElement).value)}
             placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_placeholder') || 'e.g., Warning!')}
           />
+          {tokenChipsBlock &&
+            tokenChipsBlock(tokens, (name: string) => {
+              const insertion = `{{${name}}}`;
+              const current = displaySetting('title') || '';
+
+              if (!this.titleInput) {
+                displaySetting('title', current + insertion);
+                return;
+              }
+
+              const start = this.titleInput.selectionStart != null ? this.titleInput.selectionStart : current.length;
+              const end = this.titleInput.selectionEnd != null ? this.titleInput.selectionEnd : current.length;
+              const next = current.substring(0, start) + insertion + current.substring(end);
+
+              displaySetting('title', next);
+              this.titleInput.value = next;
+              this.titleInput.focus();
+
+              const cursor = start + insertion.length;
+              try {
+                this.titleInput.setSelectionRange(cursor, cursor);
+              } catch (e) {}
+            })}
         </div>
         <div className="RulesetEditor-customStyles-row">
           <div className="Form-group">

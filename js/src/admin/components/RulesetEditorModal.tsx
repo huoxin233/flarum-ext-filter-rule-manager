@@ -371,7 +371,15 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
               />
             </div>
 
-            {SettingsComponent && <SettingsComponent displaySetting={this.displaySetting.bind(this)} effectType={effect} displayMode={displayMode} />}
+            {SettingsComponent && (
+              <SettingsComponent
+                displaySetting={this.displaySetting.bind(this)}
+                effectType={effect}
+                displayMode={displayMode}
+                tokens={tokens}
+                tokenChipsBlock={this.tokenChipsBlock.bind(this)}
+              />
+            )}
 
             <hr className="RulesetEditor-divider" />
 
@@ -576,7 +584,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     return out;
   }
 
-  tokenChipsBlock(tokens: Record<string, unknown>[], targetField: string): Mithril.Children {
+  tokenChipsBlock(tokens: Record<string, unknown>[], targetField: string | ((name: string) => void)): Mithril.Children {
     if (!tokens || tokens.length === 0) {
       return <div className="TokenHints TokenHints--empty">{app.translator.trans('huoxin-filter-rule-manager.admin.tokens_none')}</div>;
     }
@@ -602,7 +610,12 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     );
   }
 
-  insertToken(name: string, targetField: string) {
+  insertToken(name: string, targetField: string | ((name: string) => void)) {
+    if (typeof targetField === 'function') {
+      targetField(name);
+      return;
+    }
+
     const insertion = `{{${name}}}`;
     const stream = targetField === 'flagMessage' ? this.flagMessage : this.message;
     const ref = targetField === 'flagMessage' ? this.flagMessageTextarea : this.messageTextarea;
@@ -647,12 +660,17 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       sampleTokens['matched_string'] = '[matched_string]';
     }
 
-    const rendered = filterEngine.interpolate(message, sampleTokens);
+    const renderedMessage = filterEngine.interpolate(message, sampleTokens);
+
+    const previewSettings = { ...settings };
+    if (typeof previewSettings.title === 'string') {
+      previewSettings.title = filterEngine.interpolate(previewSettings.title, sampleTokens);
+    }
 
     const dummyAlert = {
       type: effect,
-      message: rendered,
-      displaySettings: settings,
+      message: renderedMessage,
+      displaySettings: previewSettings,
       key: 'preview-alert',
     };
 

@@ -68,7 +68,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
         type: a.ruleset.effectType,
         message: a.message,
         key: `rs-${a.ruleset.id}`,
-        displaySettings: a.ruleset.displaySettings,
+        displaySettings: a.displaySettings,
       }));
     const blocks = filterEngine.blockResults
       .filter((a) => (isMobile ? true : a.displayMode === variant))

@@ -49,6 +49,7 @@ export interface ActiveAlert {
   ruleset: Ruleset;
   tokens: Record<string, string>;
   message: string;
+  displaySettings: Record<string, unknown>;
 }
 
 export interface BlockResult {
@@ -249,17 +250,23 @@ export class FilterEngine {
   }
 
   setBlockResults(filterRules: Record<string, unknown>[]): void {
-    this.blockResults = (filterRules || []).map(
-      (alert) =>
-        ({
-          effectType: alert.effect_type,
-          displayMode: alert.display_mode,
-          message: alert.message,
-          tokens: alert.tokens || {},
-          displaySettings: alert.display_settings || {},
-          isBlock: true,
-        } as any)
-    );
+    this.blockResults = (filterRules || []).map((alert) => {
+      const tokens = (alert.tokens as Record<string, string>) || {};
+      let displaySettings = (alert.display_settings as Record<string, unknown>) || {};
+
+      if (typeof displaySettings.title === 'string') {
+        displaySettings = { ...displaySettings, title: this.interpolate(displaySettings.title, tokens) };
+      }
+
+      return {
+        effectType: alert.effect_type as string,
+        displayMode: alert.display_mode as string,
+        message: alert.message as string,
+        tokens,
+        displaySettings,
+        isBlock: true,
+      };
+    });
     this.hasAlerts = this.activeAlerts.length > 0 || this.blockResults.length > 0;
     this._notify();
     if (typeof m !== 'undefined') m.redraw();
@@ -296,10 +303,16 @@ export class FilterEngine {
 
       const tokens = this.evaluateRuleset(ruleset, targetContent);
       if (tokens !== null) {
+        let displaySettings = ruleset.displaySettings || {};
+        if (typeof displaySettings.title === 'string') {
+          displaySettings = { ...displaySettings, title: this.interpolate(displaySettings.title, tokens) };
+        }
+
         activeAlerts.push({
           ruleset,
           tokens,
           message: this.interpolate(ruleset.message, tokens),
+          displaySettings,
         });
         if (ruleset.blockCascade) break;
       }
