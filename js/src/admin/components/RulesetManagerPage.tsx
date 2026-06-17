@@ -367,7 +367,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         </div>
 
         <div
-          className="CardList-item-cell CardList-item-cell--muted"
+          className="CardList-item-cell CardList-item-cell--muted CardList-item-cell--rules"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.rules')}
         >
           <span className="CountBadge">{rulesCount}</span>
