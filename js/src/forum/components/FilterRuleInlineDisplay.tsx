@@ -104,6 +104,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
 
     if (!TemplateComponent) return null;
 
-    return <TemplateComponent key={alert.key || i} alert={alert} variant={variant} />;
+    const TemplateComp = TemplateComponent as any;
+    return <TemplateComp key={alert.key || i} alert={alert} variant={variant} />;
   }
 }

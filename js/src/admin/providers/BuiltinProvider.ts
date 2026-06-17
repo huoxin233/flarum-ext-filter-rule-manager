@@ -8,6 +8,7 @@
  */
 
 import app from 'flarum/admin/app';
+import type Mithril from 'mithril';
 import WordsListConfig from '../components/config/WordsListConfig';
 import PatternsListConfig from '../components/config/PatternsListConfig';
 

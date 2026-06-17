@@ -38,11 +38,11 @@ export default class BuiltinTemplate extends Component<BuiltinTemplateAttrs> {
     }
 
     // Use React.CSSProperties-like typing or just any for React/Mithril inline styles
-    const style: any = {};
+    const style: Record<string, string> = {};
     if (settings.textColor) style.color = settings.textColor;
     if (settings.backgroundColor) style.backgroundColor = settings.backgroundColor;
 
-    const iconStyle: any = {};
+    const iconStyle: Record<string, string> = {};
     if (settings.iconColor) iconStyle.color = settings.iconColor;
 
     return (

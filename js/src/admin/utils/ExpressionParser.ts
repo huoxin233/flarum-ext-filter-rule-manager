@@ -7,6 +7,8 @@
  * file that was distributed with this source code.
  */
 
+import type { ASTNode } from '../../common/FilterEngine';
+
 export const T_AND = 'AND';
 export const T_OR = 'OR';
 export const T_NOT = 'NOT';
@@ -27,7 +29,7 @@ export const T_EOF = 'EOF';
 
 export interface Token {
   type: string;
-  value: any;
+  value: unknown;
   position: number;
 }
 
@@ -97,7 +99,7 @@ class Lexer {
 
       if (/[a-zA-Z_]/.test(char)) {
         const token = this.readIdentifier();
-        const lower = token.value.toLowerCase();
+        const lower = String(token.value).toLowerCase();
 
         if (lower === 'and') token.type = T_AND;
         else if (lower === 'or') token.type = T_OR;
@@ -226,7 +228,7 @@ export class Parser {
     this.position = 0;
   }
 
-  parse(): any {
+  parse(): ASTNode | null {
     const node = this.parseLogicalOr();
     if (!this.isAtEnd()) {
       const token = this.peek();
@@ -235,7 +237,7 @@ export class Parser {
     return node;
   }
 
-  parseLogicalOr(): any {
+  parseLogicalOr(): ASTNode {
     let node = this.parseLogicalAnd();
     while (this.match(T_OR)) {
       node = { type: 'logical', operator: 'OR', left: node, right: this.parseLogicalAnd() };
@@ -243,7 +245,7 @@ export class Parser {
     return node;
   }
 
-  parseLogicalAnd(): any {
+  parseLogicalAnd(): ASTNode {
     let node = this.parseUnary();
     while (this.match(T_AND)) {
       node = { type: 'logical', operator: 'AND', left: node, right: this.parseUnary() };
@@ -251,12 +253,12 @@ export class Parser {
     return node;
   }
 
-  parseUnary(): any {
+  parseUnary(): ASTNode {
     if (this.match(T_NOT)) return { type: 'not', node: this.parseUnary() };
     return this.parsePrimary();
   }
 
-  parsePrimary(): any {
+  parsePrimary(): ASTNode {
     if (this.match(T_LPAREN)) {
       const node = this.parseLogicalOr();
       this.consume(T_RPAREN, "Expected ')' after expression.");
@@ -265,29 +267,29 @@ export class Parser {
     return this.parseRule();
   }
 
-  parseRule(): any {
+  parseRule(): ASTNode {
     const fieldToken = this.consume(T_FIELD, 'Expected field identifier (e.g. provider.type)');
-    const parts = fieldToken.value.split('.');
+    const parts = String(fieldToken.value).split('.');
     if (parts.length !== 2) throw new Error(`Field '${fieldToken.value}' must be in format provider.type`);
     const [provider, ruleType] = parts;
 
     let operator = 'eq';
-    let value: any = true;
+    let value: unknown = true;
 
     if (this.check(T_OP)) {
-      operator = this.advance().value;
+      operator = String(this.advance().value);
       value = this.parseValue();
     }
 
     return { type: 'rule', provider, ruleType, operator, value };
   }
 
-  parseValue(): any {
+  parseValue(): unknown {
     if (this.match(T_STRING)) return this.previous().value;
     if (this.match(T_NUMBER)) return this.previous().value;
     if (this.match(T_BOOLEAN)) return this.previous().value;
     if (this.match(T_LBRACKET)) {
-      const arr: any[] = [];
+      const arr: unknown[] = [];
       if (!this.check(T_RBRACKET)) {
         do {
           arr.push(this.parseValue());
@@ -297,13 +299,13 @@ export class Parser {
       return arr;
     }
     if (this.match(T_LBRACE)) {
-      const obj: Record<string, any> = {};
+      const obj: Record<string, unknown> = {};
       if (!this.check(T_RBRACE)) {
         do {
           const keyToken = this.consume(T_STRING, 'Expected string key in object');
           this.consume(T_COLON, "Expected ':' after object key");
           const val = this.parseValue();
-          obj[keyToken.value] = val;
+          obj[String(keyToken.value)] = val;
         } while (this.match(T_COMMA));
       }
       this.consume(T_RBRACE, "Expected '}' after object.");
@@ -349,27 +351,28 @@ export class Parser {
   }
 }
 
-export function parseExpression(expression: string | null | undefined): any {
+export function parseExpression(expression: string | null | undefined): ASTNode | null {
   if (!expression || expression.trim() === '') return null;
   const lexer = new Lexer(expression);
   const parser = new Parser(lexer.tokenize());
   return parser.parse();
 }
 
-export function stringifyExpression(ast: any): string {
+export function stringifyExpression(ast: ASTNode | null | undefined): string {
   if (!ast) return '';
   if (ast.type === 'logical') {
     const left = stringifyExpression(ast.left);
     const right = stringifyExpression(ast.right);
-    const lStr = ast.left.type === 'logical' && ast.left.operator !== ast.operator ? `(${left})` : left;
-    const rStr = ast.right.type === 'logical' && ast.right.operator !== ast.operator ? `(${right})` : right;
-    return `${lStr} ${ast.operator.toLowerCase()} ${rStr}`;
+    const lStr = ast.left && ast.left.type === 'logical' && ast.left.operator !== ast.operator ? `(${left})` : left;
+    const rStr = ast.right && ast.right.type === 'logical' && ast.right.operator !== ast.operator ? `(${right})` : right;
+    return `${lStr} ${String(ast.operator).toLowerCase()} ${rStr}`;
   }
   if (ast.type === 'not') return `not (${stringifyExpression(ast.node)})`;
   if (ast.type === 'rule') {
     let valStr = '';
     if (typeof ast.value === 'string') valStr = `"${ast.value.replace(/"/g, '\\"')}"`;
-    else if (Array.isArray(ast.value)) valStr = `[${ast.value.map((v) => (typeof v === 'string' ? `"${v.replace(/"/g, '\\"')}"` : v)).join(', ')}]`;
+    else if (Array.isArray(ast.value))
+      valStr = `[${ast.value.map((v: unknown) => (typeof v === 'string' ? `"${v.replace(/"/g, '\\"')}"` : v)).join(', ')}]`;
     else if (typeof ast.value === 'object' && ast.value !== null) {
       valStr =
         `{` +
@@ -380,14 +383,14 @@ export function stringifyExpression(ast: any): string {
                 typeof v === 'string'
                   ? `"${(v as string).replace(/"/g, '\\"')}"`
                   : Array.isArray(v)
-                  ? `[${v.map((item) => (typeof item === 'string' ? `"${item.replace(/"/g, '\\"')}"` : item)).join(', ')}]`
+                  ? `[${v.map((item: unknown) => (typeof item === 'string' ? `"${item.replace(/"/g, '\\"')}"` : item)).join(', ')}]`
                   : v
               }`
           )
           .join(', ') +
         `}`;
-    } else valStr = ast.value;
-    return `${ast.provider}.${ast.ruleType} ${ast.operator} ${valStr}`;
+    } else valStr = String(ast.value);
+    return `${String(ast.provider)}.${String(ast.ruleType)} ${String(ast.operator)} ${valStr}`;
   }
   return '';
 }

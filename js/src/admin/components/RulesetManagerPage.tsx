@@ -15,6 +15,8 @@ import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import extractText from 'flarum/common/utils/extractText';
 import icon from 'flarum/common/helpers/icon';
 import type Mithril from 'mithril';
+import type Model from 'flarum/common/Model';
+import type { ASTNode } from '../../common/FilterEngine';
 
 import RulesetEditorModal from './RulesetEditorModal';
 
@@ -24,8 +26,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   loading: boolean = true;
   activeTab: string = 'rulesets';
   scopeFilter: string = 'all';
-  rulesets: any[] = [];
-  providers: any[] = [];
+  rulesets: Model[] = [];
+  providers: Record<string, any>[] = [];
   reordering: boolean = false;
   toggling: Set<string> = new Set();
   registryFilter: string = 'providers';
@@ -47,22 +49,24 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
 
   async loadData() {
     this.loading = true;
-    (window as any).m.redraw();
+    m.redraw();
 
     try {
       const [, providersResponse] = await Promise.all([
         app.store.find('filter-rule-rulesets'),
-        app.request<any>({
+        app.request<Record<string, any>>({
           method: 'GET',
           url: app.forum.attribute('apiUrl') + '/filter-rule-providers',
         }),
       ]);
 
-      this.rulesets = (app.store.all('filter-rule-rulesets') || []).slice().sort((a: any, b: any) => (a.priority() || 0) - (b.priority() || 0));
+      this.rulesets = (app.store.all('filter-rule-rulesets') || [])
+        .slice()
+        .sort((a: Model & { priority?: () => number }, b: Model & { priority?: () => number }) => (a.priority?.() || 0) - (b.priority?.() || 0));
 
-      this.providers = (providersResponse.data || []).map((p: any) => Object.assign({}, p, { scope: 'backend' }));
-      const frontendProviders = (app as any).filterRuleManager ? (app as any).filterRuleManager.getRegisteredFrontendTypes() : [];
-      frontendProviders.forEach((fp: any) => {
+      this.providers = (providersResponse.data || []).map((p: Record<string, any>) => Object.assign({}, p, { scope: 'backend' }));
+      const frontendProviders = app.filterRuleManager ? app.filterRuleManager.getRegisteredFrontendTypes() : [];
+      frontendProviders.forEach((fp: Record<string, any>) => {
         const existing = this.providers.find((p) => p.provider === fp.provider && p.type === fp.type);
         if (existing) {
           existing.scope = 'both';
@@ -81,11 +85,11 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       app.alerts.show({ type: 'error' }, app.translator.trans('huoxin-filter-rule-manager.admin.load_error'));
     } finally {
       this.loading = false;
-      (window as any).m.redraw();
+      m.redraw();
     }
   }
 
-  content(): Mithril.Children {
+  content(): any {
     if (this.loading) {
       return (
         <div className="FilterRulePage">
@@ -102,7 +106,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
               className={`Button ${this.activeTab === 'rulesets' ? 'active' : ''}`}
               onclick={() => {
                 this.activeTab = 'rulesets';
-                (window as any).m.redraw();
+                m.redraw();
               }}
             >
               <i className="fas fa-shield-alt"></i>
@@ -113,7 +117,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
               className={`Button ${this.activeTab === 'registry' ? 'active' : ''}`}
               onclick={() => {
                 this.activeTab = 'registry';
-                (window as any).m.redraw();
+                m.redraw();
               }}
             >
               <i className="fas fa-plug"></i>
@@ -123,7 +127,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
               className={`Button ${this.activeTab === 'settings' ? 'active' : ''}`}
               onclick={() => {
                 this.activeTab = 'settings';
-                (window as any).m.redraw();
+                m.redraw();
               }}
             >
               <i className="fas fa-cog"></i>
@@ -233,10 +237,10 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   rulesetsTab(): Mithril.Children {
     const counts: Record<string, number> = {
       all: this.rulesets.length,
-      global: this.rulesets.filter((r) => r.scopeType() === 'global').length,
-      normal_post: this.rulesets.filter((r) => r.scopeType() === 'normal_post').length,
-      private_post: this.rulesets.filter((r) => r.scopeType() === 'private_post').length,
-      tag: this.rulesets.filter((r) => r.scopeType() === 'tag').length,
+      global: this.rulesets.filter((r) => (r as any).scopeType() === 'global').length,
+      normal_post: this.rulesets.filter((r) => (r as any).scopeType() === 'normal_post').length,
+      private_post: this.rulesets.filter((r) => (r as any).scopeType() === 'private_post').length,
+      tag: this.rulesets.filter((r) => (r as any).scopeType() === 'tag').length,
     };
 
     return (
@@ -249,7 +253,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
               className={`SubTab ${this.scopeFilter === scope ? 'active' : ''}`}
               onclick={() => {
                 this.scopeFilter = scope;
-                (window as any).m.redraw();
+                m.redraw();
               }}
             >
               <span className="SubTab-label">{app.translator.trans(`huoxin-filter-rule-manager.admin.scope_filters.${scope}`)}</span>
@@ -265,10 +269,10 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
 
   filteredRulesets() {
     if (this.scopeFilter === 'all') return this.rulesets;
-    return this.rulesets.filter((r) => r.scopeType() === this.scopeFilter);
+    return this.rulesets.filter((r) => (r as any).scopeType() === this.scopeFilter);
   }
 
-  renderList(list: any[]): Mithril.Children {
+  renderList(list: Model[]): Mithril.Children {
     if (list.length === 0) {
       return (
         <div className="EmptyState">
@@ -308,18 +312,18 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     );
   }
 
-  rulesetRow(ruleset: any, filteredIndex: number, filteredList: any[]): Mithril.Children {
+  rulesetRow(ruleset: Model & Record<string, any>, filteredIndex: number, filteredList: Model[]): Mithril.Children {
     const isActive = ruleset.isActive();
     const isFirst = filteredIndex === 0;
     const isLast = filteredIndex === filteredList.length - 1;
     const effect = ruleset.effectType();
     const scope = ruleset.scopeType();
     const display = ruleset.displayMode();
-    const isTogglingThis = this.toggling.has(ruleset.id());
+    const isTogglingThis = this.toggling.has(ruleset.id() as string);
     const rulesCount = this.countRules(ruleset.compiledAst());
 
     return (
-      <div className={`CardList-item ${!isActive ? 'CardList-item--inactive' : ''}`} key={ruleset.id()}>
+      <div className={`CardList-item ${!isActive ? 'CardList-item--inactive' : ''}`} key={ruleset.id() as string}>
         <div className="CardList-item-cell CardList-item-cell--order">
           <Button
             className="Button Button--icon Button--small"
@@ -398,7 +402,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     );
   }
 
-  countRules(ast: any): number {
+  countRules(ast: ASTNode | null | undefined): number {
     if (!ast) return 0;
     if (ast.type === 'rule') return 1;
     if (ast.type === 'logical') return this.countRules(ast.left) + this.countRules(ast.right);
@@ -424,7 +428,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
               className={`SubTab ${this.registryFilter === scope ? 'active' : ''}`}
               onclick={() => {
                 this.registryFilter = scope;
-                (window as any).m.redraw();
+                m.redraw();
               }}
             >
               <span className="SubTab-label">{app.translator.trans(`huoxin-filter-rule-manager.admin.registry_tabs.${scope}`)}</span>
@@ -451,7 +455,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       );
     }
 
-    const byProvider: Record<string, any[]> = {};
+    const byProvider: Record<string, Record<string, unknown>[]> = {};
     for (const p of this.providers) {
       (byProvider[p.provider] = byProvider[p.provider] || []).push(p);
     }
@@ -480,8 +484,10 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
                     <span className={`ScopeBadge ScopeBadge--${p.scope}`}>{p.scope}</span>
                   </div>
                   <div className="CardList-item-cell CardList-item-cell--muted" data-label="Tokens">
-                    {p.tokens && p.tokens.length > 0 ? (
-                      p.tokens.map((t: any) => <code className="TokenInlineChip" key={t.name}>{`{{${t.name}}}`}</code>)
+                    {p.tokens && (p.tokens as unknown[]).length > 0 ? (
+                      (p.tokens as any[]).map((t: Record<string, unknown>) => (
+                        <code className="TokenInlineChip" key={t.name as string}>{`{{${t.name}}}`}</code>
+                      ))
                     ) : (
                       <em>—</em>
                     )}
@@ -496,7 +502,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   }
 
   renderTemplates(): Mithril.Children {
-    const templates = (app as any).filterRuleManager ? (app as any).filterRuleManager.getTemplates() : {};
+    const templates = app.filterRuleManager ? app.filterRuleManager.getTemplates() : {};
 
     return (
       <div className="ProvidersList">
@@ -508,7 +514,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
               <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.has_settings')}</span>
             </div>
             {Object.keys(templates).map((name) => {
-              const settingsComp = (app as any).filterRuleManager.getTemplateSettingsComponent(name);
+              const settingsComp = app.filterRuleManager.getTemplateSettingsComponent(name);
               return (
                 <div className="CardList-item" key={name}>
                   <div className="CardList-item-cell CardList-item-cell--primary" data-label="Template">
@@ -527,7 +533,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   }
 
   renderModes(): Mithril.Children {
-    const modes = (app as any).filterRuleManager ? (app as any).filterRuleManager.getDisplayModes() : {};
+    const modes = app.filterRuleManager ? app.filterRuleManager.getDisplayModes() : {};
 
     return (
       <div className="ProvidersList">
@@ -576,17 +582,17 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       await ruleset.delete();
       this.rulesets = this.rulesets.filter((r) => r.id() !== ruleset.id());
       app.alerts.show({ type: 'success' }, app.translator.trans('huoxin-filter-rule-manager.admin.delete_success'));
-      (window as any).m.redraw();
+      m.redraw();
     } catch (err) {
       console.error('Failed to delete ruleset:', err);
       app.alerts.show({ type: 'error' }, app.translator.trans('huoxin-filter-rule-manager.admin.delete_error'));
     }
   }
 
-  async toggleActive(ruleset: any, isActive: boolean) {
-    if (this.toggling.has(ruleset.id())) return;
-    this.toggling.add(ruleset.id());
-    (window as any).m.redraw();
+  async toggleActive(ruleset: Model, isActive: boolean) {
+    if (this.toggling.has(ruleset.id() as string)) return;
+    this.toggling.add(ruleset.id() as string);
+    m.redraw();
 
     try {
       await ruleset.save({ isActive });
@@ -594,8 +600,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       console.error('Failed to toggle isActive:', err);
       app.alerts.show({ type: 'error' }, app.translator.trans('huoxin-filter-rule-manager.admin.toggle_error'));
     } finally {
-      this.toggling.delete(ruleset.id());
-      (window as any).m.redraw();
+      this.toggling.delete(ruleset.id() as string);
+      m.redraw();
     }
   }
 
@@ -623,7 +629,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     [all[aIdx], all[bIdx]] = [all[bIdx], all[aIdx]];
     this.rulesets = all;
     this.reordering = true;
-    (window as any).m.redraw();
+    m.redraw();
 
     try {
       await app.request({
@@ -637,7 +643,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       await this.loadData();
     } finally {
       this.reordering = false;
-      (window as any).m.redraw();
+      m.redraw();
     }
   }
 }

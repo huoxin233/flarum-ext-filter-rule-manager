@@ -7,14 +7,27 @@
  * file that was distributed with this source code.
  */
 
+import app from 'flarum/common/app';
 import type Mithril from 'mithril';
+
+export interface ASTNode {
+  type: string;
+  provider?: string;
+  ruleType?: string;
+  operator?: string;
+  value?: unknown;
+  left?: ASTNode;
+  right?: ASTNode;
+  node?: ASTNode;
+  _key?: number;
+}
 
 export interface FilterRuleProvider {
   getSupportedTypes(): string[];
   getTypeLabels?(): Record<string, string>;
   getProviderLabel?(): string;
-  evaluate?(ruleType: string, content: string, config: any): Record<string, string> | null;
-  getConfigComponent?(type: string): any;
+  evaluate?(ruleType: string, content: string, config: Record<string, unknown>): Record<string, string> | null;
+  getConfigComponent?(type: string): Mithril.ComponentTypes<unknown, unknown> | null;
 }
 
 export interface Ruleset {
@@ -27,9 +40,9 @@ export interface Ruleset {
   evaluateTitle?: boolean;
   evaluateAllRules?: boolean | (() => boolean);
   blockCascade?: boolean;
-  compiledAst?: () => any;
-  compiled_ast?: any;
-  displaySettings?: any;
+  compiledAst?: () => ASTNode;
+  compiled_ast?: ASTNode;
+  displaySettings?: Record<string, unknown>;
 }
 
 export interface ActiveAlert {
@@ -43,7 +56,7 @@ export interface BlockResult {
   displayMode: string;
   message: string;
   tokens: Record<string, string>;
-  displaySettings: any;
+  displaySettings: Record<string, unknown>;
   isBlock: boolean;
 }
 
@@ -61,7 +74,10 @@ function escapeHtml(str: string): string {
 export class FilterEngine {
   public rulesets: Ruleset[] = [];
   public providers: Record<string, FilterRuleProvider> = {};
-  public templates: Record<string, { component: any; settingsComponent: any }> = {};
+  public templates: Record<
+    string,
+    { component: Mithril.ComponentTypes<unknown, unknown>; settingsComponent: Mithril.ComponentTypes<unknown, unknown> | null }
+  > = {};
   public displayModes: Record<string, string> = {};
   public activeAlerts: ActiveAlert[] = [];
   public blockResults: BlockResult[] = [];
@@ -128,36 +144,43 @@ export class FilterEngine {
   /**
    * Register a display template component.
    */
-  registerTemplate(name: string, component: any, settingsComponent: any = null): void {
+  registerTemplate(
+    name: string,
+    component: Mithril.ComponentTypes<unknown, unknown>,
+    settingsComponent: Mithril.ComponentTypes<unknown, unknown> | null = null
+  ): void {
     this.templates[name] = {
-      component,
-      settingsComponent,
+      component: component as any,
+      settingsComponent: settingsComponent as any,
     };
   }
 
   /**
    * Get a registered display template component.
    */
-  getTemplate(name: string): any {
+  getTemplate(name: string): Mithril.ComponentTypes<unknown, unknown> | null {
     return this.templates[name] ? this.templates[name].component : null;
   }
 
   /**
    * Get a registered display template settings component.
    */
-  getTemplateSettingsComponent(name: string): any {
+  getTemplateSettingsComponent(name: string): Mithril.ComponentTypes<unknown, unknown> | null {
     return this.templates[name] ? this.templates[name].settingsComponent : null;
   }
 
   /**
    * Get all registered templates.
    */
-  getTemplates(): Record<string, any> {
+  getTemplates(): Record<
+    string,
+    { component: Mithril.ComponentTypes<unknown, unknown>; settingsComponent: Mithril.ComponentTypes<unknown, unknown> | null }
+  > {
     const result: Record<string, any> = {};
     for (const [name, data] of Object.entries(this.templates)) {
       result[name] = data.component;
     }
-    return result;
+    return result as any;
   }
 
   /**
@@ -179,8 +202,7 @@ export class FilterEngine {
   getRegisteredFrontendTypes(): { provider: string; providerLabel: string; type: string; label: string }[] {
     const types: { provider: string; providerLabel: string; type: string; label: string }[] = [];
 
-    // Use window.app for translation if available
-    const app = (typeof window !== 'undefined' && (window as any).app) || null;
+    // `app` is imported natively.
 
     for (const [name, provider] of Object.entries(this.providers)) {
       if (typeof provider.getSupportedTypes !== 'function') continue;
@@ -226,30 +248,33 @@ export class FilterEngine {
     this._notify();
   }
 
-  setBlockResults(filterRules: any[]): void {
-    this.blockResults = (filterRules || []).map((alert) => ({
-      effectType: alert.effect_type,
-      displayMode: alert.display_mode,
-      message: alert.message,
-      tokens: alert.tokens || {},
-      displaySettings: alert.display_settings || {},
-      isBlock: true,
-    }));
+  setBlockResults(filterRules: Record<string, unknown>[]): void {
+    this.blockResults = (filterRules || []).map(
+      (alert) =>
+        ({
+          effectType: alert.effect_type,
+          displayMode: alert.display_mode,
+          message: alert.message,
+          tokens: alert.tokens || {},
+          displaySettings: alert.display_settings || {},
+          isBlock: true,
+        } as any)
+    );
     this.hasAlerts = this.activeAlerts.length > 0 || this.blockResults.length > 0;
     this._notify();
-    if (typeof (window as any).m !== 'undefined') (window as any).m.redraw();
+    if (typeof m !== 'undefined') m.redraw();
   }
 
   clearBlockResults(): void {
     this.blockResults = [];
     this.hasAlerts = this.activeAlerts.length > 0;
     this._notify();
-    if (typeof (window as any).m !== 'undefined') (window as any).m.redraw();
+    if (typeof m !== 'undefined') m.redraw();
   }
 
   evaluate(): void {
-    const application = (typeof window !== 'undefined' && (window as any).app) || null;
-    const composer = application && application.composer;
+    const application = app;
+    const composer = application && (application as any).composer;
     if (!composer || typeof composer.isVisible !== 'function' || !composer.isVisible()) return;
 
     const content = (composer.fields && composer.fields.content && composer.fields.content()) || '';
@@ -286,7 +311,7 @@ export class FilterEngine {
 
     if (changed) {
       this._notify();
-      if (typeof (window as any).m !== 'undefined') (window as any).m.redraw();
+      if (typeof m !== 'undefined') m.redraw();
     }
   }
 
@@ -297,7 +322,7 @@ export class FilterEngine {
     return this.evaluateAST(ast, content, ruleset);
   }
 
-  evaluateAST(node: any, content: string, ruleset: Ruleset): Record<string, string> | null {
+  evaluateAST(node: ASTNode | null | undefined, content: string, ruleset: Ruleset): Record<string, string> | null {
     if (!node) return null;
 
     if (node.type === 'logical') {
@@ -350,15 +375,16 @@ export class FilterEngine {
     return merged;
   }
 
-  evaluateRuleNode(node: any, content: string): Record<string, string> | null {
+  evaluateRuleNode(node: ASTNode, content: string): Record<string, string> | null {
+    if (!node.provider) return null;
     const provider = this.providers[node.provider];
     if (!provider || typeof provider.evaluate !== 'function') return null;
-    if (!provider.getSupportedTypes().includes(node.ruleType)) return null;
+    if (!provider.getSupportedTypes().includes(node.ruleType as string)) return null;
 
     let result = null;
     try {
       const isObject = typeof node.value === 'object' && node.value !== null && !Array.isArray(node.value);
-      let config = isObject ? { ...node.value, operator: node.operator } : { operator: node.operator, value: node.value };
+      let config: any = isObject ? { ...(node.value as object), operator: node.operator } : { operator: node.operator, value: node.value };
 
       if (node.provider === 'builtin' && !isObject) {
         let val = Array.isArray(node.value) ? node.value : [node.value];
@@ -366,9 +392,9 @@ export class FilterEngine {
         else if (node.ruleType === 'regex') config = { patterns: val };
       }
 
-      result = provider.evaluate(node.ruleType, content, config);
+      result = provider.evaluate(node.ruleType as string, content, config);
     } catch (e) {
-      console.error(`[filter-rule-manager] rule ${node.provider}/${node.ruleType} threw`, e);
+      console.error(`[filter-rule-manager] rule ${String(node.provider)}/${String(node.ruleType)} threw`, e);
       return null;
     }
 
@@ -376,17 +402,19 @@ export class FilterEngine {
   }
 
   scopeMatches(ruleset: Ruleset, composer: any, application: any): boolean {
+    if (!composer) return false;
     let isPrivate = false;
     let tagIds: (string | number)[] = [];
 
     let discussion = null;
-    if (composer.body && composer.body.attrs) {
-      if (composer.body.attrs.post) {
-        discussion = composer.body.attrs.post.discussion();
-      } else if (composer.body.attrs.discussion) {
-        discussion = composer.body.attrs.discussion;
+    if ((composer.body as any) && (composer.body as any).attrs) {
+      if ((composer.body as any).attrs.post) {
+        discussion = (composer.body as any).attrs.post.discussion();
+      } else if ((composer.body as any).attrs.discussion) {
+        discussion = (composer.body as any).attrs.discussion;
       }
     }
+    const safeComposer = composer as any;
 
     if (discussion) {
       const recipientUsers = discussion.recipientUsers && discussion.recipientUsers();
@@ -398,27 +426,29 @@ export class FilterEngine {
         discussion.attribute('is_private');
 
       isPrivate = !!isPrivateAttr || (recipientUsers && recipientUsers.length > 0) || (recipientGroups && recipientGroups.length > 0);
-      tagIds = discussion.tags && discussion.tags() ? discussion.tags().map((t: any) => t.id()) : [];
+      tagIds = discussion.tags && discussion.tags() ? discussion.tags().map((t: { id: () => string | number }) => t.id()) : [];
     } else {
-      const resolveField = (val: any) => (typeof val === 'function' ? val() : val);
+      const resolveField = (val: unknown) => (typeof val === 'function' ? val() : val);
 
-      let recipientUsers = resolveField(composer.fields.recipientUsers) || [];
-      let recipientGroups = resolveField(composer.fields.recipientGroups) || [];
+      let recipientUsers = resolveField(safeComposer.fields?.recipientUsers) || [];
+      let recipientGroups = resolveField(safeComposer.fields?.recipientGroups) || [];
 
-      const recipientsField = resolveField(composer.fields.recipients);
+      const recipientsField = resolveField(safeComposer.fields?.recipients) as Record<string, unknown> | unknown[];
       const recipientsArray =
-        recipientsField && typeof recipientsField.toArray === 'function'
-          ? recipientsField.toArray()
+        recipientsField && typeof (recipientsField as any).toArray === 'function'
+          ? (recipientsField as any).toArray()
           : Array.isArray(recipientsField)
           ? recipientsField
           : [];
 
-      const fieldsIsPrivate = resolveField(composer.fields.isPrivate);
+      const fieldsIsPrivate = resolveField(safeComposer.fields?.isPrivate);
 
-      const hasRecipients = recipientUsers.length > 0 || recipientGroups.length > 0 || recipientsArray.length > 0;
+      const hasRecipients = (recipientUsers as unknown[]).length > 0 || (recipientGroups as unknown[]).length > 0 || recipientsArray.length > 0;
       isPrivate = !!fieldsIsPrivate || hasRecipients;
 
-      tagIds = resolveField(composer.fields.tags) ? resolveField(composer.fields.tags).map((t: any) => t.id()) : [];
+      tagIds = resolveField(safeComposer.fields?.tags)
+        ? (resolveField(safeComposer.fields?.tags) as unknown[]).map((t) => (t as { id: () => string | number }).id())
+        : [];
     }
 
     switch (ruleset.scopeType) {

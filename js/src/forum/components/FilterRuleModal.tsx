@@ -8,14 +8,14 @@
  */
 
 import app from 'flarum/forum/app';
-import Modal, { ModalAttrs } from 'flarum/common/components/Modal';
+import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import type Mithril from 'mithril';
 
-export interface FilterRuleModalAttrs extends ModalAttrs {
+export interface FilterRuleModalAttrs extends IInternalModalAttrs {
   type: string;
   message: string;
-  displaySettings?: any;
+  displaySettings?: Record<string, unknown>;
 }
 
 /**
@@ -25,19 +25,19 @@ export interface FilterRuleModalAttrs extends ModalAttrs {
  * the modal on every 300ms poll tick.
  */
 export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
-  className() {
+  className(): string {
     const type = this.attrs.type || 'info';
     return `FilterRuleModal Modal--small FilterRuleModal--${type}`;
   }
 
-  title() {
+  title(): Mithril.Children {
     const type = this.attrs.type || 'info';
     const settings = this.attrs.displaySettings || {};
-    if (settings.title) return app.translator.trans(settings.title);
+    if (settings.title) return app.translator.trans(settings.title as string);
     return app.translator.trans(`huoxin-filter-rule-manager.forum.modal_title_${type}`);
   }
 
-  content() {
+  content(): Mithril.Children {
     const type = this.attrs.type || 'info';
     const settings = this.attrs.displaySettings || {};
 
@@ -46,23 +46,23 @@ export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
       iconClass = type === 'block' ? 'fas fa-times-circle' : type === 'warning' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle';
     }
 
-    const style: any = {};
-    if (settings.textColor && settings.textColor !== 'transparent') style.color = settings.textColor;
-    if (settings.backgroundColor && settings.backgroundColor !== 'transparent') style.backgroundColor = settings.backgroundColor;
+    const style: Record<string, string> = {};
+    if (settings.textColor && settings.textColor !== 'transparent') style.color = settings.textColor as string;
+    if (settings.backgroundColor && settings.backgroundColor !== 'transparent') style.backgroundColor = settings.backgroundColor as string;
     if (settings.backgroundColor === 'transparent') {
       style.backgroundColor = 'transparent';
       style.boxShadow = 'none';
       style.border = 'none';
     }
 
-    const iconStyle: any = {};
-    if (settings.iconColor && settings.iconColor !== 'transparent') iconStyle.color = settings.iconColor;
+    const iconStyle: Record<string, string> = {};
+    if (settings.iconColor && settings.iconColor !== 'transparent') iconStyle.color = settings.iconColor as string;
 
     return (
       <div className="Modal-body">
         <div className={`FilterRuleModal-message FilterRuleModal-message--${type}`} style={style}>
           {settings.icon !== 'none' && <i className={`FilterRuleModal-icon ${iconClass}`} style={iconStyle}></i>}
-          <span className="FilterRuleModal-text">{(window as any).m.trust(this.attrs.message)}</span>
+          <span className="FilterRuleModal-text">{m.trust(this.attrs.message)}</span>
         </div>
         <div className="Form-group FilterRuleModal-actions">
           <Button className="Button Button--primary" onclick={() => this.hide()}>

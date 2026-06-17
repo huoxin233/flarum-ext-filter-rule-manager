@@ -13,13 +13,23 @@ import classList from 'flarum/common/utils/classList';
 import Stream from 'flarum/common/utils/Stream';
 import type Mithril from 'mithril';
 
+export interface Tag {
+  id: () => string | number;
+  name: () => string;
+  icon: () => string | null;
+  color: () => string | null;
+  position: () => number | null | undefined;
+  isChild: () => boolean;
+  parent: () => Tag | null;
+}
+
 export interface InlineTagSelectorAttrs extends ComponentAttrs {
-  tags?: any[];
+  tags?: Tag[];
   selectedIds: Stream<number[]>;
 }
 
 export default class InlineTagSelector extends Component<InlineTagSelectorAttrs> {
-  tags: any[] = [];
+  tags: Tag[] = [];
   selectedIds!: Stream<number[]>;
 
   oninit(vnode: Mithril.Vnode<InlineTagSelectorAttrs, this>) {
@@ -32,7 +42,7 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
     const tags = this.attrs.tags || [];
     const primaryTags = tags
       .filter((t) => t.position() !== null && t.position() !== undefined && !t.isChild())
-      .sort((a, b) => a.position() - b.position());
+      .sort((a, b) => (a.position() || 0) - (b.position() || 0));
     const secondaryTags = tags.filter((t) => t.position() === null || t.position() === undefined).sort((a, b) => a.name().localeCompare(b.name()));
     const childTags = tags.filter((t) => t.isChild());
 
@@ -61,16 +71,16 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
     );
   }
 
-  renderTag(tag: any, children: any[]): Mithril.Children {
-    const id = parseInt(tag.id(), 10);
+  renderTag(tag: Tag, children: Tag[]): Mithril.Children {
+    const id = parseInt(String(tag.id()), 10);
     const selected = (this.selectedIds() || []).includes(id);
 
     return (
       <div className="InlineTagSelector-itemContainer" key={id}>
         <label className={classList('InlineTagSelector-item', { active: selected })}>
-          <input type="checkbox" checked={selected} onchange={(e: any) => this.toggleTag(id, e.target.checked)} />
+          <input type="checkbox" checked={selected} onchange={(e: Event) => this.toggleTag(id, (e.target as HTMLInputElement).checked)} />
           <span className="InlineTagSelector-icon" style={{ backgroundColor: tag.color() }}>
-            {tag.icon() && icon(tag.icon())}
+            {tag.icon() && icon(tag.icon() as string)}
           </span>
           <span className="InlineTagSelector-name">{tag.name()}</span>
         </label>
@@ -85,7 +95,7 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
     if (checked) {
       if (!ids.includes(id)) ids.push(id);
     } else {
-      ids = ids.filter((i) => i !== id);
+      ids = ids.filter((i: number) => i !== id);
     }
     this.selectedIds(ids);
   }

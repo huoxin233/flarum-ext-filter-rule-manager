@@ -14,9 +14,9 @@ import Switch from 'flarum/common/components/Switch';
 import type Mithril from 'mithril';
 
 export interface PatternsListConfigAttrs extends ComponentAttrs {
-  config?: any;
+  config?: Record<string, unknown>;
   type: string;
-  onchange: (newConfig: any) => void;
+  onchange: (newConfig: Record<string, unknown>) => void;
 }
 
 /**
@@ -53,7 +53,7 @@ export default class PatternsListConfig extends Component<PatternsListConfigAttr
           className="FormControl FilterRuleManager-LinesInput"
           rows={5}
           value={this.text()}
-          oninput={(e: any) => this.handleInput(e.target.value)}
+          oninput={(e: Event) => this.handleInput((e.target as HTMLTextAreaElement).value)}
           placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_placeholder'))}
         ></textarea>
         <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_patterns_help')}</div>
@@ -79,7 +79,7 @@ export default class PatternsListConfig extends Component<PatternsListConfigAttr
       .split(/\r?\n/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
-    const newCfg = { ...(this.attrs.config || {}), patterns };
+    const newCfg: Record<string, unknown> = { ...(this.attrs.config || {}), patterns };
     delete newCfg.value;
     delete newCfg.pattern;
     this.attrs.onchange(newCfg);

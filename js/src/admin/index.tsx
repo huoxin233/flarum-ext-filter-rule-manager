@@ -51,10 +51,10 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   filterEngine.registerDisplayMode('toast', 'huoxin-filter-rule-manager.admin.displays.toast');
   filterEngine.registerDisplayMode('modal', 'huoxin-filter-rule-manager.admin.displays.modal');
 
-  filterEngine.registerProvider('builtin', new BuiltinProvider());
-  filterEngine.registerTemplate('builtin', BuiltinTemplate, BuiltinTemplateSettings);
+  filterEngine.registerProvider('builtin', new BuiltinProvider() as any);
+  filterEngine.registerTemplate('builtin', BuiltinTemplate as any, BuiltinTemplateSettings as any);
 
   app.store.models['filter-rule-rulesets'] = Ruleset;
 
-  app.extensionData.for('huoxin-filter-rule-manager').registerPage(RulesetManagerPage);
+  app.extensionData.for('huoxin-filter-rule-manager').registerPage(RulesetManagerPage as any);
 });

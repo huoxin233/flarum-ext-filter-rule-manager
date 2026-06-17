@@ -56,7 +56,7 @@ class ColorPickerInput extends Component<ColorPickerInputAttrs> {
             type="color"
             className={value === 'transparent' ? 'is-transparent' : ''}
             value={value && value !== 'transparent' ? value : defaultColor}
-            oninput={(e: any) => onchange(e.target.value)}
+            oninput={(e: Event) => onchange((e.target as HTMLInputElement).value)}
           />
           <div className="ColorPickerInput-input">
             <input
@@ -64,7 +64,7 @@ class ColorPickerInput extends Component<ColorPickerInputAttrs> {
               className="FormControl"
               placeholder={defaultColor}
               value={value || ''}
-              oninput={(e: any) => onchange(e.target.value)}
+              oninput={(e: Event) => onchange((e.target as HTMLInputElement).value)}
             />
             <div className="ColorPicker-actions">
               <div className="ColorPicker-action" onclick={() => onchange('transparent')} title="Set transparent">
@@ -82,7 +82,7 @@ class ColorPickerInput extends Component<ColorPickerInputAttrs> {
 }
 
 export interface BuiltinTemplateSettingsAttrs extends ComponentAttrs {
-  displaySetting: (key: string, value?: any) => any;
+  displaySetting: (key: string, value?: string) => string;
   effectType: string;
   displayMode: string;
 }
@@ -120,7 +120,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
                 className="FormControl"
                 placeholder={defaultStyles.icon}
                 value={displaySetting('icon')}
-                oninput={(e: any) => displaySetting('icon', e.target.value)}
+                oninput={(e: Event) => displaySetting('icon', (e.target as HTMLInputElement).value)}
               />
               <div className="IconPicker-actions">
                 <div className="IconPicker-action" onclick={() => displaySetting('icon', '')} title="Clear to default">
@@ -167,19 +167,19 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
               label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon_color'))}
               value={displaySetting('iconColor')}
               defaultColor={defaultStyles.iconColor}
-              onchange={(val) => displaySetting('iconColor', val)}
+              onchange={(val: string) => displaySetting('iconColor', val)}
             />,
             <ColorPickerInput
               label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_text_color'))}
               value={displaySetting('textColor')}
               defaultColor={defaultStyles.textColor}
-              onchange={(val) => displaySetting('textColor', val)}
+              onchange={(val: string) => displaySetting('textColor', val)}
             />,
             <ColorPickerInput
               label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_bg_color'))}
               value={displaySetting('backgroundColor')}
               defaultColor={defaultStyles.backgroundColor}
-              onchange={(val) => displaySetting('backgroundColor', val)}
+              onchange={(val: string) => displaySetting('backgroundColor', val)}
             />,
           ]
         ) : (

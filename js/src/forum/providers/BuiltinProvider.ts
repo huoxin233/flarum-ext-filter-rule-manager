@@ -24,7 +24,7 @@ export default class BuiltinProvider implements FilterRuleProvider {
     return ['contains_word', 'regex'];
   }
 
-  evaluate(type: string, content: string, config: any): Record<string, string> | null {
+  evaluate(type: string, content: string, config: Record<string, unknown>): Record<string, string> | null {
     const scanAll = config.scan_all || false;
     if (type === 'contains_word') {
       const words = this.normalizeList(config, 'words');
@@ -81,11 +81,11 @@ export default class BuiltinProvider implements FilterRuleProvider {
   /**
    * Normalise `{ plural: string[] }` into a clean, trimmed, non-empty string array.
    */
-  normalizeList(config: any, plural: string): string[] {
+  normalizeList(config: Record<string, unknown>, plural: string): string[] {
     const cfg = config || {};
     if (Array.isArray(cfg[plural])) {
-      return cfg[plural]
-        .map((v: any) => (typeof v === 'string' ? v : String(v)))
+      return (cfg[plural] as any[])
+        .map((v: unknown) => (typeof v === 'string' ? v : String(v)))
         .map((s: string) => s.trim())
         .filter((s: string) => s.length > 0);
     }

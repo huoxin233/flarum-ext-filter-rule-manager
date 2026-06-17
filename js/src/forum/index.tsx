@@ -17,6 +17,7 @@ import EditPostComposer from 'flarum/forum/components/EditPostComposer';
 import CommentPost from 'flarum/forum/components/CommentPost';
 import ItemList from 'flarum/common/utils/ItemList';
 import type Mithril from 'mithril';
+import type { Ruleset } from '../common/FilterEngine';
 
 import filterEngine from '../common/FilterEngine';
 import FilterRulePopupDispatcher from './FilterRulePopupDispatcher';
@@ -36,11 +37,11 @@ app.initializers.add(
     filterEngine.registerDisplayMode('toast', 'huoxin-filter-rule-manager.admin.displays.toast');
     filterEngine.registerDisplayMode('modal', 'huoxin-filter-rule-manager.admin.displays.modal');
 
-    filterEngine.registerProvider('builtin', new BuiltinProvider());
-    filterEngine.registerTemplate('builtin', BuiltinTemplate);
+    filterEngine.registerProvider('builtin', new BuiltinProvider() as any);
+    filterEngine.registerTemplate('builtin', BuiltinTemplate as any);
 
     const rulesets = Array.isArray(app.data.filterRuleRulesets) ? app.data.filterRuleRulesets : [];
-    filterEngine.loadRulesets(rulesets as any[]);
+    filterEngine.loadRulesets(rulesets as Ruleset[]);
 
     app.filterRulePopupDispatcher = new FilterRulePopupDispatcher(filterEngine);
 
@@ -62,7 +63,7 @@ app.initializers.add(
     });
 
     // ── `banner` mode: injected at the top of #composer ─────────────────────
-    extend(Composer.prototype, 'oncreate', function (this: any) {
+    extend(Composer.prototype, 'oncreate', function (this: Composer & { alertBannerHost?: HTMLElement | null }) {
       const composerEl = document.getElementById('composer');
       if (!composerEl || this.alertBannerHost) return;
 
@@ -70,15 +71,15 @@ app.initializers.add(
       this.alertBannerHost.className = 'FilterRuleManager-host';
       composerEl.insertBefore(this.alertBannerHost, composerEl.firstChild);
 
-      (window as any).m.mount(this.alertBannerHost, {
-        view: () => (window as any).m(FilterRuleInlineDisplay, { variant: 'banner' }),
+      m.mount(this.alertBannerHost, {
+        view: () => m(FilterRuleInlineDisplay, { variant: 'banner' }),
       });
     });
 
-    extend(Composer.prototype, 'onremove', function (this: any) {
+    extend(Composer.prototype, 'onremove', function (this: Composer & { alertBannerHost?: HTMLElement | null }) {
       if (!this.alertBannerHost) return;
       try {
-        (window as any).m.mount(this.alertBannerHost, null);
+        m.mount(this.alertBannerHost, null);
       } catch (e) {
         /* ignore */
       }
@@ -90,7 +91,7 @@ app.initializers.add(
 
     // ── Warning confirmation on submit ───────────────────────────────────────
     [DiscussionComposer, ReplyComposer, EditPostComposer].forEach((Cls: any) => {
-      override(Cls.prototype, 'onsubmit', function (this: any, original: Function) {
+      override(Cls.prototype as any, 'onsubmit', function (this: any, original: Function) {
         filterEngine.clearBlockResults();
 
         const warnings = filterEngine.activeAlerts.filter((a) => a.ruleset.effectType === 'warning');
@@ -115,7 +116,7 @@ app.initializers.add(
     });
 
     // ── Intercept filter_rule_block errors via the documented hook ──────────────
-    override(app, 'requestErrorCatch', function (original: Function, error: any) {
+    override(app, 'requestErrorCatch' as any, function (this: any, original: Function, error: any) {
       const errors = error && error.response && error.response.errors;
       if (Array.isArray(errors) && errors[0] && errors[0].code === 'filter_rule_block') {
         const filterRules = errors[0].filterRules || (errors[0].meta && errors[0].meta.filterRules);
@@ -127,8 +128,8 @@ app.initializers.add(
       return original(error);
     });
 
-    if ('flarum-flags' in (window as any).flarum.extensions) {
-      override(CommentPost.prototype, 'flagReason', function (original: Function, flag: any) {
+    if (app.initializers.has('flarum-flags')) {
+      override(CommentPost.prototype, 'flagReason', function (this: CommentPost, original: Function, flag: any) {
         if (flag.type() === 'autoMod') {
           const detail = flag.reasonDetail();
           return [

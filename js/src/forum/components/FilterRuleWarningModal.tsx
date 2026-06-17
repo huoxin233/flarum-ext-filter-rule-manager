@@ -8,26 +8,26 @@
  */
 
 import app from 'flarum/forum/app';
-import Modal, { ModalAttrs } from 'flarum/common/components/Modal';
+import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import type Mithril from 'mithril';
 
-export interface FilterRuleWarningModalAttrs extends ModalAttrs {
-  alerts: any[];
+export interface FilterRuleWarningModalAttrs extends IInternalModalAttrs {
+  alerts: Record<string, string>[];
   onconfirm: () => void;
   oncancel: () => void;
 }
 
 export default class FilterRuleWarningModal extends Modal<FilterRuleWarningModalAttrs> {
-  className() {
+  className(): string {
     return 'FilterRuleWarningModal Modal--small';
   }
 
-  title() {
+  title(): Mithril.Children {
     return app.translator.trans('huoxin-filter-rule-manager.forum.warning_modal_title');
   }
 
-  content() {
+  content(): Mithril.Children {
     const alerts = this.attrs.alerts || [];
 
     return (
@@ -35,7 +35,7 @@ export default class FilterRuleWarningModal extends Modal<FilterRuleWarningModal
         <p>{app.translator.trans('huoxin-filter-rule-manager.forum.warning_modal_text')}</p>
         <ul className="FilterRuleWarningModal-list">
           {alerts.map((alert, i) => (
-            <li key={i}>{(window as any).m.trust(alert.message)}</li>
+            <li key={i}>{m.trust(alert.message)}</li>
           ))}
         </ul>
         <div className="Form-group">

@@ -14,11 +14,20 @@ import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
 import icon from 'flarum/common/helpers/icon';
 import { parseExpression, stringifyExpression } from '../utils/ExpressionParser';
+import { ASTNode } from '../../common/FilterEngine';
 import type Mithril from 'mithril';
+
+export interface FrontendProvider {
+  provider: string;
+  providerLabel?: string;
+  type: string;
+  label?: string;
+  tokens?: string[];
+}
 
 let nodeIdCounter = 1;
 
-function ensureKeys(node: any) {
+function ensureKeys(node: ASTNode | null | undefined) {
   if (!node) return;
   if (!node._key) node._key = nodeIdCounter++;
   if (node.left) ensureKeys(node.left);
@@ -26,15 +35,15 @@ function ensureKeys(node: any) {
   if (node.node) ensureKeys(node.node);
 }
 
-function createEmptyRule(providers: any[]) {
+function createEmptyRule(providers: FrontendProvider[]): ASTNode {
   const first = providers[0];
   return { _key: nodeIdCounter++, type: 'rule', provider: first ? first.provider : '', ruleType: first ? first.type : '', operator: 'eq', value: '' };
 }
 
 interface LogicalNodeViewAttrs extends ComponentAttrs {
-  node: any;
-  onchange: (v: any) => void;
-  providers: any[];
+  node: ASTNode;
+  onchange: (v: ASTNode | null) => void;
+  providers: FrontendProvider[];
 }
 
 class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
@@ -49,8 +58,8 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
           <NodeView
             key={node.left ? node.left._key : 'l'}
             node={node.left}
-            onchange={(v: any) => {
-              if (v === null) onchange(node.right);
+            onchange={(v: ASTNode | null) => {
+              if (v === null) onchange(node.right || null);
               else onchange({ ...node, left: v });
             }}
             providers={providers}
@@ -87,8 +96,8 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
           <NodeView
             key={node.right ? node.right._key : 'r'}
             node={node.right}
-            onchange={(v: any) => {
-              if (v === null) onchange(node.left);
+            onchange={(v: ASTNode | null) => {
+              if (v === null) onchange(node.left || null);
               else onchange({ ...node, right: v });
             }}
             providers={providers}
@@ -100,11 +109,11 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
 }
 
 interface RuleNodeViewAttrs extends ComponentAttrs {
-  node: any;
+  node: ASTNode;
   isNegated: boolean;
-  onchange: (v: any) => void;
+  onchange: (v: ASTNode | null) => void;
   onNegateChange: (v: boolean) => void;
-  providers: any[];
+  providers: FrontendProvider[];
 }
 
 class RuleNodeView extends Component<RuleNodeViewAttrs> {
@@ -169,7 +178,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
   renderConfig(): Mithril.Children {
     const { node, onchange } = this.attrs;
 
-    const filterRuleManager = (app as any).filterRuleManager;
+    const filterRuleManager = (app as Record<string, any>).filterRuleManager;
     const providerInstance =
       filterRuleManager && typeof filterRuleManager.getProvider === 'function' ? filterRuleManager.getProvider(node.provider) : null;
 
@@ -183,7 +192,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
         <ConfigComponent
           config={configObj}
           type={node.ruleType}
-          onchange={(newConfig: any) => {
+          onchange={(newConfig: Record<string, unknown>) => {
             onchange({ ...node, value: newConfig });
           }}
         />
@@ -198,8 +207,8 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
         className="FormControl"
         rows={2}
         value={valStr}
-        onchange={(e: any) => {
-          let v = e.target.value;
+        onchange={(e: Event) => {
+          let v = (e.target as HTMLTextAreaElement).value;
           const trimmed = v.trim();
           if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
             try {
@@ -215,9 +224,9 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
 }
 
 interface NodeViewAttrs extends ComponentAttrs {
-  node: any;
-  onchange: (v: any) => void;
-  providers: any[];
+  node: ASTNode | null | undefined;
+  onchange: (v: ASTNode | null) => void;
+  providers: FrontendProvider[];
 }
 
 class NodeView extends Component<NodeViewAttrs> {
@@ -266,14 +275,14 @@ class NodeView extends Component<NodeViewAttrs> {
             <RuleNodeView
               node={node.node}
               isNegated={true}
-              onchange={(v: any) => {
+              onchange={(v: ASTNode | null) => {
                 if (v === null) onchange(null);
                 else onchange({ ...node, node: v });
               }}
               providers={providers}
               onNegateChange={(v: boolean) => {
                 if (!v) {
-                  onchange(node.node);
+                  onchange(node.node || null);
                 }
               }}
             />
@@ -289,7 +298,7 @@ class NodeView extends Component<NodeViewAttrs> {
           <NodeView
             key={node.node ? node.node._key : 'n'}
             node={node.node}
-            onchange={(v: any) => {
+            onchange={(v: ASTNode | null) => {
               if (v === null) onchange(null);
               else onchange({ ...node, node: v });
             }}
@@ -306,13 +315,13 @@ class NodeView extends Component<NodeViewAttrs> {
 export interface RuleBuilderAttrs extends ComponentAttrs {
   expression?: string;
   onchange?: (v: string) => void;
-  providers?: any[];
+  providers?: FrontendProvider[];
 }
 
 export default class RuleBuilder extends Component<RuleBuilderAttrs> {
   mode: string = 'visual';
   expression: string = '';
-  ast: any = null;
+  ast: ASTNode | null = null;
   parseError: string | null = null;
 
   oninit(vnode: Mithril.Vnode<RuleBuilderAttrs, this>) {
@@ -334,8 +343,8 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
     try {
       this.ast = parseExpression(this.expression);
       ensureKeys(this.ast);
-    } catch (e: any) {
-      this.parseError = e.message;
+    } catch (e: Error | unknown) {
+      this.parseError = e instanceof Error ? e.message : String(e);
       this.mode = 'editor';
     }
   }
@@ -391,7 +400,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
               <NodeView
                 key={this.ast ? this.ast._key : 'root'}
                 node={this.ast}
-                onchange={(newAst: any) => {
+                onchange={(newAst: ASTNode | null) => {
                   this.ast = newAst;
                   this.syncToEditor();
                 }}
@@ -406,7 +415,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
                         _key: nodeIdCounter++,
                         type: 'logical',
                         operator: 'AND',
-                        left: this.ast,
+                        left: this.ast || undefined,
                         right: createEmptyRule(providers),
                       };
                       this.ast = newLogical;
@@ -422,7 +431,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
                         _key: nodeIdCounter++,
                         type: 'logical',
                         operator: 'OR',
-                        left: this.ast,
+                        left: this.ast || undefined,
                         right: createEmptyRule(providers),
                       };
                       this.ast = newLogical;
@@ -440,8 +449,8 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
             <textarea
               className="FormControl RuleBuilder-textarea"
               value={this.expression}
-              oninput={(e: any) => {
-                this.expression = e.target.value;
+              oninput={(e: Event) => {
+                this.expression = (e.target as HTMLTextAreaElement).value;
                 this.emit();
               }}
               placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_placeholder'))}

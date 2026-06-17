@@ -8,13 +8,15 @@
  */
 
 import app from 'flarum/admin/app';
-import Modal, { ModalAttrs } from 'flarum/common/components/Modal';
+import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
 import Select from 'flarum/common/components/Select';
+import type { ASTNode } from '../../common/FilterEngine';
 import Stream from 'flarum/common/utils/Stream';
 import icon from 'flarum/common/helpers/icon';
 import type Mithril from 'mithril';
+import type Model from 'flarum/common/Model';
 
 import RuleBuilder from './RuleBuilder';
 import filterEngine from '../../common/FilterEngine';
@@ -22,9 +24,9 @@ import filterEngine from '../../common/FilterEngine';
 import InlineTagSelector from './InlineTagSelector';
 import { parseExpression } from '../utils/ExpressionParser';
 
-export interface RulesetEditorModalAttrs extends ModalAttrs {
-  ruleset?: any;
-  providers: any[];
+export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
+  ruleset?: Model & Record<string, any>;
+  providers: Record<string, unknown>[];
   onsave?: () => void;
 }
 
@@ -44,15 +46,15 @@ export interface RulesetEditorModalAttrs extends ModalAttrs {
  * cursor.
  */
 export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
-  ruleset: any;
-  providers!: any[];
+  ruleset?: Model & Record<string, any>;
+  providers!: Record<string, unknown>[];
   loading: boolean = false;
   messageTextarea: HTMLTextAreaElement | null = null;
   flagMessageTextarea: HTMLTextAreaElement | null = null;
   showIconPicker: boolean = false;
   tagsLoading: boolean = false;
-  availableTags: any[] = [];
-  closeIconPickerHandler: any;
+  availableTags: Model[] = [];
+  closeIconPickerHandler: ((e: MouseEvent) => void) | null = null;
 
   name!: Stream<string>;
   expression!: Stream<string>;
@@ -71,7 +73,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   requireApproval!: Stream<boolean | null>;
   scopeType!: Stream<string>;
   scopeTagIds!: Stream<number[]>;
-  displaySettings!: Stream<any>;
+  displaySettings!: Stream<Record<string, unknown>>;
 
   oninit(vnode: Mithril.Vnode<RulesetEditorModalAttrs, this>) {
     super.oninit(vnode);
@@ -91,11 +93,11 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
         .then((tags: any) => {
           this.availableTags = tags || [];
           this.tagsLoading = false;
-          (window as any).m.redraw();
+          m.redraw();
         })
         .catch(() => {
           this.tagsLoading = false;
-          (window as any).m.redraw();
+          m.redraw();
         });
     }
 
@@ -124,7 +126,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     this.closeIconPickerHandler = (e: MouseEvent) => {
       if (this.showIconPicker && !(e.target as Element).closest('.IconPickerInput')) {
         this.showIconPicker = false;
-        (window as any).m.redraw();
+        m.redraw();
       }
     };
     document.addEventListener('click', this.closeIconPickerHandler);
@@ -204,7 +206,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
           <input
             className="FormControl"
             value={this.name()}
-            oninput={(e: any) => this.name(e.target.value)}
+            oninput={(e: Event) => this.name((e.target as HTMLInputElement).value)}
             placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_name_placeholder'))}
             required
           />
@@ -254,8 +256,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_scope_tags')}</label>
             {app.initializers.has('flarum-tags') ? (
               (() => {
-                const getTagsLabel = (window as any).flarum.core.compat['tags/common/helpers/tagsLabel'];
-                const selectedTags = this.availableTags.filter((t) => (this.scopeTagIds() || []).includes(parseInt(t.id(), 10)));
+                const getTagsLabel = (window as Record<string, any>).flarum.core.compat['tags/common/helpers/tagsLabel'];
+                const selectedTags = this.availableTags.filter((t) => (this.scopeTagIds() || []).includes(parseInt(String(t.id()), 10)));
 
                 return (
                   <div className="RulesetEditor-tagsSelection">
@@ -278,7 +280,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     );
   }
 
-  displaySetting(key: string, val?: any): any {
+  displaySetting(key: string, val?: unknown): unknown {
     let settings = this.displaySettings() || {};
     if (typeof val !== 'undefined') {
       const newSettings = Object.assign({}, settings);
@@ -294,8 +296,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     const displayMode = this.displayMode();
     const tokens = this.availableTokens();
     const templateName = this.displaySetting('template') || 'builtin';
-    const templates = (app as any).filterRuleManager.getTemplates();
-    const SettingsComponent = (app as any).filterRuleManager.getTemplateSettingsComponent(templateName);
+    const templates = app.filterRuleManager.getTemplates();
+    const SettingsComponent = app.filterRuleManager.getTemplateSettingsComponent(templateName);
 
     return (
       <div className="RulesetEditor-section">
@@ -340,7 +342,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                   this.messageTextarea = null;
                 }}
                 value={this.message()}
-                oninput={(e: any) => this.message(e.target.value)}
+                oninput={(e: Event) => this.message((e.target as HTMLTextAreaElement).value)}
                 placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message_placeholder'))}
                 rows={2}
                 required
@@ -355,11 +357,14 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_mode')}</label>
               <Select
                 options={
-                  (app as any).filterRuleManager && typeof (app as any).filterRuleManager.getDisplayModes === 'function'
-                    ? Object.entries((app as any).filterRuleManager.getDisplayModes()).reduce((acc: any, [key, translationKey]: [string, any]) => {
-                        acc[key] = String(app.translator.trans(translationKey));
-                        return acc;
-                      }, {})
+                  app.filterRuleManager && typeof app.filterRuleManager.getDisplayModes === 'function'
+                    ? Object.entries(app.filterRuleManager.getDisplayModes()).reduce(
+                        (acc: Record<string, string>, [key, translationKey]: [string, unknown]) => {
+                          acc[key] = String(app.translator.trans(translationKey as string));
+                          return acc;
+                        },
+                        {}
+                      )
                     : { banner: String(app.translator.trans('huoxin-filter-rule-manager.admin.displays.banner')) }
                 }
                 value={displayMode}
@@ -375,7 +380,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                 className="FormControl"
                 placeholder={String(app.translator.trans(`huoxin-filter-rule-manager.forum.modal_title_${effect}`))}
                 value={this.displaySetting('title') || ''}
-                oninput={(e: any) => this.displaySetting('title', e.target.value)}
+                oninput={(e: Event) => this.displaySetting('title', (e.target as HTMLInputElement).value)}
               />
               <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_help')}</div>
             </div>
@@ -384,8 +389,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_template')}</label>
               <Select
                 options={
-                  (app as any).filterRuleManager && typeof (app as any).filterRuleManager.getTemplates === 'function'
-                    ? Object.keys((app as any).filterRuleManager.getTemplates()).reduce((acc: any, k) => {
+                  app.filterRuleManager && typeof app.filterRuleManager.getTemplates === 'function'
+                    ? Object.keys(app.filterRuleManager.getTemplates()).reduce((acc: Record<string, string>, k) => {
                         const transKey = `huoxin-filter-rule-manager.admin.templates.${k}`;
                         const translated = String(app.translator.trans(transKey));
                         acc[k] = translated !== transKey && translated ? translated : k;
@@ -460,8 +465,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                   min="0"
                   step="1"
                   value={this.evasionTimeout() === null ? '' : this.evasionTimeout()!}
-                  oninput={(e: any) => {
-                    const val = e.target.value;
+                  oninput={(e: Event) => {
+                    const val = (e.target as HTMLInputElement).value;
                     this.evasionTimeout(val === '' ? null : Math.max(0, parseInt(val, 10)) || 0);
                   }}
                   placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default'))}
@@ -476,8 +481,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                   min="1"
                   step="1"
                   value={this.evasionThreshold() === null ? '' : this.evasionThreshold()!}
-                  oninput={(e: any) => {
-                    const val = e.target.value;
+                  oninput={(e: Event) => {
+                    const val = (e.target as HTMLInputElement).value;
                     this.evasionThreshold(val === '' ? null : Math.max(1, parseInt(val, 10)) || 1);
                   }}
                   placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default'))}
@@ -502,7 +507,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                 this.flagMessageTextarea = null;
               }}
               value={this.flagMessage()}
-              oninput={(e: any) => this.flagMessage(e.target.value)}
+              oninput={(e: Event) => this.flagMessage((e.target as HTMLTextAreaElement).value)}
               placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_placeholder'))}
               rows={2}
             ></textarea>
@@ -531,9 +536,9 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
   availableTokens() {
     const seen = new Set();
-    const out: any[] = [];
+    const out: Record<string, unknown>[] = [];
 
-    const push = (token: any, source: string) => {
+    const push = (token: Record<string, unknown>, source: string) => {
       if (!token || !token.name || seen.has(token.name)) return;
       seen.add(token.name);
       out.push({
@@ -550,8 +555,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       // Ignore parse errors, user might be typing
     }
 
-    const activeRules: any[] = [];
-    const traverse = (node: any) => {
+    const activeRules: ASTNode[] = [];
+    const traverse = (node: ASTNode | null | undefined) => {
       if (!node) return;
       if (node.type === 'rule' && node.provider && node.ruleType) {
         activeRules.push(node);
@@ -566,24 +571,22 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
     for (const rule of activeRules) {
       const fp =
-        (app as any).filterRuleManager && typeof (app as any).filterRuleManager.getProvider === 'function'
-          ? (app as any).filterRuleManager.getProvider(rule.provider)
-          : null;
+        app.filterRuleManager && typeof app.filterRuleManager.getProvider === 'function' ? app.filterRuleManager.getProvider(rule.provider) : null;
       if (fp && typeof fp.getProvidedTokens === 'function') {
         const ftokens = fp.getProvidedTokens(rule.ruleType) || [];
-        ftokens.forEach((t: any) => push(t, `${rule.provider}/${rule.ruleType}`));
+        ftokens.forEach((t: Record<string, unknown>) => push(t, `${rule.provider}/${rule.ruleType}`));
         continue;
       }
 
       const meta = (this.providers || []).find((p) => p.provider === rule.provider && p.type === rule.ruleType);
       const tokens = meta && Array.isArray(meta.tokens) ? meta.tokens : [];
-      tokens.forEach((t) => push(t, `${rule.provider}/${rule.ruleType}`));
+      tokens.forEach((t: Record<string, unknown>) => push(t, `${rule.provider}/${rule.ruleType}`));
     }
 
     return out;
   }
 
-  tokenChipsBlock(tokens: any[], targetField: string): Mithril.Children {
+  tokenChipsBlock(tokens: Record<string, unknown>[], targetField: string): Mithril.Children {
     if (!tokens || tokens.length === 0) {
       return <div className="TokenHints TokenHints--empty">{app.translator.trans('huoxin-filter-rule-manager.admin.tokens_none')}</div>;
     }
@@ -596,9 +599,9 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
             <button
               type="button"
               className="TokenHints-chip"
-              key={t.name}
-              title={t.description || t.name}
-              onclick={() => this.insertToken(t.name, targetField)}
+              key={t.name as string}
+              title={String(t.description || t.name)}
+              onclick={() => this.insertToken(t.name as string, targetField)}
             >
               <code>{`{{${t.name}}}`}</code>
               {t.description && <span className="TokenHints-chip-desc">{t.description}</span>}
@@ -642,10 +645,10 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
     let TemplateComponent = filterEngine.getTemplate(templateName) || filterEngine.getTemplate('builtin');
 
-    const sampleTokens: any = {};
+    const sampleTokens: Record<string, string> = {};
     const available = this.availableTokens() || [];
     available.forEach((t) => {
-      sampleTokens[t.name] = `[${t.name}]`;
+      sampleTokens[t.name as string] = `[${t.name}]`;
     });
 
     if (available.length === 0) {
@@ -667,9 +670,10 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       return <div>Loading template...</div>;
     }
 
+    const TemplateComp = TemplateComponent as any;
     return (
       <div className="FilterRuleManager-preview">
-        <TemplateComponent alert={dummyAlert} variant={this.displayMode()} />
+        <TemplateComp alert={dummyAlert} variant={this.displayMode()} />
       </div>
     );
   }
@@ -727,7 +731,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     return null;
   }
 
-  onsubmit(e: any) {
+  onsubmit(e: Event) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     this.save();
   }
@@ -736,7 +740,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     if (!this.canSave()) return;
 
     this.loading = true;
-    (window as any).m.redraw();
+    m.redraw();
 
     const data = {
       name: this.name(),
@@ -774,7 +778,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       console.error('Failed to save ruleset:', err);
       app.alerts.show({ type: 'error' }, app.translator.trans('huoxin-filter-rule-manager.admin.save_error'));
       this.loading = false;
-      (window as any).m.redraw();
+      m.redraw();
     }
   }
 }

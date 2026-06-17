@@ -14,9 +14,9 @@ import Switch from 'flarum/common/components/Switch';
 import type Mithril from 'mithril';
 
 export interface WordsListConfigAttrs extends ComponentAttrs {
-  config?: any;
+  config?: Record<string, unknown>;
   type: string;
-  onchange: (newConfig: any) => void;
+  onchange: (newConfig: Record<string, unknown>) => void;
 }
 
 /**
@@ -55,7 +55,7 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
           className="FormControl FilterRuleManager-LinesInput"
           rows={5}
           value={this.text()}
-          oninput={(e: any) => this.handleInput(e.target.value)}
+          oninput={(e: Event) => this.handleInput((e.target as HTMLTextAreaElement).value)}
           placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_words_placeholder'))}
         ></textarea>
         <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}</div>
@@ -81,7 +81,7 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
       .split('\n')
       .map((w) => w.trim())
       .filter((w) => w.length > 0);
-    const newCfg = { ...(this.attrs.config || {}), words };
+    const newCfg: Record<string, unknown> = { ...(this.attrs.config || {}), words };
     delete newCfg.value;
     delete newCfg.word;
     this.attrs.onchange(newCfg);

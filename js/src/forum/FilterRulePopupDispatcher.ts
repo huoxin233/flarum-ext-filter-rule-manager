@@ -13,7 +13,7 @@ import type { FilterEngine } from '../common/FilterEngine';
 
 export interface DisplayedInfo {
   displayMode: string;
-  alertKey: any;
+  alertKey: unknown;
 }
 
 /**
@@ -44,7 +44,7 @@ export default class FilterRulePopupDispatcher {
   }
 
   dispatch(): void {
-    const application = (typeof window !== 'undefined' && (window as any).app) || null;
+    const application = app;
     if (!application || !application.alerts || !application.modal) return;
 
     const seen = new Set<string>();
@@ -70,10 +70,10 @@ export default class FilterRulePopupDispatcher {
     }
   }
 
-  private _maybeShow(id: string, displayMode: string, type: string, message: string, displaySettings: any = {}): void {
+  private _maybeShow(id: string, displayMode: string, type: string, message: string, displaySettings: Record<string, unknown> = {}): void {
     if (displayMode !== 'toast' && displayMode !== 'modal') return;
 
-    const application = (window as any).app;
+    const application = app;
     const existing = this._displayed.get(id);
 
     if (existing) {
@@ -82,7 +82,7 @@ export default class FilterRulePopupDispatcher {
 
     if (displayMode === 'toast') {
       const defaultToastType = type === 'block' ? 'error' : type;
-      const alertAttrs: any = {
+      const alertAttrs: Record<string, unknown> = {
         type: displaySettings.toastTheme || defaultToastType,
         dismissible: true,
       };
@@ -92,10 +92,10 @@ export default class FilterRulePopupDispatcher {
       }
 
       if (displaySettings.title) {
-        alertAttrs.title = application.translator.trans(displaySettings.title);
+        alertAttrs.title = application.translator.trans(displaySettings.title as string);
       }
 
-      const alertKey = application.alerts.show(alertAttrs, (window as any).m.trust(message));
+      const alertKey = application.alerts.show(alertAttrs as any, m.trust(message));
       this._displayed.set(id, { displayMode, alertKey });
       return;
     }
@@ -111,11 +111,11 @@ export default class FilterRulePopupDispatcher {
     const info = this._displayed.get(id);
     if (!info) return;
 
-    const application = (window as any).app;
+    const application = app;
 
     if (info.displayMode === 'toast' && info.alertKey != null && application && application.alerts) {
       try {
-        application.alerts.dismiss(info.alertKey);
+        application.alerts.dismiss(info.alertKey as number);
       } catch (e) {
         /* ignore */
       }
