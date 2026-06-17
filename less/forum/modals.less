@@ -1,0 +1,45 @@
+// Warning confirmation modal
+
+.FilterRuleWarningModal-list {
+  margin: 12px 0 16px;
+  padding-left: 20px;
+  color: @filter-rule-warning-color;
+
+  li { margin-bottom: 6px; }
+}
+
+// Alert modal
+
+.FilterRuleModal {
+  &-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+
+    &--info    { background: @filter-rule-info-bg;    color: @filter-rule-info-color; }
+    &--warning { background: @filter-rule-warning-bg; color: @filter-rule-warning-color; }
+    &--block   { background: @filter-rule-error-bg;   color: @filter-rule-error-color; }
+  }
+
+  &-icon {
+    flex-shrink: 0;
+    font-size: 22px;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  &-text {
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+  }
+
+  &-actions {
+    text-align: right;
+    margin: 0;
+  }
+}

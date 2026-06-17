@@ -1,0 +1,496 @@
+.card-style() {
+  background: var(--body-bg, @body-bg);
+  border: 1px solid var(--control-bg, @control-bg);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.FilterRulePage {
+  .EffectBadge,
+  .ScopeBadge,
+  .StatusBadge {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+
+    i { font-size: 10px; margin-right: 4px; }
+  }
+
+  .EffectBadge {
+    &--info    { background: fade(@info-color, 15%);    color: darken(@info-color, 10%); }
+    &--warning { background: fade(@warning-color, 15%); color: darken(@warning-color, 10%); }
+    &--block   { background: fade(@error-color, 15%);   color: darken(@error-color, 10%); }
+    &--silent  { background: fade(@muted-color, 15%);   color: darken(@muted-color, 10%); }
+  }
+
+  .ScopeBadge {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--muted-color, @muted-color);
+
+    &--global       { background: fade(@info-color, 12%);    color: darken(@info-color, 12%); }
+    &--normal_post  { background: var(--body-bg-shaded); color: var(--muted-color-light); }
+    &--private_post { background: fade(@warning-color, 15%); color: darken(@warning-color, 12%); }
+    &--tag          { background: fade(@success-color, 15%); color: darken(@success-color, 12%); }
+    &--backend      { background: fade(@info-color, 12%);    color: darken(@info-color, 12%); }
+    &--frontend     { background: fade(@success-color, 15%); color: darken(@success-color, 12%); }
+    &--both         { background: fade(@secondary-color, 15%); color: darken(@secondary-color, 12%); }
+  }
+
+  .StatusBadge {
+    &--active   { background: fade(@success-color, 15%); color: darken(@success-color, 10%); }
+    &--inactive { background: rgba(0, 0, 0, 0.05);       color: var(--muted-color, @muted-color); }
+  }
+
+  .CountBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 22px;
+    padding: 0 8px;
+    background: var(--primary-color, @primary-color);
+    color: var(--body-bg, @body-bg);
+    border-radius: 11px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+.RulesetEditor-priorityInput {
+  max-width: 140px;
+}
+
+// Segmented control for inheritance (3-state)
+.RulesetEditor-segmentedControl {
+  display: flex;
+  background: var(--control-bg, @control-bg);
+  border-radius: 6px;
+  padding: 3px;
+  gap: 3px;
+
+  .segmented-option {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--control-color, @control-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    outline: none;
+
+    &:hover:not([class*="active"]) {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text-color, @text-color);
+    }
+
+    &.active, &.active-enabled, &.active-disabled {
+      background: var(--body-bg, @body-bg);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    &.active {
+      color: var(--primary-color, @primary-color);
+    }
+
+    &.active-enabled {
+      color: @success-color;
+    }
+
+    &.active-disabled {
+      color: @error-color;
+    }
+
+    i {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+  }
+}
+
+// Segmented control for effect type
+.RulesetEditor-effectSelector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.RulesetEditor-effectOption {
+  flex: 1;
+  min-width: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 2px solid var(--control-bg, @control-bg);
+  background: var(--body-bg, @body-bg);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+  color: var(--muted-color, @muted-color);
+
+  &:hover {
+    border-color: var(--primary-color, @primary-color);
+    color: var(--text-color, @text-color);
+  }
+
+  i { font-size: 14px; }
+
+  &--info.active    { border-color: @info-color;    background: fade(@info-color, 10%);    color: darken(@info-color, 10%); }
+  &--warning.active { border-color: @warning-color; background: fade(@warning-color, 10%); color: darken(@warning-color, 10%); }
+  &--block.active   { border-color: @error-color;   background: fade(@error-color, 10%);   color: darken(@error-color, 10%); }
+  &--silent.active  { border-color: var(--muted-color, @muted-color); background: fade(@muted-color, 10%); color: darken(@muted-color, 10%); }
+}
+// Token hint chips
+
+.TokenHints {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 6px;
+
+  &--empty {
+    font-size: 12px;
+    color: var(--muted-color, @muted-color);
+    font-style: italic;
+  }
+
+  &-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--muted-color, @muted-color);
+    margin-bottom: 6px;
+  }
+
+  &-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: var(--body-bg, @body-bg);
+    border: 1px solid var(--control-bg, @control-bg);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 120ms ease;
+    max-width: 100%;
+
+    &:hover {
+      border-color: var(--primary-color, @primary-color);
+      background: fade(@info-color, 8%);
+    }
+
+    code {
+      background: rgba(0, 0, 0, 0.05);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: darken(@info-color, 10%);
+      flex-shrink: 0;
+    }
+
+    &-desc {
+      color: var(--muted-color, @muted-color);
+      font-size: 11px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Inline token chip
+
+.TokenInlineChip {
+  display: inline-block;
+  margin: 0 4px 4px 0;
+  padding: 1px 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  font-size: 11px;
+  color: darken(@info-color, 10%);
+}
+.RulesetEditor-customStyles {
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  margin-top: 16px;
+  background: var(--body-bg, @body-bg);
+  border: 1px solid var(--control-bg-shaded);
+  padding: 16px;
+  border-radius: 6px;
+  
+  .Form-group {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  .RulesetEditor-customStyles-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+    
+    .Form-group {
+      flex: 1;
+    }
+  }
+
+  .ColorPickerInput {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    input[type="color"] {
+      height: 36px;
+      width: 36px;
+      padding: 0;
+      border: 1px solid var(--control-bg-shaded);
+      border-radius: 4px;
+      cursor: pointer;
+      background: transparent;
+      overflow: hidden;
+
+      &::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+      &::-webkit-color-swatch {
+        border: none;
+        border-radius: 4px;
+      }
+      &::-moz-color-swatch {
+        border: none;
+        border-radius: 4px;
+      }
+      
+      &.is-transparent {
+        background: repeating-conic-gradient(#eee 0% 25%, transparent 0% 50%) 50% / 12px 12px;
+        opacity: 0.5;
+        
+        &::-webkit-color-swatch { opacity: 0; }
+        &::-moz-color-swatch { opacity: 0; }
+      }
+    }
+    
+    .ColorPickerInput-input {
+      position: relative;
+      flex: 1;
+
+      input[type="text"] {
+        padding-right: 52px;
+        width: 100%;
+      }
+
+      .ColorPicker-actions {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        gap: 8px;
+
+        .ColorPicker-action {
+          cursor: pointer;
+          opacity: 0.4;
+          transition: opacity 0.2s;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  .IconPickerInput {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+
+    .IconPicker-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      width: 36px;
+      flex-shrink: 0;
+      border: 1px solid var(--control-bg-shaded);
+      border-radius: 4px;
+      cursor: pointer;
+      background: var(--control-bg);
+    }
+
+    .IconPickerInput-input {
+      position: relative;
+      flex: 1;
+
+      input[type="text"] {
+        padding-right: 32px;
+        width: 100%;
+      }
+
+      .IconPicker-actions {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        gap: 8px;
+
+        .IconPicker-action {
+          cursor: pointer;
+          opacity: 0.4;
+          transition: opacity 0.2s;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+
+    .IconPicker-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 8px;
+      background: var(--control-bg);
+      border: 1px solid var(--control-bg-shaded);
+      padding: 10px;
+      border-radius: 6px;
+      width: 280px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+      .IconPicker-icons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .IconPicker-btn {
+        padding: 6px 10px;
+        background: var(--body-bg);
+        border: 1px solid var(--control-bg-shaded);
+
+        &--none {
+          width: 80px;
+        }
+      }
+    }
+
+    input[type="text"] {
+      flex: 1;
+    }
+  }
+}
+
+.InlineTagSelector {
+  background: @control-bg;
+  border-radius: @border-radius;
+  border: 1px solid mix(@control-color, @control-bg, 20%);
+  padding: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 10px;
+  margin-bottom: 15px;
+
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  &-group {
+    margin-bottom: 15px;
+    &:last-child { margin-bottom: 0; }
+  }
+
+  &-groupLabel {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: @muted-color;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  &-itemContainer {
+    margin-bottom: 5px;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: @border-radius;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: normal;
+    margin: 0;
+
+    &:hover {
+      background: fade(@primary-color, 10%);
+    }
+
+    &.active {
+      background: fade(@primary-color, 15%);
+      font-weight: bold;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 10px;
+    }
+  }
+
+  &-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    color: white;
+    font-size: 10px;
+  }
+
+  &-name {
+    flex: 1;
+  }
+
+  &-children {
+    padding-left: 30px;
+    margin-top: 5px;
+    border-left: 2px solid @control-bg;
+    margin-left: 15px;
+  }
+}

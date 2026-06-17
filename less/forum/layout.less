@@ -1,0 +1,153 @@
+// Reset Flarum's default list item wrapper for full-width components
+.ComposerBody-header > .item-filter-rule-header-banner,
+.ComposerBody-header > .item-filter-rule-sidebar {
+  display: block;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Lift drag handle above relative content
+.Composer .Composer-handle {
+  z-index: 10;
+}
+
+.ComposerBody-header {
+  flex-wrap: wrap;
+}
+
+// Compensate for Flarum's reserved margin-right space for window controls
+.ComposerBody-header > .item-filter-rule-header-banner {
+  flex-basis: 100%;
+  order: 99;
+  margin-right: -120px;
+}
+
+// Prevent layout shifts by hiding empty banner/sidebar
+.ComposerBody-header > .item-filter-rule-header-banner:empty,
+.ComposerBody-header > .item-filter-rule-sidebar:empty {
+  display: none !important;
+}
+
+@media @phone {
+  // Hide on mobile (items are hosted directly in the main banner instead)
+  .ComposerBody-header > .item-filter-rule-header-banner,
+  .ComposerBody-header > .item-filter-rule-sidebar {
+    display: none !important;
+  }
+}
+
+// Host element
+
+.FilterRuleManager-host {
+  // Constrain width using margins rather than fixed 100% width
+  width: auto;
+
+  // Anchor banner below the fixed-height mobile composer
+  @media @phone {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 350px; // below the fixed-height phone composer
+    z-index: var(--zindex-composer);
+    padding: 6px 15px 8px;
+  }
+
+  // On desktop, match .Composer's margins exactly:
+  //   - Index page (.App--index): margin-left: 220px
+  //   - Discussion page (.App--discussion): margin-left: -20px; margin-right: 205px
+  @media @desktop-up {
+    margin-left: 220px;
+
+    .App--discussion & {
+      margin-left: -20px;
+      margin-right: 205px;
+    }
+  }
+}
+
+.FilterRuleManager--banner {
+  width: 100%;
+  // Remove bottom margin on mobile
+  @media @tablet-up {
+    margin-bottom: 6px;
+  }
+}
+
+.FilterRuleManager-banners {
+  padding: 8px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+// Hint panel variant
+
+// Make Composer-content the anchor for the absolute hint panel.
+.Composer .Composer-content {
+  position: relative;
+}
+
+.FilterRuleManager--sidebar {
+  position: absolute;
+  top: 12px;
+  right: 0; // flush with Composer-content right edge (has 20px padding)
+  width: 240px;
+  max-width: calc(50% - 24px);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  // On narrow screens / mobile, fall back to inline flow.
+  @media (max-width: 768px) {
+    position: static;
+    width: auto;
+    max-width: none;
+    margin-top: 8px;
+    box-shadow: none;
+  }
+
+  .FilterRuleManager-sidebarTitle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: @muted-color;
+    padding-bottom: 6px;
+    border-bottom: 1px solid @control-bg;
+    margin-bottom: 2px;
+  }
+
+  .FilterRuleManager-item {
+    font-size: 12px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .FilterRuleManager-item-wrapper {
+    position: relative;
+  }
+
+  .FilterRuleManager-item-dismiss {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 0;
+    min-width: 0;
+    min-height: 0;
+    line-height: 1;
+    color: inherit;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
