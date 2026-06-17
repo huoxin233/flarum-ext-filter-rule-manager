@@ -7,8 +7,10 @@
  * file that was distributed with this source code.
  */
 
-import app from 'flarum/common/app';
+import FilterEngine from './FilterEngine';
+import BuiltinTemplate from './components/BuiltinTemplate';
 
-app.initializers.add('huoxin/filter-rule-manager', () => {
-  console.log('[huoxin/filter-rule-manager] Hello, forum and admin!');
-});
+export const common = {
+  FilterEngine,
+  BuiltinTemplate,
+};
