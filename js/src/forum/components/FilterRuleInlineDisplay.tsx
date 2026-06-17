@@ -31,11 +31,11 @@ export interface FilterRuleInlineDisplayAttrs extends ComponentAttrs {
  * component.
  */
 export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineDisplayAttrs> {
-  isSidebarClosed: boolean = false;
+  dismissedAlerts: Set<string> = new Set();
 
   oninit(vnode: Mithril.Vnode<FilterRuleInlineDisplayAttrs, this>) {
     super.oninit(vnode);
-    this.isSidebarClosed = false;
+    this.dismissedAlerts.clear();
   }
 
   view(vnode: Mithril.Vnode<FilterRuleInlineDisplayAttrs, this>): Mithril.Children {
@@ -44,20 +44,8 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
     if (items.length === 0) return null;
 
     if (variant === 'sidebar') {
-      if (this.isSidebarClosed) return null;
       return (
         <aside className="FilterRuleManager FilterRuleManager--sidebar" aria-label="Composer hints">
-          <div className="FilterRuleManager-sidebarTitle">
-            {icon('fas fa-shield-alt')}
-            <span style={{ flex: 1 }}>{app.translator.trans('huoxin-filter-rule-manager.forum.sidebar_title') || 'Composer hints'}</span>
-            <button
-              className="Button Button--icon Button--link"
-              onclick={() => (this.isSidebarClosed = true)}
-              style={{ padding: '0', minWidth: '0', minHeight: '0', lineHeight: '1', color: 'inherit' }}
-            >
-              {icon('fas fa-times')}
-            </button>
-          </div>
           {items.map((alert, i) => this._renderItem(alert, i, 'sidebar'))}
         </aside>
       );
@@ -90,7 +78,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
         key: `block-${i}-${a.message}`,
         displaySettings: null,
       }));
-    return [...active, ...blocks];
+    return [...active, ...blocks].filter((a) => !this.dismissedAlerts.has(a.key));
   }
 
   _renderItem(alert: any, i: number, variant: string): Mithril.Children {
@@ -105,6 +93,25 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
     if (!TemplateComponent) return null;
 
     const TemplateComp = TemplateComponent as any;
-    return <TemplateComp key={alert.key || i} alert={alert} variant={variant} />;
+    const content = <TemplateComp alert={alert} variant={variant} />;
+
+    if (variant === 'sidebar') {
+      return (
+        <div key={alert.key || i} className="FilterRuleManager-item-wrapper">
+          {content}
+          <button
+            className="Button Button--icon Button--link FilterRuleManager-item-dismiss"
+            onclick={() => {
+              this.dismissedAlerts.add(alert.key || String(i));
+            }}
+            title={String(app.translator.trans('core.lib.error.dismiss_button')) || 'Dismiss'}
+          >
+            {icon('fas fa-times')}
+          </button>
+        </div>
+      );
+    }
+
+    return <div key={alert.key || i}>{content}</div>;
   }
 }

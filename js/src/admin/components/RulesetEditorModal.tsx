@@ -329,30 +329,10 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
           <div className="helpText">{app.translator.trans(`huoxin-filter-rule-manager.admin.effects.${effect}_help`)}</div>
         </div>
 
+        <hr className="RulesetEditor-divider" />
+
         {effect !== 'silent' && (
           <div>
-            <div className="Form-group">
-              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message')}</label>
-              <textarea
-                className="FormControl"
-                oncreate={(vnode) => {
-                  this.messageTextarea = vnode.dom as HTMLTextAreaElement;
-                }}
-                onremove={() => {
-                  this.messageTextarea = null;
-                }}
-                value={this.message()}
-                oninput={(e: Event) => this.message((e.target as HTMLTextAreaElement).value)}
-                placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message_placeholder'))}
-                rows={2}
-                required
-              ></textarea>
-              <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.message_help')}</div>
-              {this.tokenChipsBlock(tokens, 'message')}
-            </div>
-
-            <hr className="RulesetEditor-divider" />
-
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_mode')}</label>
               <Select
@@ -374,18 +354,6 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
             </div>
 
             <div className="Form-group">
-              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title')}</label>
-              <input
-                type="text"
-                className="FormControl"
-                placeholder={String(app.translator.trans(`huoxin-filter-rule-manager.forum.modal_title_${effect}`))}
-                value={this.displaySetting('title') || ''}
-                oninput={(e: Event) => this.displaySetting('title', (e.target as HTMLInputElement).value)}
-              />
-              <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_help')}</div>
-            </div>
-
-            <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_template')}</label>
               <Select
                 options={
@@ -404,6 +372,28 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
             </div>
 
             {SettingsComponent && <SettingsComponent displaySetting={this.displaySetting.bind(this)} effectType={effect} displayMode={displayMode} />}
+
+            <hr className="RulesetEditor-divider" />
+
+            <div className="Form-group">
+              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message')}</label>
+              <textarea
+                className="FormControl"
+                oncreate={(vnode) => {
+                  this.messageTextarea = vnode.dom as HTMLTextAreaElement;
+                }}
+                onremove={() => {
+                  this.messageTextarea = null;
+                }}
+                value={this.message()}
+                oninput={(e: Event) => this.message((e.target as HTMLTextAreaElement).value)}
+                placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message_placeholder'))}
+                rows={2}
+                required
+              ></textarea>
+              <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.message_help')}</div>
+              {this.tokenChipsBlock(tokens, 'message')}
+            </div>
 
             <hr className="RulesetEditor-divider" />
 

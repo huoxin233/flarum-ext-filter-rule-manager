@@ -110,93 +110,104 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
     return (
       <div className="RulesetEditor-customStyles">
         <div className="Form-group">
-          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon')}</label>
-          <div className="IconPickerInput">
-            <div className="IconPicker-preview" onclick={() => (this.showIconPicker = !this.showIconPicker)}>
-              {icon(displaySetting('icon') || defaultStyles.icon)}
-            </div>
-            <div className="IconPickerInput-input">
-              <input
-                className="FormControl"
-                placeholder={defaultStyles.icon}
-                value={displaySetting('icon')}
-                oninput={(e: Event) => displaySetting('icon', (e.target as HTMLInputElement).value)}
-              />
-              <div className="IconPicker-actions">
-                <div className="IconPicker-action" onclick={() => displaySetting('icon', '')} title="Clear to default">
-                  {icon('fas fa-eraser')}
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title') || 'Alert Title (Optional)'}</label>
+          <input
+            className="FormControl"
+            value={displaySetting('title') || ''}
+            oninput={(e: Event) => displaySetting('title', (e.target as HTMLInputElement).value)}
+            placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_placeholder') || 'e.g., Warning!')}
+          />
+        </div>
+        <div className="RulesetEditor-customStyles-row">
+          <div className="Form-group">
+            <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon')}</label>
+            <div className="IconPickerInput">
+              <div className="IconPicker-preview" onclick={() => (this.showIconPicker = !this.showIconPicker)}>
+                {icon(displaySetting('icon') || defaultStyles.icon)}
+              </div>
+              <div className="IconPickerInput-input">
+                <input
+                  className="FormControl"
+                  placeholder={defaultStyles.icon}
+                  value={displaySetting('icon')}
+                  oninput={(e: Event) => displaySetting('icon', (e.target as HTMLInputElement).value)}
+                />
+                <div className="IconPicker-actions">
+                  <div className="IconPicker-action" onclick={() => displaySetting('icon', '')} title="Clear to default">
+                    {icon('fas fa-eraser')}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {this.showIconPicker && (
-              <div className="IconPicker-dropdown">
-                <div className="IconPicker-icons">
-                  <button
-                    type="button"
-                    className="Button IconPicker-btn IconPicker-btn--none"
-                    onclick={() => {
-                      displaySetting('icon', 'none');
-                      this.showIconPicker = false;
-                    }}
-                    title="No Icon"
-                  >
-                    {icon('fas fa-ban')} {String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_no_icon')) || 'None'}
-                  </button>
-                  {COMMON_ICONS.map((iconClass) => (
+              {this.showIconPicker && (
+                <div className="IconPicker-dropdown">
+                  <div className="IconPicker-icons">
                     <button
                       type="button"
-                      className="Button Button--icon IconPicker-btn"
+                      className="Button IconPicker-btn IconPicker-btn--none"
                       onclick={() => {
-                        displaySetting('icon', iconClass);
+                        displaySetting('icon', 'none');
                         this.showIconPicker = false;
                       }}
-                      title={iconClass}
+                      title="No Icon"
                     >
-                      {icon(iconClass)}
+                      {icon('fas fa-ban')} {String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_no_icon')) || 'None'}
                     </button>
-                  ))}
+                    {COMMON_ICONS.map((iconClass) => (
+                      <button
+                        type="button"
+                        className="Button Button--icon IconPicker-btn"
+                        onclick={() => {
+                          displaySetting('icon', iconClass);
+                          this.showIconPicker = false;
+                        }}
+                        title={iconClass}
+                      >
+                        {icon(iconClass)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
+          {!isToast ? (
+            [
+              <ColorPickerInput
+                label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon_color'))}
+                value={displaySetting('iconColor')}
+                defaultColor={defaultStyles.iconColor}
+                onchange={(val: string) => displaySetting('iconColor', val)}
+              />,
+              <ColorPickerInput
+                label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_text_color'))}
+                value={displaySetting('textColor')}
+                defaultColor={defaultStyles.textColor}
+                onchange={(val: string) => displaySetting('textColor', val)}
+              />,
+              <ColorPickerInput
+                label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_bg_color'))}
+                value={displaySetting('backgroundColor')}
+                defaultColor={defaultStyles.backgroundColor}
+                onchange={(val: string) => displaySetting('backgroundColor', val)}
+              />,
+            ]
+          ) : (
+            <div className="Form-group">
+              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme')}</label>
+              <Select
+                options={{
+                  '': String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_auto')),
+                  success: String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_success')),
+                  error: String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_error')),
+                  warning: String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_warning')),
+                }}
+                value={displaySetting('toastTheme') || ''}
+                onchange={(val: string) => displaySetting('toastTheme', val)}
+              />
+            </div>
+          )}
         </div>
-        {!isToast ? (
-          [
-            <ColorPickerInput
-              label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon_color'))}
-              value={displaySetting('iconColor')}
-              defaultColor={defaultStyles.iconColor}
-              onchange={(val: string) => displaySetting('iconColor', val)}
-            />,
-            <ColorPickerInput
-              label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_text_color'))}
-              value={displaySetting('textColor')}
-              defaultColor={defaultStyles.textColor}
-              onchange={(val: string) => displaySetting('textColor', val)}
-            />,
-            <ColorPickerInput
-              label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_bg_color'))}
-              value={displaySetting('backgroundColor')}
-              defaultColor={defaultStyles.backgroundColor}
-              onchange={(val: string) => displaySetting('backgroundColor', val)}
-            />,
-          ]
-        ) : (
-          <div className="Form-group">
-            <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme')}</label>
-            <Select
-              options={{
-                '': String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_auto')),
-                success: String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_success')),
-                error: String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_error')),
-                warning: String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_toast_theme_warning')),
-              }}
-              value={displaySetting('toastTheme') || ''}
-              onchange={(val: string) => displaySetting('toastTheme', val)}
-            />
-          </div>
-        )}
       </div>
     );
   }
