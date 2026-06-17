@@ -103,7 +103,6 @@ huoxin-filter-rule-manager:
     ruleset_custom_text_color: "Text Color"
     ruleset_custom_bg_color: "Background Color"
     ruleset_no_icon: "None"
-    ruleset_override_styles_confirm: "You already have custom styles configured. Do you want to override them with the defaults for this effect type?"
     ruleset_scope_type: "Applies to"
     ruleset_scope_tags: "Tag IDs"
     ruleset_scope_tags_help: "Comma-separated integer tag IDs. The ruleset will run when the discussion has any of these tags."
