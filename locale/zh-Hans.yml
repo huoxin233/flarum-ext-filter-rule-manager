@@ -19,7 +19,6 @@ huoxin-filter-rule-manager:
     save_success: "规则集已保存。"
     save_error: "保存规则集失败，请检查表单填写是否有误。"
     delete: "删除"
-    delete: "删除"
     delete_success: "规则集已删除。"
     delete_error: "删除规则集失败。"
     delete_ruleset_confirm: '确定删除规则集 "{name}" 吗？其包含的所有规则将被一并删除，且不可恢复。'
