@@ -17,7 +17,7 @@ return Migration::createTable(
         $table->json('group_ids')->nullable();
 
         // Display settings
-        $table->string('intervention_type', 16)->default('info');      // info | warning | block | silent | require_approval | auto_flag
+        $table->string('intervention_type', 16)->default('info');      // info | warning | block | silent
         $table->string('display_mode', 32)->default('banner');   // banner | header_banner | sidebar | toast | modal
         $table->text('message')->nullable();
         $table->text('flag_message')->nullable();
