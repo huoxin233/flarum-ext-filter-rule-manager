@@ -116,10 +116,12 @@ class ExecuteModerationActions
                 $autoFlag = $ruleset->auto_flag ?? $globalAutoFlag;
                 $requireApproval = $ruleset->require_approval ?? $globalRequireApproval;
 
-                if ($requireApproval)
+                if ($requireApproval) {
                     $requiresApproval = true;
-                if ($autoFlag)
+                }
+                if ($autoFlag) {
                     $requiresFlag = true;
+                }
 
                 if ($ruleset->block_cascade) {
                     $blockedRulesetName = $ruleset->name;
@@ -147,8 +149,9 @@ class ExecuteModerationActions
                 $maxTimeout = 0;
                 foreach ($evasionRulesets as $ruleset) {
                     $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
-                    if ($timeout > $maxTimeout)
+                    if ($timeout > $maxTimeout) {
                         $maxTimeout = $timeout;
+                    }
                 }
 
                 if ($maxTimeout > 0) {
@@ -162,8 +165,9 @@ class ExecuteModerationActions
                         $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
                         $threshold = $ruleset->evasion_threshold ?? $globalEvasionThreshold;
 
-                        if ($timeout <= 0)
+                        if ($timeout <= 0) {
                             continue;
+                        }
 
                         $cutoff = Carbon::now()->subMinutes($timeout);
                         $count = $recentBlocks->filter(function ($log) use ($rulesetId, $cutoff) {
