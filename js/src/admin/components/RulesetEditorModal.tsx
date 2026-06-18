@@ -442,7 +442,10 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.preview')}</label>
-              {this.previewBlock(intervention, this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder')))}
+              {this.previewBlock(
+                intervention,
+                this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder'))
+              )}
             </div>
           </div>
         )}
