@@ -24,9 +24,12 @@ class BuiltinProvider implements RuleProviderInterface
 {
     public function getBackendTypeLabels(): array
     {
+        /** @var \Flarum\Locale\Translator $translator */
+        $translator = resolve('translator');
+        
         return [
-            'contains_word' => 'Contains word(s)',
-            'regex'         => 'Matches regex pattern(s)',
+            'contains_word' => $translator->trans('huoxin-filter-rule-manager.admin.type_contains_word'),
+            'regex'         => $translator->trans('huoxin-filter-rule-manager.admin.type_regex'),
         ];
     }
 

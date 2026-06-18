@@ -71,9 +71,13 @@ huoxin-filter-rule-manager:
     settings_header: "全局设置"
     settings:
       global_evaluate_title: "检查主题标题"
+      global_evaluate_title_help: "开启后，规则引擎将同时检查主题的标题和帖子的内容。"
       global_auto_flag: "自动举报"
+      global_auto_flag_help: "开启后，触发此规则集的帖子将自动被举报并进入管理队列。（需要 flarum/flags 扩展）"
       global_require_approval: "进入审核队列"
+      global_require_approval_help: "开启后，帖子将被隐藏，直到被管理团队批准。（需要 flarum/approval 扩展）"
       global_evasion_active: "恶意绕过检测"
+      global_evasion_active_help: "开启后，若用户在被拦截后短时间内发布了正常帖子，该帖子仍将被自动举报以供审查。"
       global_evasion_timeout: "检测时长（分钟）"
       global_evasion_threshold: "触发阈值（拦截次数）"
 
@@ -151,6 +155,9 @@ huoxin-filter-rule-manager:
       normal_post: "普通主题"
       private_post: "私密主题"
       tag: "指定标签"
+      backend: "后端"
+      frontend: "前端"
+      both: "前端 + 后端"
 
     templates:
       builtin: "内置"
