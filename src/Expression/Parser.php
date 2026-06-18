@@ -32,7 +32,6 @@ class Parser
         $node = $this->parseLogicalAnd();
 
         while ($this->match(Token::T_OR)) {
-            $operator = $this->previous()->value;
             $right = $this->parseLogicalAnd();
             $node = new LogicalNode('OR', $node, $right);
         }
@@ -45,7 +44,6 @@ class Parser
         $node = $this->parseUnary();
 
         while ($this->match(Token::T_AND)) {
-            $operator = $this->previous()->value;
             $right = $this->parseUnary();
             $node = new LogicalNode('AND', $node, $right);
         }

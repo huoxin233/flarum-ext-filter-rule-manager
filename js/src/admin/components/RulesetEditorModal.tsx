@@ -296,7 +296,6 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     const displayMode = this.displayMode();
     const tokens = this.availableTokens();
     const templateName = this.displaySetting('template') || 'builtin';
-    const templates = app.filterRuleManager.getTemplates();
     const SettingsComponent = app.filterRuleManager.getTemplateSettingsComponent(templateName);
 
     return (
@@ -357,8 +356,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_display_template')}</label>
               <Select
                 options={
-                  app.filterRuleManager && typeof app.filterRuleManager.getTemplates === 'function'
-                    ? Object.keys(app.filterRuleManager.getTemplates()).reduce((acc: Record<string, string>, k) => {
+                  app.filterRuleManager && app.filterRuleManager.templates
+                    ? Object.keys(app.filterRuleManager.templates).reduce((acc: Record<string, string>, k) => {
                         const transKey = `huoxin-filter-rule-manager.admin.templates.${k}`;
                         const translated = String(app.translator.trans(transKey));
                         acc[k] = translated !== transKey && translated ? translated : k;

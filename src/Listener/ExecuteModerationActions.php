@@ -70,7 +70,6 @@ class ExecuteModerationActions
         $defaultRulesets = [];
         $customMessages = [];
         $providers = $this->evaluator->getProviders();
-        $blockedRulesetName = null;
         $requiresApproval = false;
         $requiresFlag = false;
 
@@ -92,15 +91,12 @@ class ExecuteModerationActions
                 if ($autoFlag) {
                     $requiresFlag = true;
                 }
-
-                if ($ruleset->block_cascade) {
-                    $blockedRulesetName = $ruleset->name;
-                }
             }
         }
 
         $actor = $event->actor;
         $isEvasion = false;
+        $blockedRulesetName = null;
 
         if ($actor && ! $actor->isGuest()) {
             $evasionRulesets = $allActive->filter(function (Ruleset $ruleset) use ($globalEvasionActive) {

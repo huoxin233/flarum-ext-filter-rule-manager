@@ -171,20 +171,6 @@ export class FilterEngine {
   }
 
   /**
-   * Get all registered templates.
-   */
-  getTemplates(): Record<
-    string,
-    { component: Mithril.ComponentTypes<unknown, unknown>; settingsComponent: Mithril.ComponentTypes<unknown, unknown> | null }
-  > {
-    const result: Record<string, any> = {};
-    for (const [name, data] of Object.entries(this.templates)) {
-      result[name] = data.component;
-    }
-    return result as any;
-  }
-
-  /**
    * Register a display mode placement option.
    * @param {string} key - The unique identifier for the mode
    * @param {string} translationKey - The translation key for the UI label

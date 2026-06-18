@@ -505,7 +505,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   }
 
   renderTemplates(): Mithril.Children {
-    const templates = app.filterRuleManager ? app.filterRuleManager.getTemplates() : {};
+    const templates = app.filterRuleManager ? app.filterRuleManager.templates : {};
 
     return (
       <div className="ProvidersList">
