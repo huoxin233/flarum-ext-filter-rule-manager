@@ -19,6 +19,7 @@ huoxin-filter-rule-manager:
     save_success: "规则集已保存。"
     save_error: "保存规则集失败，请检查表单填写是否有误。"
     delete: "删除"
+    delete: "删除"
     delete_success: "规则集已删除。"
     delete_error: "删除规则集失败。"
     delete_ruleset_confirm: '确定删除规则集 "{name}" 吗？其包含的所有规则将被一并删除，且不可恢复。'
@@ -31,7 +32,7 @@ huoxin-filter-rule-manager:
     active: "开启"
     inactive: "关闭"
 
-    # ── List headers ───────────────────────────────────────────────────────
+    # ── List headers & Filters ─────────────────────────────────────────────
     headers:
       order: "排序"
       name: "名称"
@@ -49,23 +50,12 @@ huoxin-filter-rule-manager:
       component: "组件类"
       has_settings: "包含设置界面"
       identifier: "标识符"
-
     scope_filters:
       all: "全部"
       global: "全局"
       normal_post: "普通主题"
       private_post: "私密主题"
       tag: "指定标签"
-
-    tokens_available: "可用变量 — 点击插入"
-    tokens_none: "暂无可用变量。添加规则后即可查看其提供的变量。"
-
-    # ── Section titles in the editor ───────────────────────────────────────
-    section_general: "常规"
-    section_scope: "应用范围"
-    section_display: "显示"
-    section_moderation: "审核操作"
-    section_rules: "规则"
 
     # ── Settings Tab ───────────────────────────────────────────────────────
     settings_header: "全局设置"
@@ -81,17 +71,9 @@ huoxin-filter-rule-manager:
       global_evasion_timeout: "检测时长（分钟）"
       global_evasion_threshold: "触发阈值（拦截次数）"
 
-    inherit_global_default: "继承全局默认值"
-    force_enabled: "强制开启"
-    force_disabled: "强制关闭"
-
-    ruleset_evaluate_title_label: "检查主题标题"
-    ruleset_evaluate_title_help: "开启后，规则引擎将同时检查主题的标题和帖子的内容。"
-
     # ── Form labels ────────────────────────────────────────────────────────
     ruleset_name: "名称"
     ruleset_name_placeholder: "例如：拦截垃圾广告词"
-
     ruleset_intervention_type: "干预方式"
     ruleset_display_mode: "显示模式"
     ruleset_display_template: "显示模板"
@@ -113,6 +95,9 @@ huoxin-filter-rule-manager:
     ruleset_message: "提示内容"
     ruleset_message_placeholder: "您的帖子包含违规词汇：{{matched_word}}"
     ruleset_is_active: "开启"
+    
+    ruleset_evaluate_title_label: "检查主题标题"
+    ruleset_evaluate_title_help: "开启后，规则引擎将同时检查主题的标题和帖子的内容。"
     ruleset_auto_flag: "匹配时自动举报"
     ruleset_auto_flag_help: "开启后，触发此规则集的帖子将自动被举报并进入管理队列。（需要 flarum/flags 扩展）"
     ruleset_require_approval: "匹配时进入审核队列"
@@ -131,13 +116,21 @@ huoxin-filter-rule-manager:
     ruleset_flag_message_help: "可选。定义触发此规则集时管理团队看到的具体理由。留空则使用默认通用理由。"
     ruleset_evaluate_all_rules: "匹配所有规则（聚合变量）"
     ruleset_evaluate_all_rules_help: "开启后，引擎将检查此规则集中的所有规则，即使已经找到匹配项。这允许您收集所有命中的变量用于自定义消息。如果关闭，引擎在找到第一个匹配项后就会立即停止，以提高性能。"
-    rule_scan_all: "匹配所有结果"
-    rule_scan_all_help: "开启后，系统将找出文本中所有匹配的词汇或正则模式。如果关闭，则在匹配到第一个结果后立即停止，以提高处理性能。"
-
+    
+    inherit_global_default: "继承全局默认值"
+    force_enabled: "强制开启"
+    force_disabled: "强制关闭"
+    
     message_help: "您可以使用 {{token}} 插入规则提取的变量值。变量内容会自动进行 HTML 转义；模板本身以可信方式渲染，允许使用简单的 HTML（如 <br>）。"
-    rule_regex_warning: "正则表达式会在每次保存帖子时在服务端执行。请避免使用可能导致灾难性回溯的写法（例如像 (a+)+ 这样的嵌套量词）—— 保持正则模式简单并做好边界定位。"
     preview: "预览"
     preview_placeholder: "提示内容将显示在这里。"
+
+    # ── Section titles in the editor ───────────────────────────────────────
+    section_general: "常规"
+    section_scope: "应用范围"
+    section_display: "显示"
+    section_moderation: "审核操作"
+    section_rules: "规则"
 
     # ── Intervention / scope / display labels ────────────────────────────────────
     interventions:
@@ -155,9 +148,9 @@ huoxin-filter-rule-manager:
       normal_post: "普通主题"
       private_post: "私密主题"
       tag: "指定标签"
-      backend: "后端"
-      frontend: "前端"
-      both: "前端 + 后端"
+      backend: "后端 (Backend)"
+      frontend: "前端 (Frontend)"
+      both: "前端+后端 (Frontend + Backend)"
 
     templates:
       builtin: "内置"
@@ -177,24 +170,7 @@ huoxin-filter-rule-manager:
       modal: "弹窗"
       modal_help: "打断用户操作的模态对话框。每次规则集触发时只显示一次——仅在规则清除并再次命中后才会重新弹出。"
 
-    # ── Rule type labels ─────────────────────────────────────────────────
-    type_contains_word: "包含以下词汇"
-    type_regex: "匹配正则表达式"
-
-    # ── Config form strings ────────────────────────────────────────────────
-    config_words_label: "单词 / 短语"
-    config_words_placeholder: "垃圾邮件\n钓鱼\n抽奖"
-    config_words_help: "每行一个单词或短语。如果帖子包含其中任意一个（不区分大小写），则触发规则。首个命中的词汇将作为 {{matched_word}} 变量用于提示内容。"
-    config_patterns_label: "正则表达式模式"
-    config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]{20,}$"
-    config_patterns_help: "每行一个模式。裸模式将进行不区分大小写的匹配；可使用 /pattern/flags 这种 PCRE 完整格式以获得更精确的控制。首个匹配项将作为 {{matched_pattern}} 和 {{matched_string}} 变量提供。"
-
-    # ── Validation messages ────────────────────────────────────────────────
-    validation:
-      name_required: "请为该规则集提供一个名称。"
-      tags_required: "已选择按标签应用 — 请至少填写一个标签 ID。"
-      expression_required: "表达式不能为空。"
-
+    # ── Rule Builder ───────────────────────────────────────────────────────
     rule_builder:
       visual_builder: "可视化构建器"
       expression_editor: "表达式编辑器"
@@ -210,6 +186,30 @@ huoxin-filter-rule-manager:
       and: "并且 (AND)"
       or: "或者 (OR)"
       not: "非 (NOT)"
+      
+    tokens_available: "可用变量 — 点击插入"
+    tokens_none: "暂无可用变量。添加规则后即可查看其提供的变量。"
+
+    # ── Built-in Rules Config ──────────────────────────────────────────────
+    type_contains_word: "包含以下词汇"
+    type_regex: "匹配正则表达式"
+
+    config_words_label: "单词 / 短语"
+    config_words_placeholder: "垃圾邮件\n钓鱼\n抽奖"
+    config_words_help: "每行一个单词或短语。如果帖子包含其中任意一个（不区分大小写），则触发规则。首个命中的词汇将作为 {{matched_word}} 变量用于提示内容。"
+    config_patterns_label: "正则表达式模式"
+    config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]{20,}$"
+    config_patterns_help: "每行一个模式。裸模式将进行不区分大小写的匹配；可使用 /pattern/flags 这种 PCRE 完整格式以获得更精确的控制。首个匹配项将作为 {{matched_pattern}} 和 {{matched_string}} 变量提供。"
+
+    rule_scan_all: "匹配所有结果"
+    rule_scan_all_help: "开启后，系统将找出文本中所有匹配的词汇或正则模式。如果关闭，则在匹配到第一个结果后立即停止，以提高处理性能。"
+    rule_regex_warning: "正则表达式会在每次保存帖子时在服务端执行。请避免使用可能导致灾难性回溯的写法（例如像 (a+)+ 这样的嵌套量词）—— 保持正则模式简单并做好边界定位。"
+
+    # ── Validation messages ────────────────────────────────────────────────
+    validation:
+      name_required: "请为该规则集提供一个名称。"
+      tags_required: "已选择按标签应用 — 请至少填写一个标签 ID。"
+      expression_required: "表达式不能为空。"
 
   forum:
     # ── Warning confirmation modal ─────────────────────────────────────────

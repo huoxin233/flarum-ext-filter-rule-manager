@@ -31,7 +31,7 @@ huoxin-filter-rule-manager:
     active: "Active"
     inactive: "Inactive"
 
-    # ── List headers ───────────────────────────────────────────────────────
+    # ── List headers & Filters ─────────────────────────────────────────────
     headers:
       order: "Order"
       name: "Name"
@@ -49,23 +49,12 @@ huoxin-filter-rule-manager:
       component: "Component Class"
       has_settings: "Has Settings UI"
       identifier: "Identifier"
-
     scope_filters:
       all: "All"
       global: "Global"
       normal_post: "Normal posts"
       private_post: "Private posts"
       tag: "Tagged"
-
-    tokens_available: "Available tokens — click to insert"
-    tokens_none: "No tokens available — add a rule to see what tokens it exposes."
-
-    # ── Section titles in the editor ───────────────────────────────────────
-    section_general: "General"
-    section_scope: "Scope"
-    section_display: "Display"
-    section_moderation: "Moderation Actions"
-    section_rules: "Rules"
 
     # ── Settings Tab ───────────────────────────────────────────────────────
     settings_header: "Global Settings"
@@ -81,17 +70,9 @@ huoxin-filter-rule-manager:
       global_evasion_timeout: "Evasion Timeout (minutes)"
       global_evasion_threshold: "Evasion Threshold"
 
-    inherit_global_default: "Inherit Global Default"
-    force_enabled: "Force Enabled"
-    force_disabled: "Force Disabled"
-
-    ruleset_evaluate_title_label: "Evaluate Discussion Title"
-    ruleset_evaluate_title_help: "When enabled, the rules engine will evaluate the title of the discussion alongside the post content."
-
     # ── Form labels ────────────────────────────────────────────────────────
     ruleset_name: "Name"
     ruleset_name_placeholder: "e.g. Block spam keywords"
-
     ruleset_intervention_type: "Intervention"
     ruleset_display_mode: "Display mode"
     ruleset_display_template: "Display Template"
@@ -113,6 +94,9 @@ huoxin-filter-rule-manager:
     ruleset_message: "Message"
     ruleset_message_placeholder: "Your post contains a restricted word: {{matched_word}}"
     ruleset_is_active: "Enabled"
+    
+    ruleset_evaluate_title_label: "Evaluate Discussion Title"
+    ruleset_evaluate_title_help: "When enabled, the rules engine will evaluate the title of the discussion alongside the post content."
     ruleset_auto_flag: "Auto-flag post on match"
     ruleset_auto_flag_help: "If enabled, triggering this ruleset will automatically create a flag for moderators to review. (Requires flarum/flags)"
     ruleset_require_approval: "Require approval on match"
@@ -131,13 +115,21 @@ huoxin-filter-rule-manager:
     ruleset_flag_message_help: "Optional. Define a custom flag or approval reason string for moderators to see when this ruleset triggers. If empty, the default group message will be used."
     ruleset_evaluate_all_rules: "Evaluate all rules (Aggregate tokens)"
     ruleset_evaluate_all_rules_help: "If enabled, the engine will evaluate every rule in this ruleset even if a match is already found. This allows you to gather tokens from multiple rules for your custom flag message. If disabled, the ruleset stops evaluating as soon as its condition is met, improving performance."
-    rule_scan_all: "Find all matches"
-    rule_scan_all_help: "If enabled, this rule will gather every matched word or pattern in your list. If disabled, it returns quickly on the first match to save processing time."
-
+    
+    inherit_global_default: "Inherit Global Default"
+    force_enabled: "Force Enabled"
+    force_disabled: "Force Disabled"
+    
     message_help: "Use {{token}} to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like <br>."
-    rule_regex_warning: "Regex patterns run server-side on every post save. Avoid catastrophic backtracking (e.g. nested quantifiers like (a+)+) — keep patterns simple and well-anchored."
     preview: "Preview"
     preview_placeholder: "Your message will appear here."
+
+    # ── Section titles in the editor ───────────────────────────────────────
+    section_general: "General"
+    section_scope: "Scope"
+    section_display: "Display"
+    section_moderation: "Moderation Actions"
+    section_rules: "Rules"
 
     # ── Intervention / scope / display labels ────────────────────────────────────
     interventions:
@@ -177,24 +169,7 @@ huoxin-filter-rule-manager:
       modal: "Modal"
       modal_help: "Modal dialog interrupting the user. Shown once per ruleset firing — re-opens only after the rule clears and triggers again."
 
-    # ── Rule type labels ─────────────────────────────────────────────────
-    type_contains_word: "Contains word(s)"
-    type_regex: "Matches regex pattern(s)"
-
-    # ── Config form strings ────────────────────────────────────────────────
-    config_words_label: "Words / phrases"
-    config_words_placeholder: "spam\nphishing\ngiveaway"
-    config_words_help: "One word or phrase per line. The rule triggers if the post contains any of them (case-insensitive). The first match is available as {{matched_word}} in the alert message."
-    config_patterns_label: "Regex patterns"
-    config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]{20,}$"
-    config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as {{matched_pattern}} and {{matched_string}}."
-
-    # ── Validation messages ────────────────────────────────────────────────
-    validation:
-      name_required: "Please give the ruleset a name."
-      tags_required: "Tag scope is selected — list at least one tag ID."
-      expression_required: "An expression is required."
-
+    # ── Rule Builder ───────────────────────────────────────────────────────
     rule_builder:
       visual_builder: "Visual Builder"
       expression_editor: "Expression Editor"
@@ -210,6 +185,30 @@ huoxin-filter-rule-manager:
       and: "AND"
       or: "OR"
       not: "NOT"
+      
+    tokens_available: "Available tokens — click to insert"
+    tokens_none: "No tokens available — add a rule to see what tokens it exposes."
+
+    # ── Built-in Rules Config ──────────────────────────────────────────────
+    type_contains_word: "Contains word(s)"
+    type_regex: "Matches regex pattern(s)"
+
+    config_words_label: "Words / phrases"
+    config_words_placeholder: "spam\nphishing\ngiveaway"
+    config_words_help: "One word or phrase per line. The rule triggers if the post contains any of them (case-insensitive). The first match is available as {{matched_word}} in the alert message."
+    config_patterns_label: "Regex patterns"
+    config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]{20,}$"
+    config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as {{matched_pattern}} and {{matched_string}}."
+
+    rule_scan_all: "Find all matches"
+    rule_scan_all_help: "If enabled, this rule will gather every matched word or pattern in your list. If disabled, it returns quickly on the first match to save processing time."
+    rule_regex_warning: "Regex patterns run server-side on every post save. Avoid catastrophic backtracking (e.g. nested quantifiers like (a+)+) — keep patterns simple and well-anchored."
+
+    # ── Validation messages ────────────────────────────────────────────────
+    validation:
+      name_required: "Please give the ruleset a name."
+      tags_required: "Tag scope is selected — list at least one tag ID."
+      expression_required: "An expression is required."
 
   forum:
     # ── Warning confirmation modal ─────────────────────────────────────────
