@@ -6,6 +6,7 @@ use Flarum\Extension\ExtensionManager;
 use Flarum\Post\Event\Saving;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
+use Huoxin\FilterRuleManager\Service\RulesetMatcher;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Events\Dispatcher;
 use Carbon\Carbon;
@@ -16,6 +17,7 @@ class ExecuteModerationActions
 {
     public function __construct(
         protected RuleEvaluator $evaluator,
+        protected RulesetMatcher $matcher,
         protected ExtensionManager $extensions,
         protected ConnectionInterface $db,
         protected TranslatorInterface $translator,
@@ -52,19 +54,8 @@ class ExecuteModerationActions
             return;
         }
 
-        $content = (string) $post->content;
-        $discussion = $post->discussion;
-        $title = $discussion ? (string) $discussion->title : '';
-
-        $isFirstPost = false;
-        if ($discussion) {
-            $isFirstPost = $discussion->first_post_id === $post->id
-                || $discussion->first_post_id === null;
-        }
-
         $globalAutoFlag = (bool) $this->settings->get('huoxin-filter.global_auto_flag', true);
         $globalRequireApproval = (bool) $this->settings->get('huoxin-filter.global_require_approval', true);
-        $globalEvaluateTitle = (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
         $globalEvasionActive = (bool) $this->settings->get('huoxin-filter.global_evasion_active', false);
         $globalEvasionTimeout = (int) $this->settings->get('huoxin-filter.global_evasion_timeout', 5);
         $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter.global_evasion_threshold', 2);
@@ -84,18 +75,7 @@ class ExecuteModerationActions
         $requiresFlag = false;
 
         foreach ($rulesets as $ruleset) {
-            if (! $this->evaluator->scopeMatches($ruleset, $post->discussion)) {
-                continue;
-            }
-
-            $targetContent = $content;
-
-            $evaluateTitle = $ruleset->evaluate_title ?? $globalEvaluateTitle;
-            if ($isFirstPost && $title !== '' && $evaluateTitle !== false) {
-                $targetContent = $title."\n\n".$content;
-            }
-
-            $tokens = $this->evaluator->evaluateRuleset($ruleset, $targetContent, $providers);
+            $tokens = $this->matcher->match($ruleset, $post, $providers);
             if ($tokens !== null) {
                 if (! empty($ruleset->flag_message)) {
                     $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);

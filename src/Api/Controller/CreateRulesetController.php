@@ -23,6 +23,8 @@ use Tobscure\JsonApi\Exception\InvalidParameterException;
 
 class CreateRulesetController extends AbstractCreateController
 {
+    use RulesetValidationTrait;
+
     public $serializer = RulesetSerializer::class;
 
     protected function data(ServerRequestInterface $request, Document $document): Ruleset
@@ -77,19 +79,5 @@ class CreateRulesetController extends AbstractCreateController
         $ruleset->save();
 
         return $ruleset;
-    }
-
-    private function sanitizeTagIds($raw): ?array
-    {
-        if (!is_array($raw)) {
-            return null;
-        }
-        $ids = array_values(array_filter(array_map('intval', $raw), fn ($id) => $id > 0));
-        return $ids === [] ? null : $ids;
-    }
-
-    private function validEnum(string $value, array $allowed, string $default): string
-    {
-        return in_array($value, $allowed, true) ? $value : $default;
     }
 }

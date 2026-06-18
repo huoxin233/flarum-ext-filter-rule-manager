@@ -15,6 +15,7 @@ use Flarum\Post\Event\Saving;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
+use Huoxin\FilterRuleManager\Service\RulesetMatcher;
 use Flarum\Post\Exception\FloodingException;
 use Illuminate\Database\ConnectionInterface;
 use Carbon\Carbon;
@@ -24,6 +25,7 @@ class EvaluateBlockRulesets
 {
     public function __construct(
         protected RuleEvaluator $evaluator,
+        protected RulesetMatcher $matcher,
         protected ConnectionInterface $db,
         protected SettingsRepositoryInterface $settings
     ) {
@@ -42,13 +44,6 @@ class EvaluateBlockRulesets
         $content = (string) $post->content;
         $discussion = $post->discussion;
         $title = $discussion ? (string) $discussion->title : '';
-        
-        $isFirstPost = false;
-        if ($discussion) {
-            $isFirstPost = $post->number === 1 
-                || $discussion->first_post_id === $post->id 
-                || $discussion->first_post_id === null;
-        }
 
         /** @var \Illuminate\Support\Collection $rulesets */
         $rulesets = Ruleset::getActiveRulesets()->filter(function ($ruleset) {
@@ -60,21 +55,21 @@ class EvaluateBlockRulesets
         $triggered = [];
 
         foreach ($rulesets as $ruleset) {
-            if (! $this->evaluator->scopeMatches($ruleset, $discussion)) {
-                continue;
-            }
-
-            $targetContent = $content;
-
-            $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
-
-            if ($evaluateTitle && $title !== '' && $isFirstPost) {
-                $targetContent = $title . "\n\n" . $content;
-            }
-
-            $tokens = $this->evaluator->evaluateRuleset($ruleset, $targetContent, $providers);
+            $tokens = $this->matcher->match($ruleset, $post, $providers);
             if ($tokens === null) {
                 continue;
+            }
+
+            $targetContent = $content; // targetContent used for the block log
+            $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
+            $isFirstPost = false;
+            if ($discussion) {
+                $isFirstPost = $post->number === 1
+                    || $discussion->first_post_id === $post->id
+                    || $discussion->first_post_id === null;
+            }
+            if ($evaluateTitle && $title !== '' && $isFirstPost) {
+                $targetContent = $title . "\n\n" . $content;
             }
 
             $triggered[] = [
