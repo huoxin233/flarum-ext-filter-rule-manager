@@ -11,6 +11,8 @@
 
 namespace Huoxin\FilterRuleManager\Provider;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 /**
  * Backend side of the builtin provider — kept in lockstep with the JS version.
  *
@@ -22,14 +24,15 @@ namespace Huoxin\FilterRuleManager\Provider;
  */
 class BuiltinProvider implements RuleProviderInterface
 {
+    public function __construct(protected TranslatorInterface $translator)
+    {
+    }
+
     public function getBackendTypeLabels(): array
     {
-        /** @var \Flarum\Locale\Translator $translator */
-        $translator = resolve('translator');
-        
         return [
-            'contains_word' => $translator->trans('huoxin-filter-rule-manager.admin.type_contains_word'),
-            'regex'         => $translator->trans('huoxin-filter-rule-manager.admin.type_regex'),
+            'contains_word' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_contains_word'),
+            'regex'         => $this->translator->trans('huoxin-filter-rule-manager.admin.type_regex'),
         ];
     }
 
