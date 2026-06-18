@@ -74,7 +74,7 @@ class ExecuteModerationActions
         $requiresFlag = false;
 
         foreach ($rulesets as $ruleset) {
-            $tokens = $this->matcher->match($ruleset, $post, $providers);
+            $tokens = $this->matcher->match($ruleset, $post, $event->actor, $providers);
             if ($tokens !== null) {
                 if (! empty($ruleset->flag_message)) {
                     $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);

@@ -91,6 +91,8 @@ huoxin-filter-rule-manager:
     ruleset_scope_type: "应用于"
     ruleset_scope_tags: "指定标签 ID"
     ruleset_scope_tags_help: "多个数字标签 ID 请用逗号分隔。当主题包含这些标签中的任意一个时，此规则集将会生效。"
+    ruleset_bypass_groups: "跳过以下用户组"
+    ruleset_bypass_groups_help: "属于这些用户组的用户将完全跳过该规则集的检查。"
     ruleset_message: "提示内容"
     ruleset_message_placeholder: "您的帖子包含违规词汇：{{matched_word}}"
     ruleset_is_active: "开启"
@@ -209,6 +211,10 @@ huoxin-filter-rule-manager:
       name_required: "请为该规则集提供一个名称。"
       tags_required: "已选择按标签应用 — 请至少填写一个标签 ID。"
       expression_required: "表达式不能为空。"
+
+    # ── Permissions ────────────────────────────────────────────────────────
+    permissions:
+      bypass_all_rules: "跳过所有过滤规则"
 
   forum:
     # ── Warning confirmation modal ─────────────────────────────────────────

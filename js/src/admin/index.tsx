@@ -37,6 +37,7 @@ Object.assign(Ruleset.prototype, {
   requireApproval: Model.attribute('requireApproval'),
   scopeType: Model.attribute('scopeType'),
   scopeTagIds: Model.attribute('scopeTagIds'),
+  bypassGroupIds: Model.attribute('bypassGroupIds'),
   displaySettings: Model.attribute('displaySettings'),
 });
 
@@ -56,5 +57,15 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
 
   app.store.models['filter-rule-rulesets'] = Ruleset;
 
-  app.extensionData.for('huoxin-filter-rule-manager').registerPage(RulesetManagerPage as any);
+  app.extensionData
+    .for('huoxin-filter-rule-manager')
+    .registerPage(RulesetManagerPage as any)
+    .registerPermission(
+      {
+        icon: 'fas fa-shield-alt',
+        label: app.translator.trans('huoxin-filter-rule-manager.admin.permissions.bypass_all_rules'),
+        permission: 'huoxin-filter-rule-manager.bypassAllRules',
+      },
+      'moderate'
+    );
 });

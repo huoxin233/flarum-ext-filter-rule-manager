@@ -14,7 +14,7 @@ return Migration::createTable(
         $table->boolean('is_active')->default(true);
         $table->string('scope_type', 32)->default('global');     // global | normal_post | private_post | tag
         $table->json('scope_tag_ids')->nullable();
-        $table->json('group_ids')->nullable();
+        $table->json('bypass_group_ids')->nullable();
 
         // Display settings
         $table->string('intervention_type', 16)->default('info');      // info | warning | block | silent

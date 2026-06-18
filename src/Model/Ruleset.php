@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property bool   $is_active
  * @property string $scope_type     global|normal_post|private_post|tag
  * @property array|null $scope_tag_ids
- * @property array|null $group_ids
+ * @property array|null $bypass_group_ids
  * @property bool|null $auto_flag
  * @property bool|null $require_approval
  * @property array|null $display_settings
@@ -54,7 +54,7 @@ class Ruleset extends AbstractModel
         'auto_flag'          => 'boolean',
         'require_approval'   => 'boolean',
         'scope_tag_ids'      => 'array',
-        'group_ids'          => 'array',
+        'bypass_group_ids'   => 'array',
         'display_settings'   => 'array',
     ];
 

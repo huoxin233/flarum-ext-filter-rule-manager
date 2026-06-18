@@ -32,15 +32,25 @@ class InjectFrontendRulesets
     public function __invoke(Document $document, ServerRequestInterface $request): void
     {
         $actor = RequestUtil::getActor($request);
-        if ($actor->isGuest()) {
+        if ($actor->isGuest() || $actor->can('huoxin-filter-rule-manager.bypassAllRules')) {
             $document->payload['filterRuleRulesets'] = [];
             return;
         }
+
+        $userGroups = $actor->groups->pluck('id')->toArray();
 
         $rulesets = Ruleset::active()
             ->frontend()
             ->ordered()
             ->get()
+            ->filter(function (Ruleset $r) use ($userGroups) {
+                if (is_array($r->bypass_group_ids) && count($r->bypass_group_ids) > 0) {
+                    if (count(array_intersect($userGroups, $r->bypass_group_ids)) > 0) {
+                        return false;
+                    }
+                }
+                return true;
+            })
             ->map(fn (Ruleset $r) => [
                 'id'           => $r->id,
                 'name'         => $r->name,
@@ -56,6 +66,7 @@ class InjectFrontendRulesets
                 'scopeTagIds'  => $r->scope_tag_ids ?? [],
                 'displaySettings'  => $r->display_settings,
             ])
+            ->values()
             ->toArray();
 
         $document->payload['filterRuleRulesets'] = $rulesets;

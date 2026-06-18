@@ -91,6 +91,8 @@ huoxin-filter-rule-manager:
     ruleset_scope_type: "Applies to"
     ruleset_scope_tags: "Tag IDs"
     ruleset_scope_tags_help: "Comma-separated integer tag IDs. The ruleset will run when the discussion has any of these tags."
+    ruleset_bypass_groups: "Bypass Groups"
+    ruleset_bypass_groups_help: "Users in these groups will bypass this ruleset completely."
     ruleset_message: "Message"
     ruleset_message_placeholder: "Your post contains a restricted word: {{matched_word}}"
     ruleset_is_active: "Enabled"
@@ -209,6 +211,10 @@ huoxin-filter-rule-manager:
       name_required: "Please give the ruleset a name."
       tags_required: "Tag scope is selected — list at least one tag ID."
       expression_required: "An expression is required."
+
+    # ── Permissions ────────────────────────────────────────────────────────
+    permissions:
+      bypass_all_rules: "Bypass all filter rules"
 
   forum:
     # ── Warning confirmation modal ─────────────────────────────────────────

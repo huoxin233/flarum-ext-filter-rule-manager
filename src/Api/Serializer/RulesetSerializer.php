@@ -51,7 +51,7 @@ class RulesetSerializer extends AbstractSerializer
             'requireApproval' => $model->require_approval === null ? null : (bool) $model->require_approval,
             'scopeType'     => $model->scope_type,
             'scopeTagIds'   => $model->scope_tag_ids ?? [],
-            'groupIds'      => $model->group_ids ?? [],
+            'bypassGroupIds' => $model->bypass_group_ids ?? [],
             'displaySettings' => $model->display_settings ?? [],
 
             'createdAt'     => $this->formatDate($model->created_at),

@@ -13,7 +13,7 @@ namespace Huoxin\FilterRuleManager\Api\Controller;
 
 trait RulesetValidationTrait
 {
-    protected function sanitizeTagIds($raw): ?array
+    protected function sanitizeIds($raw): ?array
     {
         if (!is_array($raw)) {
             return null;

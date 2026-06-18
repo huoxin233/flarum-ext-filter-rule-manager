@@ -55,7 +55,7 @@ class EvaluateBlockRulesets
         $triggered = [];
 
         foreach ($rulesets as $ruleset) {
-            $tokens = $this->matcher->match($ruleset, $post, $providers);
+            $tokens = $this->matcher->match($ruleset, $post, $event->actor, $providers);
             if ($tokens === null) {
                 continue;
             }

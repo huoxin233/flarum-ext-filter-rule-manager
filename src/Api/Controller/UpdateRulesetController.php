@@ -82,7 +82,10 @@ class UpdateRulesetController extends AbstractShowController
         if (array_key_exists('requireApproval', $attributes)) $ruleset->require_approval = $attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval'];
         if (isset($attributes['scopeType']))    $ruleset->scope_type    = $this->validEnum($attributes['scopeType'], ['global', 'normal_post', 'private_post', 'tag'], $ruleset->scope_type);
         if (array_key_exists('scopeTagIds', $attributes)) {
-            $ruleset->scope_tag_ids = $this->sanitizeTagIds($attributes['scopeTagIds']);
+            $ruleset->scope_tag_ids = $this->sanitizeIds($attributes['scopeTagIds']);
+        }
+        if (array_key_exists('bypassGroupIds', $attributes)) {
+            $ruleset->bypass_group_ids = $this->sanitizeIds($attributes['bypassGroupIds']);
         }
         if (array_key_exists('displaySettings', $attributes)) {
             $ruleset->display_settings = is_array($attributes['displaySettings']) ? $attributes['displaySettings'] : null;

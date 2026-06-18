@@ -25,12 +25,23 @@ class RulesetMatcher
 
     /**
      * Evaluates a ruleset against a post, automatically handling scope matching,
-     * first-post title prepending, and provider injection.
+     * bypass checking, first-post title prepending, and provider injection.
      *
      * @return array|null Returns matched tokens if the ruleset triggers, null otherwise.
      */
-    public function match(Ruleset $ruleset, Post $post, array $providers = null): ?array
+    public function match(Ruleset $ruleset, Post $post, ?\Flarum\User\User $actor = null, array $providers = null): ?array
     {
+        if ($actor && $actor->can('huoxin-filter-rule-manager.bypassAllRules')) {
+            return null;
+        }
+
+        if ($actor && is_array($ruleset->bypass_group_ids) && count($ruleset->bypass_group_ids) > 0) {
+            $userGroups = $actor->groups->pluck('id')->toArray();
+            if (count(array_intersect($userGroups, $ruleset->bypass_group_ids)) > 0) {
+                return null;
+            }
+        }
+
         $discussion = $post->discussion;
 
         if (! $this->evaluator->scopeMatches($ruleset, $discussion)) {

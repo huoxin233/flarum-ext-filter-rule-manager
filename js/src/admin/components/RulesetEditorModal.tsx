@@ -12,6 +12,7 @@ import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
 import Select from 'flarum/common/components/Select';
+import GroupBadge from 'flarum/common/components/GroupBadge';
 import type { ASTNode } from '../../common/FilterEngine';
 import Stream from 'flarum/common/utils/Stream';
 import icon from 'flarum/common/helpers/icon';
@@ -73,6 +74,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   requireApproval!: Stream<boolean | null>;
   scopeType!: Stream<string>;
   scopeTagIds!: Stream<number[]>;
+  bypassGroupIds!: Stream<number[]>;
   displaySettings!: Stream<Record<string, unknown>>;
 
   oninit(vnode: Mithril.Vnode<RulesetEditorModalAttrs, this>) {
@@ -118,6 +120,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     this.requireApproval = Stream(this.ruleset ? this.ruleset.requireApproval() : null);
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
+    this.bypassGroupIds = Stream(this.ruleset ? this.ruleset.bypassGroupIds() || [] : []);
     this.displaySettings = Stream(this.ruleset ? Object.assign({}, this.ruleset.displaySettings() || {}) : {});
   }
 
@@ -276,6 +279,39 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
             <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_scope_tags_help')}</div>
           </div>
         )}
+
+        <div className="Form-group">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_bypass_groups')}</label>
+          <div className="RulesetEditor-groupSelection">
+            {app.store.all('groups').map((group: any) => {
+              const id = parseInt(String(group.id()), 10);
+              const isActive = (this.bypassGroupIds() || []).includes(id);
+              return (
+                <label className={`RulesetEditor-groupOption ${isActive ? 'active' : ''}`} key={id}>
+                  <input
+                    type="checkbox"
+                    checked={isActive}
+                    onchange={(e: Event) => {
+                      const checked = (e.target as HTMLInputElement).checked;
+                      let current = this.bypassGroupIds() || [];
+                      if (checked) {
+                        current.push(id);
+                      } else {
+                        current = current.filter((g: number) => g !== id);
+                      }
+                      this.bypassGroupIds(current);
+                    }}
+                  />
+                  <div className="RulesetEditor-groupOption-content">
+                    <GroupBadge group={group} label="" />
+                    <span className="RulesetEditor-groupOption-name">{String(group.namePlural() || group.name())}</span>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_bypass_groups_help')}</div>
+        </div>
       </div>
     );
   }
@@ -767,6 +803,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       requireApproval: this.requireApproval(),
       scopeType: this.scopeType(),
       scopeTagIds: this.scopeTagIds(),
+      bypassGroupIds: this.bypassGroupIds(),
       displaySettings: this.displaySettings(),
     };
 
