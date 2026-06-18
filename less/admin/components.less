@@ -413,10 +413,6 @@
 }
 
 .InlineTagSelector {
-  background: @control-bg;
-  border-radius: @border-radius;
-  border: 1px solid mix(@control-color, @control-bg, 20%);
-  padding: 10px;
   max-height: 300px;
   overflow-y: auto;
   margin-top: 10px;
@@ -443,31 +439,45 @@
     display: block;
   }
 
+  &-list {
+    column-width: 200px;
+    column-gap: 10px;
+  }
+
   &-itemContainer {
-    margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    break-inside: avoid;
+    margin-bottom: 10px;
   }
 
   &-item {
     display: flex;
     align-items: center;
-    padding: 5px 10px;
-    border-radius: @border-radius;
+    padding: 8px 12px;
+    background: var(--body-bg, @body-bg);
+    border: 1px solid var(--control-bg, @control-bg);
+    border-radius: var(--border-radius, @border-radius);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
     font-weight: normal;
     margin: 0;
 
     &:hover {
-      background: fade(@primary-color, 10%);
+      background: fade(@primary-color, 5%);
     }
 
     &.active {
-      background: fade(@primary-color, 15%);
+      border-color: var(--primary-color, @primary-color);
+      background: fade(@primary-color, 5%);
       font-weight: bold;
     }
 
     input[type="checkbox"] {
+      margin: 0;
       margin-right: 10px;
+      flex-shrink: 0;
     }
   }
 
@@ -498,7 +508,7 @@
 // Bypass group selection
 .RulesetEditor-groupSelection {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 10px;
   margin-top: 10px;
 

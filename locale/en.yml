@@ -90,13 +90,15 @@ huoxin-filter-rule-manager:
     ruleset_no_icon: "None"
     ruleset_scope_type: "Applies to"
     ruleset_scope_tags: "Tag IDs"
-    ruleset_scope_tags_help: "Comma-separated integer tag IDs. The ruleset will run when the discussion has any of these tags."
+    ruleset_primary_tags: => flarum-tags.admin.tags.primary_heading
+    ruleset_secondary_tags: => flarum-tags.admin.tags.secondary_heading
+    ruleset_scope_tags_help: "Select the tags you want this ruleset to apply to. The ruleset will run when the discussion has any of these tags."
     ruleset_bypass_groups: "Bypass Groups"
     ruleset_bypass_groups_help: "Users in these groups will bypass this ruleset completely."
     ruleset_message: "Message"
     ruleset_message_placeholder: "Your post contains a restricted word: {{matched_word}}"
     ruleset_is_active: "Enabled"
-    
+
     ruleset_evaluate_title_label: "Evaluate Discussion Title"
     ruleset_evaluate_title_help: "When enabled, the rules engine will evaluate the title of the discussion alongside the post content."
     ruleset_auto_flag: "Auto-flag post on match"
@@ -117,11 +119,11 @@ huoxin-filter-rule-manager:
     ruleset_flag_message_help: "Optional. Define a custom flag or approval reason string for moderators to see when this ruleset triggers. If empty, the default group message will be used."
     ruleset_evaluate_all_rules: "Evaluate all rules (Aggregate tokens)"
     ruleset_evaluate_all_rules_help: "If enabled, the engine will evaluate every rule in this ruleset even if a match is already found. This allows you to gather tokens from multiple rules for your custom flag message. If disabled, the ruleset stops evaluating as soon as its condition is met, improving performance."
-    
+
     inherit_global_default: "Inherit Global Default"
     force_enabled: "Force Enabled"
     force_disabled: "Force Disabled"
-    
+
     message_help: "Use {{token}} to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like <br>."
     preview: "Preview"
     preview_placeholder: "Your message will appear here."
@@ -187,7 +189,7 @@ huoxin-filter-rule-manager:
       and: "AND"
       or: "OR"
       not: "NOT"
-      
+
     tokens_available: "Available tokens — click to insert"
     tokens_none: "No tokens available — add a rule to see what tokens it exposes."
 

@@ -8,6 +8,7 @@
  */
 
 import Component, { ComponentAttrs } from 'flarum/common/Component';
+import app from 'flarum/admin/app';
 import icon from 'flarum/common/helpers/icon';
 import classList from 'flarum/common/utils/classList';
 import Stream from 'flarum/common/utils/Stream';
@@ -50,7 +51,7 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
       <div className="InlineTagSelector">
         {primaryTags.length > 0 && (
           <div className="InlineTagSelector-group">
-            <label className="InlineTagSelector-groupLabel">Primary Tags</label>
+            <label className="InlineTagSelector-groupLabel">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_primary_tags')}</label>
             <div className="InlineTagSelector-list">
               {primaryTags.map((tag) =>
                 this.renderTag(
@@ -63,7 +64,7 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
         )}
         {secondaryTags.length > 0 && (
           <div className="InlineTagSelector-group">
-            <label className="InlineTagSelector-groupLabel">Secondary Tags</label>
+            <label className="InlineTagSelector-groupLabel">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_secondary_tags')}</label>
             <div className="InlineTagSelector-list">{secondaryTags.map((tag) => this.renderTag(tag, []))}</div>
           </div>
         )}

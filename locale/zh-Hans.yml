@@ -90,13 +90,15 @@ huoxin-filter-rule-manager:
     ruleset_no_icon: "无"
     ruleset_scope_type: "应用于"
     ruleset_scope_tags: "指定标签 ID"
-    ruleset_scope_tags_help: "多个数字标签 ID 请用逗号分隔。当主题包含这些标签中的任意一个时，此规则集将会生效。"
+    ruleset_primary_tags: => flarum-tags.admin.tags.primary_heading
+    ruleset_secondary_tags: => flarum-tags.admin.tags.secondary_heading
+    ruleset_scope_tags_help: "请选择您希望此规则集应用到的标签。当主题包含这些标签中的任意一个时，此规则集将会生效。"
     ruleset_bypass_groups: "跳过以下用户组"
     ruleset_bypass_groups_help: "属于这些用户组的用户将完全跳过该规则集的检查。"
     ruleset_message: "提示内容"
     ruleset_message_placeholder: "您的帖子包含违规词汇：{{matched_word}}"
     ruleset_is_active: "开启"
-    
+
     ruleset_evaluate_title_label: "检查主题标题"
     ruleset_evaluate_title_help: "开启后，规则引擎将同时检查主题的标题和帖子的内容。"
     ruleset_auto_flag: "匹配时自动举报"
@@ -117,11 +119,11 @@ huoxin-filter-rule-manager:
     ruleset_flag_message_help: "可选。定义触发此规则集时管理团队看到的具体理由。留空则使用默认通用理由。"
     ruleset_evaluate_all_rules: "匹配所有规则（聚合变量）"
     ruleset_evaluate_all_rules_help: "开启后，引擎将检查此规则集中的所有规则，即使已经找到匹配项。这允许您收集所有命中的变量用于自定义消息。如果关闭，引擎在找到第一个匹配项后就会立即停止，以提高性能。"
-    
+
     inherit_global_default: "继承全局默认值"
     force_enabled: "强制开启"
     force_disabled: "强制关闭"
-    
+
     message_help: "您可以使用 {{token}} 插入规则提取的变量值。变量内容会自动进行 HTML 转义；模板本身以可信方式渲染，允许使用简单的 HTML（如 <br>）。"
     preview: "预览"
     preview_placeholder: "提示内容将显示在这里。"
@@ -187,7 +189,7 @@ huoxin-filter-rule-manager:
       and: "并且 (AND)"
       or: "或者 (OR)"
       not: "非 (NOT)"
-      
+
     tokens_available: "可用变量 — 点击插入"
     tokens_none: "暂无可用变量。添加规则后即可查看其提供的变量。"
 
