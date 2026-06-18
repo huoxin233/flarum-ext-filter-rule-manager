@@ -13,7 +13,7 @@ export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
  *
  *   1. General   — name, priority, active toggle
  *   2. Scope    — global/normal/private/tag (+ tag IDs when applicable)
- *   3. Display  — effect, display mode, message + token hint chips + preview
+ *   3. Display  — intervention, display mode, message + token hint chips + preview
  *   4. Rules    — operator + RuleBuilder
  *
  * Token hints below the message textarea are discovered from each configured
@@ -35,7 +35,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     closeIconPickerHandler: ((e: MouseEvent) => void) | null;
     name: Stream<string>;
     expression: Stream<string>;
-    effectType: Stream<string>;
+    interventionType: Stream<string>;
     displayMode: Stream<string>;
     message: Stream<string>;
     flagMessage: Stream<string>;
@@ -67,10 +67,10 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     availableTokens(): Record<string, unknown>[];
     tokenChipsBlock(tokens: Record<string, unknown>[], targetField: string | ((name: string) => void)): Mithril.Children;
     insertToken(name: string, targetField: string | ((name: string) => void)): void;
-    previewBlock(effect: string, message: string): Mithril.Children;
+    previewBlock(intervention: string, message: string): Mithril.Children;
     validationBlock(): Mithril.Children;
     actionsBlock(): Mithril.Children;
-    effectIcon(effect: string): "fas fa-exclamation-triangle" | "fas fa-info-circle" | "fas fa-ban" | "fas fa-user-secret";
+    interventionIcon(intervention: string): "fas fa-exclamation-triangle" | "fas fa-info-circle" | "fas fa-ban" | "fas fa-user-secret";
     canSave(): boolean;
     validationError(): import("@askvortsov/rich-icu-message-formatter").NestedStringArray | null;
     onsubmit(e: Event): void;

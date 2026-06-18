@@ -20,7 +20,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     renderList(list: Model[]): Mithril.Children;
     rulesetRow(ruleset: Model & Record<string, any>, filteredIndex: number, filteredList: Model[]): Mithril.Children;
     countRules(ast: ASTNode | null | undefined): number;
-    effectIcon(effect: string): "fas fa-exclamation-triangle" | "fas fa-info-circle" | "fas fa-ban";
+    interventionIcon(intervention: string): "fas fa-exclamation-triangle" | "fas fa-info-circle" | "fas fa-ban";
     registryTab(): Mithril.Children;
     renderProviders(): Mithril.Children;
     renderTemplates(): Mithril.Children;

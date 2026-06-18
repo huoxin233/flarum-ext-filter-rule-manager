@@ -19,7 +19,7 @@ export interface FilterRuleProvider {
 }
 export interface Ruleset {
     id: string | number;
-    effectType: string;
+    interventionType: string;
     displayMode: string;
     message: string;
     scopeType: string;
@@ -38,7 +38,7 @@ export interface ActiveAlert {
     displaySettings: Record<string, unknown>;
 }
 export interface BlockResult {
-    effectType: string;
+    interventionType: string;
     displayMode: string;
     message: string;
     tokens: Record<string, string>;
