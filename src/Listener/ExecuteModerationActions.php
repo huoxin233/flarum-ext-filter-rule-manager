@@ -208,7 +208,8 @@ class ExecuteModerationActions
         }
 
         if ($isEvasion) {
-            $messages[] = "Suspicious: User was recently blocked by ruleset '{$blockedRulesetName}', then successfully submitted this post. Please review for filter evasion.";
+            $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.evasion_flag_message', ['{ruleset}' => $blockedRulesetName ?? '']);
+            $messages[] = is_array($trans) ? $trans[0] : $trans;
         }
 
         $reasonDetail = implode("\n\n", $messages);

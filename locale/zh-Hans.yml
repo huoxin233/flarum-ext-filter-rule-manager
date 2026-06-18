@@ -230,3 +230,4 @@ huoxin-filter-rule-manager:
     # ── Auto Flag ──────────────────────────────────────────────────────────
     flag_message: "由过滤规则管理器自动举报。触发的规则集：{rulesets}"
     flagger_name: "过滤规则管理器"
+    evasion_flag_message: "可疑行为：该用户最近被规则集 '{ruleset}' 拦截后，随即成功提交了此帖。请审查是否存在绕过过滤的行为。"

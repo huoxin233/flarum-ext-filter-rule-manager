@@ -229,3 +229,4 @@ huoxin-filter-rule-manager:
     # ── Auto Flag ──────────────────────────────────────────────────────────
     flag_message: "Auto-flagged by Filter Rule Manager. Triggered rulesets: {rulesets}"
     flagger_name: "Filter Rule Manager"
+    evasion_flag_message: "Suspicious: User was recently blocked by ruleset '{ruleset}', then successfully submitted this post. Please review for filter evasion."
