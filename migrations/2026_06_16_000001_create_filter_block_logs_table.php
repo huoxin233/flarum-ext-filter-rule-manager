@@ -19,5 +19,7 @@ return Migration::createTable(
         // Relationships
         $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         $table->foreign('ruleset_id')->references('id')->on('filter_rulesets')->onDelete('cascade');
+
+        $table->index(['user_id', 'is_cleared', 'created_at']);
     }
 );
