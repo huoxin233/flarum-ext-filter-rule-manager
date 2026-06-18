@@ -1,9 +1,10 @@
 <?php
 
-namespace Huoxin\FilterRuleManager\Tests\integration;
+namespace Huoxin\FilterRuleManager\Tests\unit;
 
 use Huoxin\FilterRuleManager\Provider\BuiltinProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuiltinProviderTest extends TestCase
 {
@@ -13,7 +14,13 @@ class BuiltinProviderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->provider = new BuiltinProvider();
+        
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(function ($id) {
+            return $id;
+        });
+
+        $this->provider = new BuiltinProvider($translator);
     }
 
     /**
