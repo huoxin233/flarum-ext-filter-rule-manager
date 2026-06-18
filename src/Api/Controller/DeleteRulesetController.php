@@ -17,6 +17,7 @@ use Laminas\Diactoros\Response\EmptyResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Illuminate\Support\Arr;
 
 class DeleteRulesetController implements RequestHandlerInterface
 {
@@ -24,7 +25,7 @@ class DeleteRulesetController implements RequestHandlerInterface
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        $id = \Illuminate\Support\Arr::get($request->getAttributes(), 'id');
+        $id = Arr::get($request->getQueryParams(), 'id');
         Ruleset::findOrFail($id)->delete();
 
         return new EmptyResponse(204);
