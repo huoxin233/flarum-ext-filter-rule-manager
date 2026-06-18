@@ -399,12 +399,6 @@ export class FilterEngine {
       const isObject = typeof node.value === 'object' && node.value !== null && !Array.isArray(node.value);
       let config: any = isObject ? { ...(node.value as object), operator: node.operator } : { operator: node.operator, value: node.value };
 
-      if (node.provider === 'builtin' && !isObject) {
-        let val = Array.isArray(node.value) ? node.value : [node.value];
-        if (node.ruleType === 'contains_word') config = { words: val };
-        else if (node.ruleType === 'regex') config = { patterns: val };
-      }
-
       result = provider.evaluate(node.ruleType as string, content, config);
     } catch (e) {
       console.error(`[filter-rule-manager] rule ${String(node.provider)}/${String(node.ruleType)} threw`, e);

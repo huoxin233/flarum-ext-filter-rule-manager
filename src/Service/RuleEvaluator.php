@@ -113,17 +113,6 @@ class RuleEvaluator
             } else {
                 $config = ['operator' => $node['operator'], 'value' => $node['value']];
             }
-
-            // Adapter for built-in provider
-            if ($node['provider'] === 'builtin' && !$isObject) {
-                $val = is_array($node['value']) ? $node['value'] : [$node['value']];
-                if ($node['ruleType'] === 'contains_word') {
-                    $config = ['words' => $val];
-                } elseif ($node['ruleType'] === 'regex') {
-                    $config = ['patterns' => $val];
-                }
-            }
-
             $result = $provider->evaluate($node['ruleType'], $content, $config);
             return $result;
         } catch (\Throwable $e) {
