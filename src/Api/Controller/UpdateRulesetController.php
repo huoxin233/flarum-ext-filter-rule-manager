@@ -88,8 +88,6 @@ class UpdateRulesetController extends AbstractShowController
 
         $ruleset->save();
 
-        $ruleset->save();
-
         return $ruleset;
     }
 
