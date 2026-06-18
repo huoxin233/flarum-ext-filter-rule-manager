@@ -58,6 +58,27 @@ class Ruleset extends AbstractModel
         'display_settings'   => 'array',
     ];
 
+    protected static $activeRulesetsCache = null;
+
+    public static function getActiveRulesets()
+    {
+        if (self::$activeRulesetsCache === null) {
+            self::$activeRulesetsCache = static::active()->ordered()->get();
+        }
+        return self::$activeRulesetsCache;
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::saved(function () {
+            self::$activeRulesetsCache = null;
+        });
+        static::deleted(function () {
+            self::$activeRulesetsCache = null;
+        });
+    }
 
 
     public function scopeActive(Builder $query): Builder

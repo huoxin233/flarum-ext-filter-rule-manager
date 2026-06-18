@@ -50,8 +50,10 @@ class EvaluateBlockRulesets
                 || $discussion->first_post_id === null;
         }
 
-        /** @var Ruleset[] $rulesets */
-        $rulesets = Ruleset::active()->block()->ordered()->get();
+        /** @var \Illuminate\Support\Collection $rulesets */
+        $rulesets = Ruleset::getActiveRulesets()->filter(function ($ruleset) {
+            return $ruleset->intervention_type === 'block';
+        });
 
         $providers = $this->evaluator->getProviders();
 

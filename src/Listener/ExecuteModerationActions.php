@@ -65,26 +65,16 @@ class ExecuteModerationActions
         $globalAutoFlag = (bool) $this->settings->get('huoxin-filter.global_auto_flag', true);
         $globalRequireApproval = (bool) $this->settings->get('huoxin-filter.global_require_approval', true);
         $globalEvaluateTitle = (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
+        $globalEvasionActive = (bool) $this->settings->get('huoxin-filter.global_evasion_active', false);
+        $globalEvasionTimeout = (int) $this->settings->get('huoxin-filter.global_evasion_timeout', 5);
+        $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter.global_evasion_threshold', 2);
 
-        /** @var Ruleset[] $rulesets */
-        $rulesets = Ruleset::active()
-            ->where(function ($query) use ($globalAutoFlag, $globalRequireApproval) {
-                $query->where(function ($q) use ($globalAutoFlag) {
-                    if ($globalAutoFlag) {
-                        $q->where('auto_flag', true)->orWhereNull('auto_flag');
-                    } else {
-                        $q->where('auto_flag', true);
-                    }
-                })->orWhere(function ($q) use ($globalRequireApproval) {
-                    if ($globalRequireApproval) {
-                        $q->where('require_approval', true)->orWhereNull('require_approval');
-                    } else {
-                        $q->where('require_approval', true);
-                    }
-                });
-            })
-            ->ordered()
-            ->get();
+        // Load all active rulesets once from in-memory cache, filter per concern.
+        $allActive = Ruleset::getActiveRulesets();
+
+        $rulesets = $allActive->filter(function (Ruleset $ruleset) use ($globalAutoFlag, $globalRequireApproval) {
+            return ($ruleset->auto_flag ?? $globalAutoFlag) || ($ruleset->require_approval ?? $globalRequireApproval);
+        });
 
         $defaultRulesets = [];
         $customMessages = [];
@@ -133,17 +123,9 @@ class ExecuteModerationActions
         $isEvasion = false;
 
         if ($actor && ! $actor->isGuest()) {
-            $globalEvasionActive = (bool) $this->settings->get('huoxin-filter.global_evasion_active', false);
-            $globalEvasionTimeout = (int) $this->settings->get('huoxin-filter.global_evasion_timeout', 5);
-            $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter.global_evasion_threshold', 2);
-
-            $evasionRulesets = Ruleset::active()->where(function ($query) use ($globalEvasionActive) {
-                if ($globalEvasionActive) {
-                    $query->where('evasion_active', true)->orWhereNull('evasion_active');
-                } else {
-                    $query->where('evasion_active', true);
-                }
-            })->get()->keyBy('id');
+            $evasionRulesets = $allActive->filter(function (Ruleset $ruleset) use ($globalEvasionActive) {
+                return $ruleset->evasion_active ?? $globalEvasionActive;
+            })->keyBy('id');
 
             if ($evasionRulesets->isNotEmpty()) {
                 $maxTimeout = 0;
