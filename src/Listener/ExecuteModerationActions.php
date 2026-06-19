@@ -6,11 +6,11 @@ use Carbon\Carbon;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Post\Event\Saving;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\ConnectionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExecuteModerationActions
@@ -19,7 +19,6 @@ class ExecuteModerationActions
         protected RuleEvaluator $evaluator,
         protected RulesetMatcher $matcher,
         protected ExtensionManager $extensions,
-        protected ConnectionInterface $db,
         protected TranslatorInterface $translator,
         protected SettingsRepositoryInterface $settings
     ) {
@@ -43,8 +42,7 @@ class ExecuteModerationActions
 
         // If the post is being explicitly approved by a moderator, forgive evasion for this user
         if ($post->exists && $post->isDirty('is_approved') && $post->is_approved && $post->user_id) {
-            $this->db->table('filter_rule_block_logs')
-                ->where('user_id', $post->user_id)
+            FilterBlockLog::where('user_id', $post->user_id)
                 ->update(['is_cleared' => true]);
         }
 
@@ -114,8 +112,7 @@ class ExecuteModerationActions
 
                 if ($maxTimeout > 0) {
                     // Fetch only ruleset_id and created_at to avoid memory bloat from longText columns
-                    $recentLogs = $this->db->table('filter_rule_block_logs')
-                        ->where('user_id', $actor->id)
+                    $recentLogs = FilterBlockLog::where('user_id', $actor->id)
                         ->where('is_cleared', false)
                         ->whereIn('ruleset_id', $evasionRulesets->keys())
                         ->where('created_at', '>=', Carbon::now()->subMinutes($maxTimeout))

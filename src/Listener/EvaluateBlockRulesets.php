@@ -16,17 +16,16 @@ use Flarum\Post\Event\Saving;
 use Flarum\Post\Exception\FloodingException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
+use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
-use Illuminate\Database\ConnectionInterface;
 
 class EvaluateBlockRulesets
 {
     public function __construct(
         protected RuleEvaluator $evaluator,
         protected RulesetMatcher $matcher,
-        protected ConnectionInterface $db,
         protected SettingsRepositoryInterface $settings
     ) {
     }
@@ -90,8 +89,7 @@ class EvaluateBlockRulesets
         if (! empty($triggered)) {
             $actor = $event->actor;
             if ($actor && ! $actor->isGuest()) {
-                $lastBlock = $this->db->table('filter_rule_block_logs')
-                    ->where('user_id', $actor->id)
+                $lastBlock = FilterBlockLog::where('user_id', $actor->id)
                     ->orderBy('created_at', 'desc')
                     ->first();
 
@@ -99,15 +97,16 @@ class EvaluateBlockRulesets
                     throw new FloodingException();
                 }
 
-                $logs = array_map(fn ($t) => [
-                    'user_id' => $actor->id,
-                    'ruleset_id' => $t['ruleset_id'],
-                    'content' => $t['content'],
-                    'message' => $t['message'],
-                    'tokens' => json_encode($t['tokens']),
-                    'created_at' => Carbon::now(),
-                ], $triggered);
-                $this->db->table('filter_rule_block_logs')->insert($logs);
+                foreach ($triggered as $t) {
+                    FilterBlockLog::create([
+                        'user_id' => $actor->id,
+                        'ruleset_id' => $t['ruleset_id'],
+                        'content' => $t['content'],
+                        'message' => $t['message'],
+                        'tokens' => $t['tokens'],
+                        'created_at' => Carbon::now(),
+                    ]);
+                }
             }
 
             throw new RuleBlockException($triggered);
