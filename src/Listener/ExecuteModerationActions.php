@@ -192,6 +192,7 @@ class ExecuteModerationActions
         }
 
         $reasonDetail = implode("\n\n", $messages);
+        $reasonDetail = html_entity_decode($reasonDetail, ENT_QUOTES, 'UTF-8');
 
         if ($shouldApprove) {
             $post->is_approved = false;
