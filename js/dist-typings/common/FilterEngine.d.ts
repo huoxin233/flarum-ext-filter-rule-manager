@@ -109,13 +109,6 @@ export declare class FilterEngine {
      */
     getTemplateSettingsComponent(name: string): Mithril.ComponentTypes<unknown, unknown> | null;
     /**
-     * Get all registered templates.
-     */
-    getTemplates(): Record<string, {
-        component: Mithril.ComponentTypes<unknown, unknown>;
-        settingsComponent: Mithril.ComponentTypes<unknown, unknown> | null;
-    }>;
-    /**
      * Register a display mode placement option.
      * @param {string} key - The unique identifier for the mode
      * @param {string} translationKey - The translation key for the UI label

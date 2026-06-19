@@ -24,6 +24,8 @@ export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
  * cursor.
  */
 export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
+    static readonly isDismissibleViaBackdropClick = false;
+    static readonly isDismissibleViaEscKey = false;
     ruleset?: Model & Record<string, any>;
     providers: Record<string, unknown>[];
     loading: boolean;
@@ -31,6 +33,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     flagMessageTextarea: HTMLTextAreaElement | null;
     showIconPicker: boolean;
     tagsLoading: boolean;
+    showingDiscardConfirmation: boolean;
     availableTags: Model[];
     closeIconPickerHandler: ((e: MouseEvent) => void) | null;
     name: Stream<string>;
@@ -72,6 +75,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     validationBlock(): Mithril.Children;
     actionsBlock(): Mithril.Children;
     interventionIcon(intervention: string): "fas fa-exclamation-triangle" | "fas fa-info-circle" | "fas fa-ban" | "fas fa-user-secret";
+    isDirty(): boolean;
+    hide(): void;
     canSave(): boolean;
     validationError(): import("@askvortsov/rich-icu-message-formatter").NestedStringArray | null;
     onsubmit(e: Event): void;
