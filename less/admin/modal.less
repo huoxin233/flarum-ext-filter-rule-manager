@@ -116,3 +116,34 @@
   margin-bottom: 20px;
 }
 
+.RulesetEditor-discardConfirmation {
+  text-align: center;
+  padding: 30px 10px;
+
+  .RulesetEditor-discardIcon {
+    font-size: 3rem;
+    color: var(--error-color, @error-color);
+    margin-bottom: 20px;
+  }
+
+  .RulesetEditor-discardTitle {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: var(--heading-color, @heading-color);
+  }
+
+  .RulesetEditor-discardMessage {
+    margin-bottom: 25px;
+    font-size: 1.1em;
+  }
+
+  .RulesetEditor-discardActions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+
+    .RulesetEditor-discardCancel {
+      margin-left: 0;
+    }
+  }
+}

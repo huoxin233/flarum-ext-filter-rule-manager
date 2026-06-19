@@ -30,6 +30,10 @@ huoxin-filter-rule-manager:
     toggle_error: "Could not update the ruleset's active state."
     active: "Active"
     inactive: "Inactive"
+    unsaved_changes_title: "Unsaved Changes"
+    unsaved_changes_message: "You have unsaved changes. Are you sure you want to discard them?"
+    discard_changes: "Discard Changes"
+    keep_editing: "Keep Editing"
 
     # ── List headers & Filters ─────────────────────────────────────────────
     headers:

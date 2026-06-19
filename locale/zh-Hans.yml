@@ -30,6 +30,10 @@ huoxin-filter-rule-manager:
     toggle_error: "更新规则集状态失败。"
     active: "开启"
     inactive: "关闭"
+    unsaved_changes_title: "未保存的更改"
+    unsaved_changes_message: "您有未保存的更改。确定要放弃这些更改吗？"
+    discard_changes: "放弃更改"
+    keep_editing: "继续编辑"
 
     # ── List headers & Filters ─────────────────────────────────────────────
     headers:

@@ -47,6 +47,9 @@ export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
  * cursor.
  */
 export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
+  static readonly isDismissibleViaBackdropClick = false;
+  static readonly isDismissibleViaEscKey = false;
+
   ruleset?: Model & Record<string, any>;
   providers!: Record<string, unknown>[];
   loading: boolean = false;
@@ -54,6 +57,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   flagMessageTextarea: HTMLTextAreaElement | null = null;
   showIconPicker: boolean = false;
   tagsLoading: boolean = false;
+  showingDiscardConfirmation: boolean = false;
   availableTags: Model[] = [];
   closeIconPickerHandler: ((e: MouseEvent) => void) | null = null;
 
@@ -87,6 +91,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     this.flagMessageTextarea = null;
     this.showIconPicker = false;
     this.tagsLoading = false;
+    this.showingDiscardConfirmation = false;
     this.availableTags = [];
     if (app.initializers.has('flarum-tags')) {
       this.tagsLoading = true;
@@ -153,6 +158,30 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   }
 
   content(): Mithril.Children {
+    if (this.showingDiscardConfirmation) {
+      return (
+        <div className="Modal-body">
+          <div className="Form">
+            <div className="RulesetEditor-discardConfirmation">
+              <i className="fas fa-exclamation-triangle RulesetEditor-discardIcon"></i>
+              <h3 className="RulesetEditor-discardTitle">{app.translator.trans('huoxin-filter-rule-manager.admin.unsaved_changes_title')}</h3>
+              <p className="helpText RulesetEditor-discardMessage">
+                {app.translator.trans('huoxin-filter-rule-manager.admin.unsaved_changes_message')}
+              </p>
+              <div className="Form-group RulesetEditor-discardActions">
+                <Button className="Button Button--danger" onclick={() => { this.showingDiscardConfirmation = false; super.hide(); }}>
+                  {app.translator.trans('huoxin-filter-rule-manager.admin.discard_changes')}
+                </Button>
+                <Button className="Button RulesetEditor-discardCancel" onclick={() => { this.showingDiscardConfirmation = false; m.redraw(); }}>
+                  {app.translator.trans('huoxin-filter-rule-manager.admin.keep_editing')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="Modal-body">
         <div className="Form">
@@ -442,10 +471,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.preview')}</label>
-              {this.previewBlock(
-                intervention,
-                this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder'))
-              )}
+              {this.previewBlock(intervention, this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder')))}
             </div>
           </div>
         )}
@@ -754,6 +780,53 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     if (intervention === 'warning') return 'fas fa-exclamation-triangle';
     if (intervention === 'silent') return 'fas fa-user-secret';
     return 'fas fa-info-circle';
+  }
+
+  isDirty(): boolean {
+    if (this.loading) return false;
+
+    const r = this.ruleset;
+    if (!r) {
+      return !!(this.name() || this.expression() || this.message() || this.flagMessage());
+    }
+
+    return (
+      this.name() !== r.name() ||
+      this.expression() !== r.expression() ||
+      this.interventionType() !== r.interventionType() ||
+      this.displayMode() !== r.displayMode() ||
+      this.message() !== r.message() ||
+      this.flagMessage() !== r.flagMessage() ||
+      this.evaluateAllRules() !== r.evaluateAllRules() ||
+      this.evaluateTitle() !== r.evaluateTitle() ||
+      this.evasionActive() !== r.evasionActive() ||
+      this.evasionTimeout() !== r.evasionTimeout() ||
+      this.evasionThreshold() !== r.evasionThreshold() ||
+      this.blockCascade() !== r.blockCascade() ||
+      this.isActive() !== r.isActive() ||
+      this.autoFlag() !== r.autoFlag() ||
+      this.requireApproval() !== r.requireApproval() ||
+      this.scopeType() !== r.scopeType() ||
+      JSON.stringify(this.scopeTagIds() || []) !== JSON.stringify(r.scopeTagIds() || []) ||
+      JSON.stringify(this.bypassGroupIds() || []) !== JSON.stringify(r.bypassGroupIds() || []) ||
+      JSON.stringify(this.displaySettings() || {}) !== JSON.stringify(r.displaySettings() || {})
+    );
+  }
+
+  hide() {
+    if (this.showingDiscardConfirmation) {
+      this.showingDiscardConfirmation = false;
+      m.redraw();
+      return;
+    }
+
+    if (this.isDirty()) {
+      this.showingDiscardConfirmation = true;
+      m.redraw();
+      return;
+    }
+
+    super.hide();
   }
 
   canSave() {
