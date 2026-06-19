@@ -4,6 +4,7 @@ namespace Huoxin\FilterRuleManager\Listener;
 
 use Carbon\Carbon;
 use Flarum\Extension\ExtensionManager;
+use Flarum\Flags\Flag;
 use Flarum\Post\Event\Saving;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Huoxin\FilterRuleManager\Model\FilterBlockLog;
@@ -165,7 +166,7 @@ class ExecuteModerationActions
             // If the post is already held for approval and not flagged, we still want to flag it if needed.
             // But if it already has our autoMod flag, skip.
             if ($hasFlags) {
-                if (\Flarum\Flags\Flag::where('post_id', $post->id)->where('type', $flagType)->exists()) {
+                if (Flag::where('post_id', $post->id)->where('type', $flagType)->exists()) {
                     return;
                 }
             }
@@ -202,7 +203,7 @@ class ExecuteModerationActions
             }
 
             if ($shouldFlag) {
-                $flag = new \Flarum\Flags\Flag();
+                $flag = new Flag();
                 $flag->post_id = $post->id;
                 $flag->type = $flagType;
                 $flag->reason_detail = $reasonDetail;
