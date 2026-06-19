@@ -164,7 +164,7 @@ class ExecuteModerationActions
         if ($post->exists) {
             // If the post is already held for approval and not flagged, we still want to flag it if needed.
             // But if it already has our autoMod flag, skip.
-            if ($hasFlags && class_exists(\Flarum\Flags\Flag::class)) {
+            if ($hasFlags) {
                 if (\Flarum\Flags\Flag::where('post_id', $post->id)->where('type', $flagType)->exists()) {
                     return;
                 }
@@ -200,7 +200,7 @@ class ExecuteModerationActions
                 $post->discussion->save();
             }
 
-            if ($shouldFlag && class_exists(\Flarum\Flags\Flag::class)) {
+            if ($shouldFlag) {
                 $flag = new \Flarum\Flags\Flag();
                 $flag->post_id = $post->id;
                 $flag->type = $flagType;
