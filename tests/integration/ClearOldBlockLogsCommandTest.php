@@ -56,10 +56,10 @@ class ClearOldBlockLogsCommandTest extends FilterTestCase
 
         $this->assertFalse($logs->has(100), 'Log older than 31 days should be deleted');
         $this->assertFalse($logs->has(101), 'Log exactly on the edge + 1 min should be deleted');
-        
+
         $this->assertTrue($logs->has(102), 'Log just inside the window should be kept');
         $this->assertTrue($logs->has(103), 'Recent log should be kept');
-        
+
         $outputStr = $output->fetch();
         $this->assertStringContainsString('Deleted 2 old block logs.', $outputStr);
     }
