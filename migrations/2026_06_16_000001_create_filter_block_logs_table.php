@@ -20,6 +20,6 @@ return Migration::createTable(
         $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         $table->foreign('ruleset_id')->references('id')->on('filter_rulesets')->onDelete('cascade');
 
-        $table->index(['user_id', 'is_cleared', 'created_at']);
+        $table->index(['user_id', 'is_cleared', 'created_at'], 'filter_rule_block_logs_uid_clear_created_idx');
     }
 );
