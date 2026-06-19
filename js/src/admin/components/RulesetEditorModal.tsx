@@ -169,10 +169,22 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                 {app.translator.trans('huoxin-filter-rule-manager.admin.unsaved_changes_message')}
               </p>
               <div className="Form-group RulesetEditor-discardActions">
-                <Button className="Button Button--danger" onclick={() => { this.showingDiscardConfirmation = false; super.hide(); }}>
+                <Button
+                  className="Button Button--danger"
+                  onclick={() => {
+                    this.showingDiscardConfirmation = false;
+                    super.hide();
+                  }}
+                >
                   {app.translator.trans('huoxin-filter-rule-manager.admin.discard_changes')}
                 </Button>
-                <Button className="Button RulesetEditor-discardCancel" onclick={() => { this.showingDiscardConfirmation = false; m.redraw(); }}>
+                <Button
+                  className="Button RulesetEditor-discardCancel"
+                  onclick={() => {
+                    this.showingDiscardConfirmation = false;
+                    m.redraw();
+                  }}
+                >
                   {app.translator.trans('huoxin-filter-rule-manager.admin.keep_editing')}
                 </Button>
               </div>
@@ -471,7 +483,10 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
 
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.preview')}</label>
-              {this.previewBlock(intervention, this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder')))}
+              {this.previewBlock(
+                intervention,
+                this.message() || String(app.translator.trans('huoxin-filter-rule-manager.admin.preview_placeholder'))
+              )}
             </div>
           </div>
         )}
