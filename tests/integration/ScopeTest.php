@@ -32,8 +32,8 @@ class ScopeTest extends FilterTestCase
                 ['id' => 4, 'discussion_id' => 4, 'user_id' => 4, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
             ],
             'recipients' => [
-                ['id' => 1, 'discussion_id' => 2, 'user_id' => 1, 'group_id' => null],
-                ['id' => 2, 'discussion_id' => 4, 'user_id' => 1, 'group_id' => null],
+                ['id' => 1, 'discussion_id' => 2, 'user_id' => 3, 'group_id' => null],
+                ['id' => 2, 'discussion_id' => 4, 'user_id' => 2, 'group_id' => null],
             ],
             'filter_rulesets' => [
                 [
@@ -98,11 +98,11 @@ class ScopeTest extends FilterTestCase
     public function private_ruleset_only_triggers_on_private_discussions()
     {
         // Normal discussion (ID 1) bypasses private rule
-        $response = $this->submitReply('This has secret word.', 1, 1);
+        $response = $this->submitReply('This has secret word.', 2, 1);
         $this->assertEquals(201, $response->getStatusCode());
 
         // Private discussion (ID 2) gets blocked
-        $response = $this->submitReply('This has secret word.', 1, 2);
+        $response = $this->submitReply('This has secret word.', 3, 2);
         $this->assertEquals(422, $response->getStatusCode());
 
         $body = json_decode($response->getBody()->getContents(), true);
@@ -115,11 +115,11 @@ class ScopeTest extends FilterTestCase
     public function normal_ruleset_only_triggers_on_normal_discussions()
     {
         // Private discussion (ID 4) bypasses normal rule
-        $response = $this->submitReply('This has publicword.', 1, 4);
+        $response = $this->submitReply('This has publicword.', 2, 4);
         $this->assertEquals(201, $response->getStatusCode());
 
         // Normal discussion (ID 1) gets blocked
-        $response = $this->submitReply('This has publicword.', 1, 1);
+        $response = $this->submitReply('This has publicword.', 3, 1);
         $this->assertEquals(422, $response->getStatusCode());
 
         $body = json_decode($response->getBody()->getContents(), true);
@@ -132,11 +132,11 @@ class ScopeTest extends FilterTestCase
     public function tag_ruleset_only_triggers_on_specific_tags()
     {
         // Discussion 1 (General tag) bypasses Gaming tag rule
-        $response = $this->submitReply('This has gameword.', 1, 1);
+        $response = $this->submitReply('This has gameword.', 2, 1);
         $this->assertEquals(201, $response->getStatusCode());
 
         // Discussion 3 (Gaming tag) gets blocked
-        $response = $this->submitReply('This has gameword.', 1, 3);
+        $response = $this->submitReply('This has gameword.', 3, 3);
         $this->assertEquals(422, $response->getStatusCode());
 
         $body = json_decode($response->getBody()->getContents(), true);
