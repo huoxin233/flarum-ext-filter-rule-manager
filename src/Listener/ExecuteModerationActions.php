@@ -104,39 +104,25 @@ class ExecuteModerationActions
             })->keyBy('id');
 
             if ($evasionRulesets->isNotEmpty()) {
-                $maxTimeout = 0;
-                foreach ($evasionRulesets as $ruleset) {
+                foreach ($evasionRulesets as $rulesetId => $ruleset) {
                     $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
-                    if ($timeout > $maxTimeout) {
-                        $maxTimeout = $timeout;
-                    }
-                }
+                    $threshold = $ruleset->evasion_threshold ?? $globalEvasionThreshold;
 
-                if ($maxTimeout > 0) {
-                    $recentBlocks = $this->db->table('filter_rule_block_logs')
+                    if ($timeout <= 0) {
+                        continue;
+                    }
+
+                    $count = $this->db->table('filter_rule_block_logs')
                         ->where('user_id', $actor->id)
                         ->where('is_cleared', false)
-                        ->where('created_at', '>=', Carbon::now()->subMinutes($maxTimeout))
-                        ->get();
+                        ->where('ruleset_id', $rulesetId)
+                        ->where('created_at', '>=', Carbon::now()->subMinutes($timeout))
+                        ->count();
 
-                    foreach ($evasionRulesets as $rulesetId => $ruleset) {
-                        $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
-                        $threshold = $ruleset->evasion_threshold ?? $globalEvasionThreshold;
-
-                        if ($timeout <= 0) {
-                            continue;
-                        }
-
-                        $cutoff = Carbon::now()->subMinutes($timeout);
-                        $count = $recentBlocks->filter(function ($log) use ($rulesetId, $cutoff) {
-                            return $log->ruleset_id == $rulesetId && Carbon::parse($log->created_at)->gte($cutoff);
-                        })->count();
-
-                        if ($count >= max(1, $threshold)) {
-                            $isEvasion = true;
-                            $blockedRulesetName = $ruleset->name;
-                            break;
-                        }
+                    if ($count >= max(1, $threshold)) {
+                        $isEvasion = true;
+                        $blockedRulesetName = $ruleset->name;
+                        break;
                     }
                 }
             }
