@@ -33,12 +33,11 @@ class ReorderRulesetsController implements RequestHandlerInterface
         $body = $request->getParsedBody();
         $ids = $body['data']['ids'] ?? [];
 
+        $ids = array_values(array_filter($ids, fn ($id) => is_numeric($id) && (int) $id > 0));
+
         if (! empty($ids)) {
-            Ruleset::getConnection()->transaction(function () use ($ids) {
-                foreach ($ids as $index => $id) {
-                    Ruleset::where('id', $id)->update(['priority' => $index * 10]);
-                }
-            });
+            $values = array_map(fn ($index, $id) => ['id' => $id, 'priority' => $index * 10], array_keys($ids), $ids);
+            Ruleset::upsert($values, ['id'], ['priority']);
         }
 
         return new JsonResponse(['status' => 'ok']);
