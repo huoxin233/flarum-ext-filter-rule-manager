@@ -54,9 +54,17 @@ Filter Rule Manager is built to be extended! If you are an extension developer a
 
 ## Screenshots
 
+### Admin Panel
+
 <img width="1565" height="861" alt="PixPin_2026-06-19_23-19-22" src="https://github.com/user-attachments/assets/a562bc11-bec2-405d-a700-a1014f90c44c" />
 
-<img width="879" height="5092" alt="PixPin_2026-06-19_23-19-02" src="https://github.com/user-attachments/assets/afed68b2-5be1-4d91-bc63-34559dd57074" />
+<img width="780" height="3453" alt="PixPin_2026-06-20_02-00-24" src="https://github.com/user-attachments/assets/d80389df-d5a9-4fa9-b298-66894ed73284" />
+
+### Frontend Display
+
+<img width="1733" height="548" alt="PixPin_2026-06-20_02-04-15" src="https://github.com/user-attachments/assets/91d0cd29-72e9-4e93-a40b-f5f514ac2774" />
+
+<img width="589" height="407" alt="PixPin_2026-06-20_02-06-20" src="https://github.com/user-attachments/assets/ee145721-5596-4050-8e44-b2b4ddd54041" />
 
 ## Links
 
