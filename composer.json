@@ -1,11 +1,20 @@
 {
     "name": "huoxin/filter-rule-manager",
-    "description": "Filter Rule Manager",
+    "description": "A powerful, AST-based moderation and filtering engine for Flarum.",
     "keywords": [
-        "flarum"
+        "flarum",
+        "moderation",
+        "filter",
+        "rule",
+        "manager",
+        "automod"
     ],
     "type": "flarum-extension",
     "license": "GPL-3.0-or-later",
+    "support": {
+        "issues": "https://github.com/huoxin233/flarum-ext-filter-rule-manager/issues",
+        "source": "https://github.com/huoxin233/flarum-ext-filter-rule-manager"
+    },
     "require": {
         "flarum/core": "^1.2.0"
     },
@@ -24,11 +33,11 @@
     "extra": {
         "flarum-extension": {
             "title": "Filter Rule Manager",
-            "category": "",
+            "category": "moderation",
             "icon": {
-                "name": "",
-                "color": "",
-                "backgroundColor": ""
+                "name": "fas fa-filter",
+                "color": "#fff",
+                "backgroundColor": "#9A2424"
             }
         },
         "flarum-cli": {
