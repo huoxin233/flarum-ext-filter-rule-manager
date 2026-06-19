@@ -42,7 +42,7 @@ class ExecuteModerationActions
         $post = $event->post;
 
         // If the post is being explicitly approved by a moderator, forgive evasion for this user
-        if ($post->exists && $post->isDirty('is_approved') && $post->is_approved == true && $post->user_id) {
+        if ($post->exists && $post->isDirty('is_approved') && $post->is_approved && $post->user_id) {
             $this->db->table('filter_rule_block_logs')
                 ->where('user_id', $post->user_id)
                 ->update(['is_cleared' => true]);
