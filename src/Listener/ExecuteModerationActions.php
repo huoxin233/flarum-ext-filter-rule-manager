@@ -104,25 +104,42 @@ class ExecuteModerationActions
             })->keyBy('id');
 
             if ($evasionRulesets->isNotEmpty()) {
-                foreach ($evasionRulesets as $rulesetId => $ruleset) {
-                    $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
-                    $threshold = $ruleset->evasion_threshold ?? $globalEvasionThreshold;
-
-                    if ($timeout <= 0) {
-                        continue;
+                $maxTimeout = 0;
+                foreach ($evasionRulesets as $ruleset) {
+                    $t = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
+                    if ($t > $maxTimeout) {
+                        $maxTimeout = $t;
                     }
+                }
 
-                    $count = $this->db->table('filter_rule_block_logs')
+                if ($maxTimeout > 0) {
+                    // Fetch only ruleset_id and created_at to avoid memory bloat from longText columns
+                    $recentLogs = $this->db->table('filter_rule_block_logs')
                         ->where('user_id', $actor->id)
                         ->where('is_cleared', false)
-                        ->where('ruleset_id', $rulesetId)
-                        ->where('created_at', '>=', Carbon::now()->subMinutes($timeout))
-                        ->count();
+                        ->whereIn('ruleset_id', $evasionRulesets->keys())
+                        ->where('created_at', '>=', Carbon::now()->subMinutes($maxTimeout))
+                        ->select('ruleset_id', 'created_at')
+                        ->get();
 
-                    if ($count >= max(1, $threshold)) {
-                        $isEvasion = true;
-                        $blockedRulesetName = $ruleset->name;
-                        break;
+                    foreach ($evasionRulesets as $rulesetId => $ruleset) {
+                        $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
+                        $threshold = $ruleset->evasion_threshold ?? $globalEvasionThreshold;
+
+                        if ($timeout <= 0) {
+                            continue;
+                        }
+
+                        $cutoff = Carbon::now()->subMinutes($timeout);
+                        $count = $recentLogs->filter(function ($log) use ($rulesetId, $cutoff) {
+                            return $log->ruleset_id == $rulesetId && Carbon::parse($log->created_at)->gte($cutoff);
+                        })->count();
+
+                        if ($count >= max(1, $threshold)) {
+                            $isEvasion = true;
+                            $blockedRulesetName = $ruleset->name;
+                            break;
+                        }
                     }
                 }
             }
