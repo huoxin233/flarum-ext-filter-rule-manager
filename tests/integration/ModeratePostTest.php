@@ -17,10 +17,23 @@ class ModeratePostTest extends FilterTestCase
             'users' => [
                 ['id' => 8, 'username' => 'user8', 'email' => 'user8@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 9, 'username' => 'user9', 'email' => 'user9@machine.local', 'is_email_confirmed' => 1],
+                ['id' => 10, 'username' => 'user10', 'email' => 'user10@machine.local', 'is_email_confirmed' => 1],
+                ['id' => 11, 'username' => 'user11', 'email' => 'user11@machine.local', 'is_email_confirmed' => 1],
+                ['id' => 12, 'username' => 'user12', 'email' => 'user12@machine.local', 'is_email_confirmed' => 1],
+                ['id' => 13, 'username' => 'user13', 'email' => 'user13@machine.local', 'is_email_confirmed' => 1],
             ],
             'posts' => [
                 // Existing post to test edits
-                ['id' => 2, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Clean post</p></t>', 'is_approved' => 1, 'number' => 2, 'created_at' => Carbon::now()->toDateTimeString()],
+                ['id' => 2, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Clean post</p></t>', 'is_approved' => 1, 'number' => 2, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
+                // User 10: unapproved post to test approval clearing logs
+                ['id' => 3, 'discussion_id' => 1, 'user_id' => 10, 'type' => 'comment', 'content' => '<t><p>Post to approve</p></t>', 'is_approved' => 0, 'number' => 3, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
+                // User 11: post that already has an autoMod flag
+                ['id' => 4, 'discussion_id' => 1, 'user_id' => 11, 'type' => 'comment', 'content' => '<t><p>Post with flag</p></t>', 'is_approved' => 0, 'number' => 4, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
+                // User 2: unapproved post without a flag
+                ['id' => 5, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Unapproved but clean</p></t>', 'is_approved' => 0, 'number' => 5, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
+            ],
+            'flags' => [
+                ['id' => 1, 'post_id' => 4, 'type' => 'autoMod', 'user_id' => null, 'reason' => null, 'reason_detail' => 'Matched custom: existing', 'created_at' => Carbon::now()->toDateTimeString()],
             ],
             'filter_rulesets' => [
                 [
@@ -99,6 +112,42 @@ class ModeratePostTest extends FilterTestCase
                     'evasion_timeout' => 15,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString()
+                ],
+                [
+                    'id' => 5,
+                    'name' => 'HTML Decode Test',
+                    'priority' => 4,
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['AT&T']]
+                    ]),
+                    'intervention_type' => 'warning',
+                    'display_mode' => 'banner',
+                    'flag_message' => 'Brand: {{matched_word}}',
+                    'scope_type' => 'global',
+                    'is_active' => 1,
+                    'auto_flag' => 1,
+                    'require_approval' => 1,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString()
+                ],
+                [
+                    'id' => 6,
+                    'name' => 'High Threshold',
+                    'priority' => 5,
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['high_threshold_word']]
+                    ]),
+                    'intervention_type' => 'warning',
+                    'display_mode' => 'banner',
+                    'scope_type' => 'global',
+                    'is_active' => 1,
+                    'auto_flag' => 1,
+                    'require_approval' => 1,
+                    'evasion_active' => 1,
+                    'evasion_threshold' => 3,
+                    'evasion_timeout' => 15,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString()
                 ]
             ],
             // For evasion tests
@@ -120,6 +169,48 @@ class ModeratePostTest extends FilterTestCase
                     'user_id' => 9,
                     'ruleset_id' => 4, // Inactive ruleset
                     'created_at' => Carbon::now()->subMinutes(2)->toDateTimeString(), // 2 mins ago
+                ],
+                [
+                    'id' => 4,
+                    'user_id' => 10,
+                    'ruleset_id' => 1,
+                    'is_cleared' => 0,
+                    'created_at' => Carbon::now()->subMinutes(2)->toDateTimeString(),
+                ],
+                [
+                    'id' => 5,
+                    'user_id' => 12,
+                    'ruleset_id' => 6,
+                    'is_cleared' => 0,
+                    'created_at' => Carbon::now()->subMinutes(2)->toDateTimeString(),
+                ],
+                [
+                    'id' => 6,
+                    'user_id' => 12,
+                    'ruleset_id' => 6,
+                    'is_cleared' => 0,
+                    'created_at' => Carbon::now()->subMinutes(1)->toDateTimeString(),
+                ],
+                [
+                    'id' => 7,
+                    'user_id' => 13,
+                    'ruleset_id' => 6,
+                    'is_cleared' => 0,
+                    'created_at' => Carbon::now()->subMinutes(3)->toDateTimeString(),
+                ],
+                [
+                    'id' => 8,
+                    'user_id' => 13,
+                    'ruleset_id' => 6,
+                    'is_cleared' => 0,
+                    'created_at' => Carbon::now()->subMinutes(2)->toDateTimeString(),
+                ],
+                [
+                    'id' => 9,
+                    'user_id' => 13,
+                    'ruleset_id' => 6,
+                    'is_cleared' => 0,
+                    'created_at' => Carbon::now()->subMinutes(1)->toDateTimeString(),
                 ]
             ]
         ]);
@@ -322,5 +413,170 @@ class ModeratePostTest extends FilterTestCase
         $post = $this->database()->table('posts')->where('id', $postId)->first();
 
         $this->assertEquals(1, $post->is_approved, 'Post should be approved because evasion ruleset is inactive');
+    }
+
+    /**
+     * @test
+     */
+    public function approving_a_post_clears_user_evasion_logs()
+    {
+        $response = $this->send(
+            $this->request('PATCH', '/api/posts/3', [
+                'authenticatedAs' => 1,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'isApproved' => true
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $log = $this->database()->table('filter_rule_block_logs')->where('id', 4)->first();
+        $this->assertEquals(1, $log->is_cleared, 'User block logs should be cleared when their post is approved');
+    }
+
+    /**
+     * @test
+     */
+    public function hiding_or_recovering_post_does_not_trigger_moderation()
+    {
+        $response = $this->submitReply('This contains word_flag which only flags.', 2);
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+
+        $this->send(
+            $this->request('PATCH', "/api/posts/$postId", [
+                'authenticatedAs' => 1,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'isHidden' => true
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->send(
+            $this->request('PATCH', "/api/posts/$postId", [
+                'authenticatedAs' => 1,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'isHidden' => false
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $flagsCount = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->count();
+        $this->assertEquals(1, $flagsCount, 'Hiding/recovering post should not create duplicate moderation flags');
+    }
+
+    /**
+     * @test
+     */
+    public function editing_post_with_existing_automod_flag_does_not_duplicate_flag()
+    {
+        $response = $this->send(
+            $this->request('PATCH', '/api/posts/4', [
+                'authenticatedAs' => 11,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'content' => 'I edited this to include word_flag again.'
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $flagsCount = $this->database()->table('flags')->where('post_id', 4)->where('type', 'autoMod')->count();
+        $this->assertEquals(1, $flagsCount, 'Editing a post that already has an autoMod flag should not duplicate it');
+    }
+
+    /**
+     * @test
+     */
+    public function editing_unapproved_post_adds_automod_flag()
+    {
+        $response = $this->send(
+            $this->request('PATCH', '/api/posts/5', [
+                'authenticatedAs' => 2,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'content' => 'I edited this to include word_both.'
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $post = $this->database()->table('posts')->where('id', 5)->first();
+        $this->assertEquals(0, $post->is_approved, 'Post should still be unapproved');
+
+        $flag = $this->database()->table('flags')->where('post_id', 5)->where('type', 'autoMod')->first();
+        $this->assertNotNull($flag, 'An autoMod flag should be added when editing an unapproved post to contain forbidden words');
+    }
+
+    /**
+     * @test
+     */
+    public function flag_message_decodes_html_entities()
+    {
+        $response = $this->submitReply('I use AT&T.', 2);
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $this->assertNotNull($flag);
+
+        $this->assertEquals('Brand: AT&T', $flag->reason_detail, 'Flag reason detail should decode HTML entities like &amp;');
+    }
+
+    /**
+     * @test
+     */
+    public function evasion_detection_requires_threshold_to_be_met()
+    {
+        // User 12 has 2 block logs for Ruleset 6 (Threshold is 3).
+        $response = $this->submitReply('I promise this is a clean post.', 12);
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+        $post = $this->database()->table('posts')->where('id', $postId)->first();
+
+        $this->assertEquals(1, $post->is_approved, 'Post should be approved because evasion threshold is not met (2 < 3)');
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $this->assertNull($flag, 'No flag should be created because evasion threshold is not met');
+    }
+
+    /**
+     * @test
+     */
+    public function evasion_detection_triggers_when_threshold_is_met()
+    {
+        // User 13 has 3 block logs for Ruleset 6 (Threshold is 3).
+        $response = $this->submitReply('I promise this is a clean post.', 13);
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+        $post = $this->database()->table('posts')->where('id', $postId)->first();
+
+        $this->assertEquals(0, $post->is_approved, 'Post should be unapproved because evasion threshold is met (3 == 3)');
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $this->assertNotNull($flag, 'Flag should be created because evasion threshold is met');
     }
 }

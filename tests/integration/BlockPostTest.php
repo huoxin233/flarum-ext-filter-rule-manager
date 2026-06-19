@@ -14,6 +14,10 @@ class BlockPostTest extends FilterTestCase
         parent::setUp();
 
         $this->prepareDatabase([
+            'posts' => [
+                ['id' => 1, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Clean post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
+                ['id' => 2, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>This contains blockword</p></t>', 'is_approved' => 1, 'number' => 2, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
+            ],
             'filter_rulesets' => [
                 [
                     'id' => 1,
@@ -71,5 +75,62 @@ class BlockPostTest extends FilterTestCase
         $log = $this->database()->table('filter_rule_block_logs')->where('user_id', 3)->first();
         $this->assertNotNull($log, 'Block log should be created');
         $this->assertEquals(1, $log->ruleset_id, 'Ruleset ID should be logged');
+    }
+
+    /**
+     * @test
+     */
+    public function editing_clean_post_to_include_blockword_is_blocked()
+    {
+        $response = $this->send(
+            $this->request('PATCH', '/api/posts/1', [
+                'authenticatedAs' => 2,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'content' => 'I edited this to include blockword.'
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->assertEquals(422, $response->getStatusCode(), 'Editing a post to include a blockword should be blocked');
+    }
+
+    /**
+     * @test
+     */
+    public function hiding_or_recovering_post_with_blockword_does_not_trigger_block()
+    {
+        // Hide it
+        $response = $this->send(
+            $this->request('PATCH', '/api/posts/2', [
+                'authenticatedAs' => 1,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'isHidden' => true
+                        ]
+                    ]
+                ]
+            ])
+        );
+        $this->assertEquals(200, $response->getStatusCode(), 'Hiding a post with a blockword should succeed');
+
+        // Recover it
+        $response = $this->send(
+            $this->request('PATCH', '/api/posts/2', [
+                'authenticatedAs' => 1,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'isHidden' => false
+                        ]
+                    ]
+                ]
+            ])
+        );
+        $this->assertEquals(200, $response->getStatusCode(), 'Recovering a post with a blockword should succeed');
     }
 }
