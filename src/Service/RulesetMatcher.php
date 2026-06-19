@@ -29,7 +29,7 @@ class RulesetMatcher
      *
      * @return array|null Returns matched tokens if the ruleset triggers, null otherwise.
      */
-    public function match(Ruleset $ruleset, Post $post, ?\Flarum\User\User $actor = null, array $providers = null): ?array
+    public function match(Ruleset $ruleset, Post $post, ?\Flarum\User\User $actor = null, ?array $providers = null): ?array
     {
         // Temporarily removed until Flarum natively supports a "Nobody" permission
         // if ($actor && $actor->can('huoxin-filter-rule-manager.bypassAllRules')) {
@@ -63,7 +63,7 @@ class RulesetMatcher
         $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
 
         if ($evaluateTitle && $title !== '' && $isFirstPost) {
-            $targetContent = $title . "\n\n" . $content;
+            $targetContent = $title."\n\n".$content;
         }
 
         if ($providers === null) {

@@ -2,10 +2,7 @@
 
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
-use Flarum\Testing\integration\TestCase;
-use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Carbon\Carbon;
-use Illuminate\Support\Arr;
 
 class ScopeTest extends FilterTestCase
 {

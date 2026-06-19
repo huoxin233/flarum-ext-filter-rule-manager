@@ -31,7 +31,7 @@ class ReorderRulesetsController implements RequestHandlerInterface
         RequestUtil::getActor($request)->assertAdmin();
 
         $body = $request->getParsedBody();
-        $ids  = $body['data']['ids'] ?? [];
+        $ids = $body['data']['ids'] ?? [];
 
         if (! empty($ids)) {
             Ruleset::getConnection()->transaction(function () use ($ids) {

@@ -15,19 +15,20 @@ class Token
     public const T_RBRACE = 'RBRACE';
     public const T_COLON = 'COLON';
     public const T_COMMA = 'COMMA';
-    
-    public const T_FIELD = 'FIELD'; 
-    public const T_OP = 'OP'; 
-    
-    public const T_STRING = 'STRING'; 
-    public const T_NUMBER = 'NUMBER'; 
-    public const T_BOOLEAN = 'BOOLEAN'; 
-    
+
+    public const T_FIELD = 'FIELD';
+    public const T_OP = 'OP';
+
+    public const T_STRING = 'STRING';
+    public const T_NUMBER = 'NUMBER';
+    public const T_BOOLEAN = 'BOOLEAN';
+
     public const T_EOF = 'EOF';
 
     public function __construct(
         public string $type,
         public mixed $value = null,
         public int $position = 0
-    ) {}
+    ) {
+    }
 }

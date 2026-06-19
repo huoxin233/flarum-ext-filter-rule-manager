@@ -2,9 +2,9 @@
 
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
-use Flarum\Testing\integration\TestCase;
-use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Carbon\Carbon;
+use Flarum\Testing\integration\RetrievesAuthorizedUsers;
+use Flarum\Testing\integration\TestCase;
 
 abstract class FilterTestCase extends TestCase
 {
@@ -60,7 +60,7 @@ abstract class FilterTestCase extends TestCase
                             'content' => $content
                         ],
                         'relationships' => [
-                            'discussion' => ['data' => ['type' => 'discussions', 'id' => (string)$discussionId]]
+                            'discussion' => ['data' => ['type' => 'discussions', 'id' => (string) $discussionId]]
                         ]
                     ]
                 ]

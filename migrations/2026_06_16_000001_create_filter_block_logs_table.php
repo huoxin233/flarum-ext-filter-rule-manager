@@ -9,7 +9,7 @@ return Migration::createTable(
         $table->increments('id');
         $table->unsignedInteger('user_id')->nullable();
         $table->unsignedInteger('ruleset_id');
-        
+
         $table->timestamp('created_at')->useCurrent();
         $table->boolean('is_cleared')->default(false);
         $table->longText('content')->nullable();

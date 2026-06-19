@@ -72,12 +72,19 @@ class Lexer
                 $token = $this->readIdentifier();
                 $lower = strtolower($token->value);
 
-                if ($lower === 'and') $token->type = Token::T_AND;
-                elseif ($lower === 'or') $token->type = Token::T_OR;
-                elseif ($lower === 'not') $token->type = Token::T_NOT;
-                elseif ($lower === 'true') { $token->type = Token::T_BOOLEAN; $token->value = true; }
-                elseif ($lower === 'false') { $token->type = Token::T_BOOLEAN; $token->value = false; }
-                elseif (in_array($lower, ['eq', 'neq', 'gt', 'lt', 'in', 'contains', 'matches', 'contains_word', 'contains_regex'])) {
+                if ($lower === 'and') {
+                    $token->type = Token::T_AND;
+                } elseif ($lower === 'or') {
+                    $token->type = Token::T_OR;
+                } elseif ($lower === 'not') {
+                    $token->type = Token::T_NOT;
+                } elseif ($lower === 'true') {
+                    $token->type = Token::T_BOOLEAN;
+                    $token->value = true;
+                } elseif ($lower === 'false') {
+                    $token->type = Token::T_BOOLEAN;
+                    $token->value = false;
+                } elseif (in_array($lower, ['eq', 'neq', 'gt', 'lt', 'in', 'contains', 'matches', 'contains_word', 'contains_regex'])) {
                     $token->type = Token::T_OP;
                     $token->value = $lower;
                 } elseif (strpos($token->value, '.') !== false) {
@@ -104,6 +111,7 @@ class Lexer
         }
 
         $tokens[] = new Token(Token::T_EOF, null, $this->position);
+
         return $tokens;
     }
 
@@ -122,6 +130,7 @@ class Lexer
                 }
             } elseif ($char === $quote) {
                 $this->position++; // skip closing quote
+
                 return new Token(Token::T_STRING, $value, $start);
             } else {
                 $value .= $char;
@@ -140,13 +149,13 @@ class Lexer
             $value .= '-';
             $this->position++;
         }
-        
+
         $hasDot = false;
         while ($this->position < $this->length) {
             $char = $this->input[$this->position];
             if (ctype_digit($char)) {
                 $value .= $char;
-            } elseif ($char === '.' && !$hasDot) {
+            } elseif ($char === '.' && ! $hasDot) {
                 $hasDot = true;
                 $value .= $char;
             } else {
@@ -155,7 +164,7 @@ class Lexer
             $this->position++;
         }
 
-        return new Token(Token::T_NUMBER, $hasDot ? (float)$value : (int)$value, $start);
+        return new Token(Token::T_NUMBER, $hasDot ? (float) $value : (int) $value, $start);
     }
 
     private function readIdentifier(): Token
@@ -172,6 +181,7 @@ class Lexer
                 break;
             }
         }
+
         return new Token(Token::T_FIELD, $value, $start); // Will be re-categorized by caller
     }
 
