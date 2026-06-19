@@ -151,9 +151,9 @@ huoxin-filter-rule-manager:
       normal_post: "普通主题"
       private_post: "私密主题"
       tag: "指定标签"
-      backend: "后端 (Backend)"
-      frontend: "前端 (Frontend)"
-      both: "前端+后端 (Frontend + Backend)"
+      backend: "后端"
+      frontend: "前端"
+      both: "前端+后端"
 
     templates:
       builtin: "内置"
