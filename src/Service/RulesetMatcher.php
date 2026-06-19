@@ -31,9 +31,10 @@ class RulesetMatcher
      */
     public function match(Ruleset $ruleset, Post $post, ?\Flarum\User\User $actor = null, array $providers = null): ?array
     {
-        if ($actor && $actor->can('huoxin-filter-rule-manager.bypassAllRules')) {
-            return null;
-        }
+        // Temporarily removed until Flarum natively supports a "Nobody" permission
+        // if ($actor && $actor->can('huoxin-filter-rule-manager.bypassAllRules')) {
+        //     return null;
+        // }
 
         if ($actor && is_array($ruleset->bypass_group_ids) && count($ruleset->bypass_group_ids) > 0) {
             $userGroups = $actor->groups->pluck('id')->toArray();

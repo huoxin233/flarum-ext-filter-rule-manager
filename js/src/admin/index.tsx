@@ -59,7 +59,10 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
 
   app.extensionData
     .for('huoxin-filter-rule-manager')
-    .registerPage(RulesetManagerPage as any)
+    .registerPage(RulesetManagerPage as any);
+    /*
+    // Temporarily removed until Flarum natively supports a "Nobody" permission.
+    // Currently, Flarum Admins inherently bypass all permissions.
     .registerPermission(
       {
         icon: 'fas fa-shield-alt',
@@ -68,4 +71,5 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
       },
       'moderate'
     );
+    */
 });

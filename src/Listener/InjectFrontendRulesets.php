@@ -32,7 +32,8 @@ class InjectFrontendRulesets
     public function __invoke(Document $document, ServerRequestInterface $request): void
     {
         $actor = RequestUtil::getActor($request);
-        if ($actor->isGuest() || $actor->can('huoxin-filter-rule-manager.bypassAllRules')) {
+        // Temporarily removed until Flarum natively supports a "Nobody" permission
+        if ($actor->isGuest() /* || $actor->can('huoxin-filter-rule-manager.bypassAllRules') */) {
             $document->payload['filterRuleRulesets'] = [];
             return;
         }
