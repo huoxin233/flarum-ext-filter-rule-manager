@@ -32,8 +32,8 @@ class UpdateRulesetController extends AbstractShowController
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        $id         = Arr::get($request->getQueryParams(), 'id');
-        $body       = $request->getParsedBody();
+        $id = Arr::get($request->getQueryParams(), 'id');
+        $body = $request->getParsedBody();
         $attributes = $body['data']['attributes'] ?? [];
 
         $ruleset = Ruleset::findOrFail($id);
@@ -46,7 +46,9 @@ class UpdateRulesetController extends AbstractShowController
             $ruleset->name = $name;
         }
 
-        if (isset($attributes['priority']))     $ruleset->priority      = (int) $attributes['priority'];
+        if (isset($attributes['priority'])) {
+            $ruleset->priority = (int) $attributes['priority'];
+        }
 
         if (array_key_exists('expression', $attributes)) {
             $expression = trim((string) $attributes['expression']);
@@ -60,27 +62,55 @@ class UpdateRulesetController extends AbstractShowController
                     $ast = $parser->parse();
                     $ruleset->compiled_ast = $ast->toArray();
                 } catch (\Exception $e) {
-                    throw new InvalidParameterException('Invalid expression syntax: ' . $e->getMessage());
+                    throw new InvalidParameterException('Invalid expression syntax: '.$e->getMessage());
                 }
             } else {
                 $ruleset->compiled_ast = null;
             }
         }
 
-        if (isset($attributes['interventionType']))   $ruleset->intervention_type   = $this->validEnum($attributes['interventionType'], ['info', 'warning', 'block', 'silent'], $ruleset->intervention_type);
-        if (isset($attributes['displayMode']))  $ruleset->display_mode  = $this->validEnum($attributes['displayMode'], ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], $ruleset->display_mode);
-        if (isset($attributes['message']))      $ruleset->message       = (string) $attributes['message'];
-        if (array_key_exists('flagMessage', $attributes)) $ruleset->flag_message = $attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage'];
-        if (isset($attributes['evaluateAllRules'])) $ruleset->evaluate_all_rules = (bool) $attributes['evaluateAllRules'];
-        if (array_key_exists('evaluateTitle', $attributes)) $ruleset->evaluate_title = $attributes['evaluateTitle'] === null ? null : (bool) $attributes['evaluateTitle'];
-        if (array_key_exists('evasionActive', $attributes)) $ruleset->evasion_active = $attributes['evasionActive'] === null ? null : (bool) $attributes['evasionActive'];
-        if (array_key_exists('evasionTimeout', $attributes)) $ruleset->evasion_timeout = $attributes['evasionTimeout'] === null ? null : max(0, (int) $attributes['evasionTimeout']);
-        if (array_key_exists('evasionThreshold', $attributes)) $ruleset->evasion_threshold = $attributes['evasionThreshold'] === null ? null : max(1, (int) $attributes['evasionThreshold']);
-        if (isset($attributes['blockCascade'])) $ruleset->block_cascade = (bool) $attributes['blockCascade'];
-        if (isset($attributes['isActive']))     $ruleset->is_active     = (bool) $attributes['isActive'];
-        if (array_key_exists('autoFlag', $attributes)) $ruleset->auto_flag = $attributes['autoFlag'] === null ? null : (bool) $attributes['autoFlag'];
-        if (array_key_exists('requireApproval', $attributes)) $ruleset->require_approval = $attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval'];
-        if (isset($attributes['scopeType']))    $ruleset->scope_type    = $this->validEnum($attributes['scopeType'], ['global', 'normal_post', 'private_post', 'tag'], $ruleset->scope_type);
+        if (isset($attributes['interventionType'])) {
+            $ruleset->intervention_type = $this->validEnum($attributes['interventionType'], ['info', 'warning', 'block', 'silent'], $ruleset->intervention_type);
+        }
+        if (isset($attributes['displayMode'])) {
+            $ruleset->display_mode = $this->validEnum($attributes['displayMode'], ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], $ruleset->display_mode);
+        }
+        if (isset($attributes['message'])) {
+            $ruleset->message = (string) $attributes['message'];
+        }
+        if (array_key_exists('flagMessage', $attributes)) {
+            $ruleset->flag_message = $attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage'];
+        }
+        if (isset($attributes['evaluateAllRules'])) {
+            $ruleset->evaluate_all_rules = (bool) $attributes['evaluateAllRules'];
+        }
+        if (array_key_exists('evaluateTitle', $attributes)) {
+            $ruleset->evaluate_title = $attributes['evaluateTitle'] === null ? null : (bool) $attributes['evaluateTitle'];
+        }
+        if (array_key_exists('evasionActive', $attributes)) {
+            $ruleset->evasion_active = $attributes['evasionActive'] === null ? null : (bool) $attributes['evasionActive'];
+        }
+        if (array_key_exists('evasionTimeout', $attributes)) {
+            $ruleset->evasion_timeout = $attributes['evasionTimeout'] === null ? null : max(0, (int) $attributes['evasionTimeout']);
+        }
+        if (array_key_exists('evasionThreshold', $attributes)) {
+            $ruleset->evasion_threshold = $attributes['evasionThreshold'] === null ? null : max(1, (int) $attributes['evasionThreshold']);
+        }
+        if (isset($attributes['blockCascade'])) {
+            $ruleset->block_cascade = (bool) $attributes['blockCascade'];
+        }
+        if (isset($attributes['isActive'])) {
+            $ruleset->is_active = (bool) $attributes['isActive'];
+        }
+        if (array_key_exists('autoFlag', $attributes)) {
+            $ruleset->auto_flag = $attributes['autoFlag'] === null ? null : (bool) $attributes['autoFlag'];
+        }
+        if (array_key_exists('requireApproval', $attributes)) {
+            $ruleset->require_approval = $attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval'];
+        }
+        if (isset($attributes['scopeType'])) {
+            $ruleset->scope_type = $this->validEnum($attributes['scopeType'], ['global', 'normal_post', 'private_post', 'tag'], $ruleset->scope_type);
+        }
         if (array_key_exists('scopeTagIds', $attributes)) {
             $ruleset->scope_tag_ids = $this->sanitizeIds($attributes['scopeTagIds']);
         }

@@ -48,6 +48,7 @@ class RuleEvaluator
                 if ($left !== null && $right !== null) {
                     return $this->mergeResults([$left, $right]);
                 }
+
                 return $left !== null ? $left : $right;
             }
 
@@ -59,12 +60,14 @@ class RuleEvaluator
                 if ($right === null) {
                     return null;
                 }
+
                 return $this->mergeResults([$left, $right]);
             }
         }
 
         if ($node['type'] === 'not') {
             $result = $this->evaluateAST($node['node'], $content, $providers, $ruleset);
+
             return $result === null ? [] : null;
         }
 
@@ -91,6 +94,7 @@ class RuleEvaluator
                 }
             }
         }
+
         return $merged;
     }
 
@@ -106,14 +110,15 @@ class RuleEvaluator
         }
 
         try {
-            $isObject = is_array($node['value']) && !array_is_list($node['value']);
-            
+            $isObject = is_array($node['value']) && ! array_is_list($node['value']);
+
             if ($isObject) {
                 $config = array_merge($node['value'], ['operator' => $node['operator']]);
             } else {
                 $config = ['operator' => $node['operator'], 'value' => $node['value']];
             }
             $result = $provider->evaluate($node['ruleType'], $content, $config);
+
             return $result;
         } catch (\Throwable $e) {
             $this->logger->error('[filter-rule-manager] provider evaluate() threw', [
@@ -121,6 +126,7 @@ class RuleEvaluator
                 'type' => $node['ruleType'],
                 'exception' => $e,
             ]);
+
             return null;
         }
     }
@@ -153,6 +159,7 @@ class RuleEvaluator
                 }
 
                 $tagIds = $tags->pluck('id')->toArray();
+
                 return count(array_intersect($ruleset->scope_tag_ids, $tagIds)) > 0;
 
             default:
@@ -176,12 +183,15 @@ class RuleEvaluator
                                 $result[] = $item;
                             }
                         }
+
                         return $result;
                     };
                     $val = implode(', ', array_unique($flatten($val)));
                 }
+
                 return htmlspecialchars((string) $val, ENT_QUOTES, 'UTF-8');
             }
+
             return $m[0];
         }, $template);
     }

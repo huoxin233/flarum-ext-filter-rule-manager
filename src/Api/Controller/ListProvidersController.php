@@ -42,10 +42,10 @@ class ListProvidersController implements RequestHandlerInterface
             foreach ($provider->getSupportedBackendTypes() as $type) {
                 $entry = [
                     'provider' => $name,
-                    'type'     => $type,
-                    'label'    => $provider->getBackendTypeLabels()[$type] ?? $type,
-                    'scope'    => 'backend',
-                    'tokens'   => $supportsTokens ? $provider->getProvidedTokens($type) : [],
+                    'type' => $type,
+                    'label' => $provider->getBackendTypeLabels()[$type] ?? $type,
+                    'scope' => 'backend',
+                    'tokens' => $supportsTokens ? $provider->getProvidedTokens($type) : [],
                 ];
                 $result[] = $entry;
             }

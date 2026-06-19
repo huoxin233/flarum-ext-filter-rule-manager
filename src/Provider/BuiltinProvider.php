@@ -32,7 +32,7 @@ class BuiltinProvider implements RuleProviderInterface
     {
         return [
             'contains_word' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_contains_word'),
-            'regex'         => $this->translator->trans('huoxin-filter-rule-manager.admin.type_regex'),
+            'regex' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_regex'),
         ];
     }
 
@@ -80,14 +80,15 @@ class BuiltinProvider implements RuleProviderInterface
             foreach ($words as $word) {
                 if (stripos($content, $word) !== false) {
                     $matches[] = $word;
-                    if (!$scanAll) {
+                    if (! $scanAll) {
                         break;
                     }
                 }
             }
-            if (!empty($matches)) {
+            if (! empty($matches)) {
                 return ['matched_word' => implode(', ', $matches)];
             }
+
             return null;
         }
 
@@ -101,22 +102,23 @@ class BuiltinProvider implements RuleProviderInterface
             foreach ($patterns as $pattern) {
                 $regex = str_starts_with($pattern, '/')
                     ? $pattern
-                    : '/' . str_replace('/', '\/', $pattern) . '/i';
+                    : '/'.str_replace('/', '\/', $pattern).'/i';
 
                 if (@preg_match($regex, $content, $matches)) {
                     $matchedPatterns[] = $pattern;
                     $matchedStrings[] = $matches[0] ?? '';
-                    if (!$scanAll) {
+                    if (! $scanAll) {
                         break;
                     }
                 }
             }
-            if (!empty($matchedPatterns)) {
+            if (! empty($matchedPatterns)) {
                 return [
                     'matched_pattern' => implode(', ', $matchedPatterns),
-                    'matched_string'  => implode(', ', $matchedStrings),
+                    'matched_string' => implode(', ', $matchedStrings),
                 ];
             }
+
             return null;
         }
 
@@ -139,6 +141,7 @@ class BuiltinProvider implements RuleProviderInterface
                     $out[] = $v;
                 }
             }
+
             return $out;
         }
 

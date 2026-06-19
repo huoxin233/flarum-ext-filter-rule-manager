@@ -11,15 +11,15 @@
 
 namespace Huoxin\FilterRuleManager\Listener;
 
+use Carbon\Carbon;
 use Flarum\Post\Event\Saving;
+use Flarum\Post\Exception\FloodingException;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
-use Flarum\Post\Exception\FloodingException;
 use Illuminate\Database\ConnectionInterface;
-use Carbon\Carbon;
-use Flarum\Settings\SettingsRepositoryInterface;
 
 class EvaluateBlockRulesets
 {
@@ -69,7 +69,7 @@ class EvaluateBlockRulesets
                     || $discussion->first_post_id === null;
             }
             if ($evaluateTitle && $title !== '' && $isFirstPost) {
-                $targetContent = $title . "\n\n" . $content;
+                $targetContent = $title."\n\n".$content;
             }
 
             $triggered[] = [
@@ -109,6 +109,7 @@ class EvaluateBlockRulesets
                 ], $triggered);
                 $this->db->table('filter_rule_block_logs')->insert($logs);
             }
+
             throw new RuleBlockException($triggered);
         }
     }

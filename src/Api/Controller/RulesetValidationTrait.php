@@ -15,10 +15,11 @@ trait RulesetValidationTrait
 {
     protected function sanitizeIds($raw): ?array
     {
-        if (!is_array($raw)) {
+        if (! is_array($raw)) {
             return null;
         }
         $ids = array_values(array_filter(array_map('intval', $raw), fn ($id) => $id > 0));
+
         return $ids === [] ? null : $ids;
     }
 

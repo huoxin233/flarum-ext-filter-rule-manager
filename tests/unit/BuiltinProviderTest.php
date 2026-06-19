@@ -14,7 +14,7 @@ class BuiltinProviderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(function ($id) {
             return $id;
@@ -29,9 +29,9 @@ class BuiltinProviderTest extends TestCase
     public function it_evaluates_contains_word_correctly()
     {
         $config = ['words' => ['apple', 'banana']];
-        
+
         $this->assertNull($this->provider->evaluate('contains_word', 'I like oranges.', $config));
-        
+
         $result = $this->provider->evaluate('contains_word', 'I like apples and bananas.', $config);
         $this->assertIsArray($result);
         $this->assertEquals('apple', $result['matched_word']);
@@ -44,9 +44,9 @@ class BuiltinProviderTest extends TestCase
     {
         // Notice we don't include delimiters, the provider should add them automatically
         $config = ['patterns' => ['[0-9]{3}-[0-9]{4}']];
-        
+
         $this->assertNull($this->provider->evaluate('regex', 'My number is hidden.', $config));
-        
+
         $result = $this->provider->evaluate('regex', 'Call me at 555-1234 please.', $config);
         $this->assertIsArray($result);
         $this->assertEquals('[0-9]{3}-[0-9]{4}', $result['matched_pattern']);
@@ -60,7 +60,7 @@ class BuiltinProviderTest extends TestCase
     {
         // Provider shouldn't add delimiters if they already start with /
         $config = ['patterns' => ['/b[a-z]+d/i']];
-        
+
         $result = $this->provider->evaluate('regex', 'That is BAD.', $config);
         $this->assertIsArray($result);
         $this->assertEquals('/b[a-z]+d/i', $result['matched_pattern']);
@@ -95,9 +95,9 @@ class BuiltinProviderTest extends TestCase
             'words' => ['apple', 'banana', 'cherry'],
             'scan_all' => true
         ];
-        
+
         $result = $this->provider->evaluate('contains_word', 'I have an apple and a cherry pie.', $config);
-        
+
         $this->assertIsArray($result);
         // It matches in the order of the configuration array, not the string order
         $this->assertEquals('apple, cherry', $result['matched_word']);
@@ -112,9 +112,9 @@ class BuiltinProviderTest extends TestCase
             'patterns' => ['foo', 'bar'],
             'scan_all' => true
         ];
-        
+
         $result = $this->provider->evaluate('regex', 'foo bar baz', $config);
-        
+
         $this->assertIsArray($result);
         $this->assertEquals('foo, bar', $result['matched_pattern']);
         $this->assertEquals('foo, bar', $result['matched_string']);

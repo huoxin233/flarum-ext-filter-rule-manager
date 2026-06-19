@@ -17,23 +17,23 @@ use Huoxin\FilterRuleManager\Api\Controller;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Exception\RuleBlockExceptionHandler;
 use Huoxin\FilterRuleManager\Listener\EvaluateBlockRulesets;
-use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
 use Huoxin\FilterRuleManager\Listener\ExecuteModerationActions;
+use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
 use Huoxin\FilterRuleManager\Provider\FilterRuleManagerServiceProvider;
 
 return [
     // ── Frontend assets ──────────────────────────────────────────────────────
     (new Extend\Frontend('forum'))
-        ->js(__DIR__ . '/js/dist/forum.js')
-        ->css(__DIR__ . '/less/forum.less')
+        ->js(__DIR__.'/js/dist/forum.js')
+        ->css(__DIR__.'/less/forum.less')
         ->content(InjectFrontendRulesets::class),
 
     (new Extend\Frontend('admin'))
-        ->js(__DIR__ . '/js/dist/admin.js')
-        ->css(__DIR__ . '/less/admin.less'),
+        ->js(__DIR__.'/js/dist/admin.js')
+        ->css(__DIR__.'/less/admin.less'),
 
     // ── Translations ─────────────────────────────────────────────────────────
-    new Extend\Locales(__DIR__ . '/locale'),
+    new Extend\Locales(__DIR__.'/locale'),
 
     // ── Service provider (rule provider registry) ─────────────────────────
     (new Extend\ServiceProvider())

@@ -33,7 +33,7 @@ class RuleBlockExceptionHandler
         return (new HandledError($e, 'filter_rule_block', 422))
             ->withDetails([
                 [
-                    'detail'         => $detailText !== '' ? $detailText : 'Filter rule block alert triggered.',
+                    'detail' => $detailText !== '' ? $detailText : 'Filter rule block alert triggered.',
                     'filterRules' => $e->alerts,
                 ],
             ]);

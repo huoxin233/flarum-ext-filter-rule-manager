@@ -11,8 +11,8 @@
 
 namespace Huoxin\FilterRuleManager\Extend;
 
-use Flarum\Extension\Extension;
 use Flarum\Extend\ExtenderInterface;
+use Flarum\Extension\Extension;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Illuminate\Contracts\Container\Container;
 
@@ -47,10 +47,11 @@ class FilterRuleProvider implements ExtenderInterface
     public function registerProvider(string $name, string $class): static
     {
         $this->providers[$name] = $class;
+
         return $this;
     }
 
-    public function extend(Container $container, Extension $extension = null): void
+    public function extend(Container $container, ?Extension $extension = null): void
     {
         if (empty($this->providers)) {
             return;
@@ -63,8 +64,10 @@ class FilterRuleProvider implements ExtenderInterface
                 foreach ($providers as $name => $class) {
                     $existing[$name] = $container->make($class);
                 }
+
                 return $existing;
             });
+
             return;
         }
 

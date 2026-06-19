@@ -13,11 +13,11 @@ namespace Huoxin\FilterRuleManager\Api\Controller;
 
 use Flarum\Http\RequestUtil;
 use Huoxin\FilterRuleManager\Model\Ruleset;
+use Illuminate\Support\Arr;
 use Laminas\Diactoros\Response\EmptyResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Illuminate\Support\Arr;
 
 class DeleteRulesetController implements RequestHandlerInterface
 {

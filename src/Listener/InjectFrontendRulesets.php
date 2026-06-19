@@ -35,6 +35,7 @@ class InjectFrontendRulesets
         // Temporarily removed until Flarum natively supports a "Nobody" permission
         if ($actor->isGuest() /* || $actor->can('huoxin-filter-rule-manager.bypassAllRules') */) {
             $document->payload['filterRuleRulesets'] = [];
+
             return;
         }
 
@@ -50,22 +51,23 @@ class InjectFrontendRulesets
                         return false;
                     }
                 }
+
                 return true;
             })
             ->map(fn (Ruleset $r) => [
-                'id'           => $r->id,
-                'name'         => $r->name,
-                'priority'     => $r->priority,
+                'id' => $r->id,
+                'name' => $r->name,
+                'priority' => $r->priority,
                 'compiled_ast' => $r->compiled_ast,
-                'interventionType'   => $r->intervention_type,
+                'interventionType' => $r->intervention_type,
                 'evaluateAllRules' => $r->evaluate_all_rules,
-                'displayMode'  => $r->display_mode,
-                'message'      => $r->message,
-                'evaluateTitle'    => $r->evaluate_title === null ? null : (bool) $r->evaluate_title,
-                'blockCascade'     => $r->block_cascade,
-                'scopeType'        => $r->scope_type,
-                'scopeTagIds'  => $r->scope_tag_ids ?? [],
-                'displaySettings'  => $r->display_settings,
+                'displayMode' => $r->display_mode,
+                'message' => $r->message,
+                'evaluateTitle' => $r->evaluate_title === null ? null : (bool) $r->evaluate_title,
+                'blockCascade' => $r->block_cascade,
+                'scopeType' => $r->scope_type,
+                'scopeTagIds' => $r->scope_tag_ids ?? [],
+                'displaySettings' => $r->display_settings,
             ])
             ->values()
             ->toArray();

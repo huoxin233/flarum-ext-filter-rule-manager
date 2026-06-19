@@ -31,7 +31,7 @@ class CreateRulesetController extends AbstractCreateController
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        $body       = $request->getParsedBody();
+        $body = $request->getParsedBody();
         $attributes = $body['data']['attributes'] ?? [];
 
         $name = trim((string) ($attributes['name'] ?? ''));
@@ -40,8 +40,8 @@ class CreateRulesetController extends AbstractCreateController
         }
 
         $ruleset = new Ruleset();
-        $ruleset->name          = $name;
-        $ruleset->priority      = ((int) Ruleset::max('priority')) + 10;
+        $ruleset->name = $name;
+        $ruleset->priority = ((int) Ruleset::max('priority')) + 10;
 
         $expression = trim((string) ($attributes['expression'] ?? ''));
         $ruleset->expression = $expression;
@@ -54,26 +54,26 @@ class CreateRulesetController extends AbstractCreateController
                 $ast = $parser->parse();
                 $ruleset->compiled_ast = $ast->toArray();
             } catch (\Exception $e) {
-                throw new InvalidParameterException('Invalid expression syntax: ' . $e->getMessage());
+                throw new InvalidParameterException('Invalid expression syntax: '.$e->getMessage());
             }
         } else {
             $ruleset->compiled_ast = null;
         }
 
-        $ruleset->intervention_type   = $this->validEnum($attributes['interventionType'] ?? 'info', ['info', 'warning', 'block', 'silent'], 'info');
-        $ruleset->display_mode  = $this->validEnum($attributes['displayMode'] ?? 'banner', ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], 'banner');
-        $ruleset->message       = (string) ($attributes['message'] ?? '');
-        $ruleset->flag_message  = array_key_exists('flagMessage', $attributes) ? ($attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage']) : null;
+        $ruleset->intervention_type = $this->validEnum($attributes['interventionType'] ?? 'info', ['info', 'warning', 'block', 'silent'], 'info');
+        $ruleset->display_mode = $this->validEnum($attributes['displayMode'] ?? 'banner', ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], 'banner');
+        $ruleset->message = (string) ($attributes['message'] ?? '');
+        $ruleset->flag_message = array_key_exists('flagMessage', $attributes) ? ($attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage']) : null;
         $ruleset->evaluate_all_rules = (bool) ($attributes['evaluateAllRules'] ?? false);
         $ruleset->evaluate_title = array_key_exists('evaluateTitle', $attributes) ? ($attributes['evaluateTitle'] === null ? null : (bool) $attributes['evaluateTitle']) : null;
         $ruleset->evasion_active = array_key_exists('evasionActive', $attributes) ? ($attributes['evasionActive'] === null ? null : (bool) $attributes['evasionActive']) : null;
         $ruleset->evasion_timeout = array_key_exists('evasionTimeout', $attributes) ? ($attributes['evasionTimeout'] === null ? null : max(0, (int) $attributes['evasionTimeout'])) : null;
         $ruleset->evasion_threshold = array_key_exists('evasionThreshold', $attributes) ? ($attributes['evasionThreshold'] === null ? null : max(1, (int) $attributes['evasionThreshold'])) : null;
         $ruleset->block_cascade = (bool) ($attributes['blockCascade'] ?? false);
-        $ruleset->is_active     = (bool) ($attributes['isActive'] ?? true);
-        $ruleset->auto_flag     = array_key_exists('autoFlag', $attributes) ? ($attributes['autoFlag'] === null ? null : (bool) $attributes['autoFlag']) : null;
+        $ruleset->is_active = (bool) ($attributes['isActive'] ?? true);
+        $ruleset->auto_flag = array_key_exists('autoFlag', $attributes) ? ($attributes['autoFlag'] === null ? null : (bool) $attributes['autoFlag']) : null;
         $ruleset->require_approval = array_key_exists('requireApproval', $attributes) ? ($attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval']) : null;
-        $ruleset->scope_type    = $this->validEnum($attributes['scopeType'] ?? 'global', ['global', 'normal_post', 'private_post', 'tag'], 'global');
+        $ruleset->scope_type = $this->validEnum($attributes['scopeType'] ?? 'global', ['global', 'normal_post', 'private_post', 'tag'], 'global');
         $ruleset->scope_tag_ids = $this->sanitizeIds($attributes['scopeTagIds'] ?? null);
         $ruleset->bypass_group_ids = $this->sanitizeIds($attributes['bypassGroupIds'] ?? null);
         $ruleset->display_settings = is_array($attributes['displaySettings'] ?? null) ? $attributes['displaySettings'] : null;

@@ -19,8 +19,9 @@ class Parser
     {
         $node = $this->parseLogicalOr();
 
-        if (!$this->isAtEnd()) {
+        if (! $this->isAtEnd()) {
             $token = $this->peek();
+
             throw new \InvalidArgumentException("Unexpected token '{$token->value}' at position {$token->position}. Expected end of expression.");
         }
 
@@ -55,6 +56,7 @@ class Parser
     {
         if ($this->match(Token::T_NOT)) {
             $node = $this->parseUnary();
+
             return new NotNode($node);
         }
 
@@ -66,6 +68,7 @@ class Parser
         if ($this->match(Token::T_LPAREN)) {
             $node = $this->parseLogicalOr();
             $this->consume(Token::T_RPAREN, "Expected ')' after expression.");
+
             return $node;
         }
 
@@ -74,8 +77,8 @@ class Parser
 
     private function parseRule(): NodeInterface
     {
-        $fieldToken = $this->consume(Token::T_FIELD, "Expected field identifier (e.g. provider.type)");
-        
+        $fieldToken = $this->consume(Token::T_FIELD, 'Expected field identifier (e.g. provider.type)');
+
         $parts = explode('.', $fieldToken->value, 2);
         if (count($parts) !== 2) {
             throw new \InvalidArgumentException("Field '{$fieldToken->value}' must be in format provider.type");
@@ -111,29 +114,32 @@ class Parser
         }
         if ($this->match(Token::T_LBRACKET)) {
             $arr = [];
-            if (!$this->check(Token::T_RBRACKET)) {
+            if (! $this->check(Token::T_RBRACKET)) {
                 do {
                     $arr[] = $this->parseValue();
                 } while ($this->match(Token::T_COMMA));
             }
             $this->consume(Token::T_RBRACKET, "Expected ']' after array elements.");
+
             return $arr;
         }
         if ($this->match(Token::T_LBRACE)) {
             $obj = [];
-            if (!$this->check(Token::T_RBRACE)) {
+            if (! $this->check(Token::T_RBRACE)) {
                 do {
-                    $keyToken = $this->consume(Token::T_STRING, "Expected string key in object");
+                    $keyToken = $this->consume(Token::T_STRING, 'Expected string key in object');
                     $this->consume(Token::T_COLON, "Expected ':' after object key");
                     $val = $this->parseValue();
                     $obj[$keyToken->value] = $val;
                 } while ($this->match(Token::T_COMMA));
             }
             $this->consume(Token::T_RBRACE, "Expected '}' after object.");
+
             return $obj;
         }
 
         $token = $this->peek();
+
         throw new \InvalidArgumentException("Expected value (string, number, boolean, array) at position {$token->position}. Found: {$token->type}");
     }
 
@@ -142,9 +148,11 @@ class Parser
         foreach ($types as $type) {
             if ($this->check($type)) {
                 $this->advance();
+
                 return true;
             }
         }
+
         return false;
     }
 
@@ -154,7 +162,7 @@ class Parser
             return $this->advance();
         }
 
-        throw new \InvalidArgumentException($message . " Found: " . $this->peek()->type);
+        throw new \InvalidArgumentException($message.' Found: '.$this->peek()->type);
     }
 
     private function check(string $type): bool
@@ -162,14 +170,16 @@ class Parser
         if ($this->isAtEnd()) {
             return false;
         }
+
         return $this->peek()->type === $type;
     }
 
     private function advance(): Token
     {
-        if (!$this->isAtEnd()) {
+        if (! $this->isAtEnd()) {
             $this->position++;
         }
+
         return $this->previous();
     }
 

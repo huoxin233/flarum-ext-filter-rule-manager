@@ -43,19 +43,19 @@ class Ruleset extends AbstractModel
     protected $table = 'filter_rulesets';
 
     protected $casts = [
-        'compiled_ast'       => 'array',
-        'block_cascade'      => 'boolean',
-        'is_active'          => 'boolean',
-        'evaluate_title'     => 'boolean',
+        'compiled_ast' => 'array',
+        'block_cascade' => 'boolean',
+        'is_active' => 'boolean',
+        'evaluate_title' => 'boolean',
         'evaluate_all_rules' => 'boolean',
-        'evasion_active'     => 'boolean',
-        'evasion_timeout'    => 'integer',
-        'evasion_threshold'  => 'integer',
-        'auto_flag'          => 'boolean',
-        'require_approval'   => 'boolean',
-        'scope_tag_ids'      => 'array',
-        'bypass_group_ids'   => 'array',
-        'display_settings'   => 'array',
+        'evasion_active' => 'boolean',
+        'evasion_timeout' => 'integer',
+        'evasion_threshold' => 'integer',
+        'auto_flag' => 'boolean',
+        'require_approval' => 'boolean',
+        'scope_tag_ids' => 'array',
+        'bypass_group_ids' => 'array',
+        'display_settings' => 'array',
     ];
 
     protected static $activeRulesetsCache = null;
@@ -65,6 +65,7 @@ class Ruleset extends AbstractModel
         if (self::$activeRulesetsCache === null) {
             self::$activeRulesetsCache = static::active()->ordered()->get();
         }
+
         return self::$activeRulesetsCache;
     }
 
@@ -79,7 +80,6 @@ class Ruleset extends AbstractModel
             self::$activeRulesetsCache = null;
         });
     }
-
 
     public function scopeActive(Builder $query): Builder
     {

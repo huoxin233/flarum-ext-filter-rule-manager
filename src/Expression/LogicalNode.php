@@ -8,7 +8,8 @@ class LogicalNode implements NodeInterface
         public string $operator, // 'AND', 'OR'
         public NodeInterface $left,
         public NodeInterface $right
-    ) {}
+    ) {
+    }
 
     public function toArray(): array
     {

@@ -9,7 +9,8 @@ class RuleNode implements NodeInterface
         public string $ruleType,
         public string $operator,
         public mixed $value
-    ) {}
+    ) {
+    }
 
     public function toArray(): array
     {
