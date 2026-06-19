@@ -14,12 +14,14 @@ namespace Huoxin\FilterRuleManager;
 use Flarum\Extend;
 use Flarum\Post\Event\Saving;
 use Huoxin\FilterRuleManager\Api\Controller;
+use Huoxin\FilterRuleManager\Console\ClearOldBlockLogsCommand;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Exception\RuleBlockExceptionHandler;
 use Huoxin\FilterRuleManager\Listener\EvaluateBlockRulesets;
 use Huoxin\FilterRuleManager\Listener\ExecuteModerationActions;
 use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
 use Huoxin\FilterRuleManager\Provider\FilterRuleManagerServiceProvider;
+use Illuminate\Console\Scheduling\Event as ScheduleEvent;
 
 return [
     // ── Frontend assets ──────────────────────────────────────────────────────
@@ -64,5 +66,13 @@ return [
         ->default('huoxin-filter.global_require_approval', true)
         ->default('huoxin-filter.global_evasion_active', false)
         ->default('huoxin-filter.global_evasion_timeout', 5)
-        ->default('huoxin-filter.global_evasion_threshold', 2),
+        ->default('huoxin-filter.global_evasion_threshold', 2)
+        ->default('huoxin-filter.global_evasion_log_keep_days', 30),
+
+    // ── Prune old block logs command ──────────────────────────────────────
+    (new Extend\Console())
+        ->command(ClearOldBlockLogsCommand::class)
+        ->schedule(ClearOldBlockLogsCommand::class, function (ScheduleEvent $event) {
+            $event->daily();
+        }),
 ];
