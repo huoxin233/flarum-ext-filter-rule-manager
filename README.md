@@ -1,6 +1,6 @@
 # Filter Rule Manager
 
-![License](https://img.shields.io/badge/license-GPL-3.0-or-later-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Total Downloads](https://img.shields.io/packagist/dt/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager)
+![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Total Downloads](https://img.shields.io/packagist/dt/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Review](https://floxum.com/extension/huoxin/filter-rule-manager/badge/review)](https://floxum.com/extension/huoxin/filter-rule-manager) [![Review Score](https://floxum.com/extension/huoxin/filter-rule-manager/badge/review-score)](https://floxum.com/extension/huoxin/filter-rule-manager)
 
 A powerful, AST-based moderation and filtering engine for [Flarum](https://flarum.org).
 
@@ -24,6 +24,14 @@ Filter Rule Manager is built to give Flarum administrators fine-grained control 
 - **Customizable Messaging**: Define dynamic flag reasons and block messages using variable interpolation (e.g., `Matched word: {{matched_word}}` or `Triggered ruleset: {{ruleset}}`). Messages support **HTML**.
 - **Extensible API**: Other extensions can securely inject their own custom Rule Providers into the AST engine.
 
+## ⚠️ Security & Privacy Note
+
+**Frontend Evaluation Disclosure:** Filter Rule Manager evaluates `Info` and `Warning` rulesets instantly on the client-side to provide real-time feedback to users as they type. To achieve this, the system injects the full logic (including compiled word lists, regex patterns, and match conditions) of all active **Info** and **Warning** rulesets into the page payload for authenticated users.
+
+A determined user could potentially inspect the page source to discover the exact patterns configured in these rulesets and attempt to bypass them.
+
+**Best Practice:** Use `Info` and `Warning` interventions only for guidelines, formatting hints, or soft moderation. For strict filters (e.g., severe profanity, spam links, zero-tolerance policies) that you wish to keep hidden, use the **Block** or **Silent** intervention types. Block and Silent rulesets are evaluated strictly server-side and are **never** exposed to the browser.
+
 ## Installation
 
 Install with composer:
@@ -44,8 +52,14 @@ php flarum cache:clear
 
 Filter Rule Manager is built to be extended! If you are an extension developer and want to register custom Rule Providers (e.g., AI toxicity checks, image scanning, custom regex engines), please read the [Extending Guide](EXTENDING.md).
 
+## Screenshots
+
+<img width="1565" height="861" alt="PixPin_2026-06-19_23-19-22" src="https://github.com/user-attachments/assets/a562bc11-bec2-405d-a700-a1014f90c44c" />
+
+<img width="879" height="5092" alt="PixPin_2026-06-19_23-19-02" src="https://github.com/user-attachments/assets/afed68b2-5be1-4d91-bc63-34559dd57074" />
+
 ## Links
 
 - [Packagist](https://packagist.org/packages/huoxin/filter-rule-manager)
-- [GitHub](https://github.com/huoxin233/filter-rule-manager)
-- [Discuss](https://discuss.flarum.org/d/PUT_DISCUSS_SLUG_HERE)
+- [GitHub](https://github.com/huoxin233/flarum-ext-filter-rule-manager)
+- [Discuss](https://discuss.flarum.org/d/39451-filter-rule-manager)
