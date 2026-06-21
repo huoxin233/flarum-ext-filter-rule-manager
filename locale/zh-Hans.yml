@@ -218,6 +218,7 @@ huoxin-filter-rule-manager:
       name_required: "请为该规则集提供一个名称。"
       tags_required: "已选择按标签应用 — 请至少填写一个标签 ID。"
       expression_required: "表达式不能为空。"
+      invalid_ruleset_ids: "一个或多个规则集 ID 无效或不存在。"
 
     # ── Permissions ────────────────────────────────────────────────────────
     permissions:

@@ -12,8 +12,11 @@
 namespace Huoxin\FilterRuleManager\Api\Controller;
 
 use Flarum\Http\RequestUtil;
+use Flarum\Foundation\ValidationException;
 use Huoxin\FilterRuleManager\Model\Ruleset;
+use Illuminate\Database\ConnectionInterface;
 use Laminas\Diactoros\Response\JsonResponse;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -26,6 +29,10 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class ReorderRulesetsController implements RequestHandlerInterface
 {
+    public function __construct(protected ConnectionInterface $db, protected TranslatorInterface $translator)
+    {
+    }
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         RequestUtil::getActor($request)->assertAdmin();
@@ -36,8 +43,21 @@ class ReorderRulesetsController implements RequestHandlerInterface
         $ids = array_values(array_filter($ids, fn ($id) => is_numeric($id) && (int) $id > 0));
 
         if (! empty($ids)) {
+            $existingIds = Ruleset::whereIn('id', $ids)->pluck('id')->all();
+            $missingIds = array_diff($ids, $existingIds);
+
+            if (! empty($missingIds)) {
+                $trans = $this->translator->trans('huoxin-filter-rule-manager.admin.validation.invalid_ruleset_ids');
+                throw new ValidationException([
+                    'ids' => is_array($trans) ? $trans[0] : $trans,
+                ]);
+            }
+
             $values = array_map(fn ($index, $id) => ['id' => $id, 'priority' => $index * 10], array_keys($ids), $ids);
-            Ruleset::upsert($values, ['id'], ['priority']);
+
+            $this->db->transaction(function () use ($values) {
+                Ruleset::upsert($values, ['id'], ['priority']);
+            });
         }
 
         return new JsonResponse(['status' => 'ok']);
