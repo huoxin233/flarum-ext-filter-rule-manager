@@ -14,7 +14,7 @@ namespace Huoxin\FilterRuleManager\Api\Controller;
 use Flarum\Foundation\ValidationException;
 use Flarum\Http\RequestUtil;
 use Huoxin\FilterRuleManager\Model\Ruleset;
-use Illuminate\Database\ConnectionInterface;
+use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,7 +29,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ReorderRulesetsController implements RequestHandlerInterface
 {
-    public function __construct(protected ConnectionInterface $db, protected TranslatorInterface $translator)
+    public function __construct(protected RulesetRepository $repository, protected TranslatorInterface $translator)
     {
     }
 
@@ -56,9 +56,7 @@ class ReorderRulesetsController implements RequestHandlerInterface
 
             $values = array_map(fn ($index, $id) => ['id' => $id, 'priority' => $index * 10], array_keys($ids), $ids);
 
-            $this->db->transaction(function () use ($values) {
-                Ruleset::upsert($values, ['id'], ['priority']);
-            });
+            $this->repository->reorder($values);
         }
 
         return new JsonResponse(['status' => 'ok']);
