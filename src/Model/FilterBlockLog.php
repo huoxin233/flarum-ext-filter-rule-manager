@@ -36,7 +36,7 @@ class FilterBlockLog extends AbstractModel
         'tokens' => 'array',
     ];
 
-    protected $guarded = [];
+    protected $fillable = ['user_id', 'ruleset_id', 'content', 'message', 'tokens', 'created_at', 'is_cleared'];
 
     public function user()
     {
