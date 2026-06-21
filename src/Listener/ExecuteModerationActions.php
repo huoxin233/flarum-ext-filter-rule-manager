@@ -69,6 +69,8 @@ class ExecuteModerationActions
             return ($ruleset->auto_flag ?? $globalAutoFlag) || ($ruleset->require_approval ?? $globalRequireApproval);
         });
 
+        $providers = $this->evaluator->getProviders();
+
         [$defaultRulesets, $customMessages, $requiresApproval, $requiresFlag] =
             $this->collectModerationMatches($rulesets, $event, $providers, $globalAutoFlag, $globalRequireApproval);
 
