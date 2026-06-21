@@ -218,6 +218,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           {this.buildSettingComponent({
             type: 'number',
             setting: 'huoxin-filter.global_evasion_timeout',
+            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_timeout_help')),
             default: 5,
           })}
         </div>
@@ -226,6 +227,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           {this.buildSettingComponent({
             type: 'number',
             setting: 'huoxin-filter.global_evasion_threshold',
+            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_threshold_help')),
             default: 2,
           })}
         </div>
@@ -234,6 +236,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           {this.buildSettingComponent({
             type: 'number',
             setting: 'huoxin-filter.global_evasion_log_keep_days',
+            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_log_keep_days_help')),
             default: 0,
           })}
         </div>

@@ -72,8 +72,11 @@ huoxin-filter-rule-manager:
       global_evasion_active: "恶意绕过检测"
       global_evasion_active_help: "开启后，若用户在被拦截后短时间内发布了正常帖子，该帖子仍将被自动举报以供审查。"
       global_evasion_timeout: "检测时长（分钟）"
+      global_evasion_timeout_help: "在触发全局拦截规则后，用户处于被检测状态的时长。（默认：5）"
       global_evasion_threshold: "触发阈值（拦截次数）"
+      global_evasion_threshold_help: "在检测时长内需达到多少次拦截才会触发规避惩罚。（默认：2）"
       global_evasion_log_keep_days: "恶意绕过日志保留天数"
+      global_evasion_log_keep_days_help: "设置为 0 以禁用日志清理，永久保留日志。（默认：0）"
 
     # ── Form labels ────────────────────────────────────────────────────────
     ruleset_name: "名称"
