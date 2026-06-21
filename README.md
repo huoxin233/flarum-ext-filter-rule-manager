@@ -28,9 +28,9 @@ Filter Rule Manager is built to give Flarum administrators fine-grained control 
 
 **Frontend Evaluation Disclosure:** Filter Rule Manager evaluates `Info` and `Warning` rulesets instantly on the client-side to provide real-time feedback to users as they type. To achieve this, the system injects the full logic (including compiled word lists, regex patterns, and match conditions) of all active **Info** and **Warning** rulesets into the page payload for authenticated users.
 
-A determined user could potentially inspect the page source to discover the exact patterns configured in these rulesets and attempt to bypass them.
+To prevent casual snooping, **this payload is obfuscated** (using a Base64 XOR cipher) before it is sent to the browser. A normal user inspecting the page source or DevTools will only see a scrambled string. However, because the decryption key is necessarily shipped to the browser, a highly determined programmer could theoretically reverse-engineer the JavaScript and decrypt the payload. 
 
-**Best Practice:** Use `Info` and `Warning` interventions only for guidelines, formatting hints, or soft moderation. For strict filters (e.g., severe profanity, spam links, zero-tolerance policies) that you wish to keep hidden, use the **Block** or **Silent** intervention types. Block and Silent rulesets are evaluated strictly server-side and are **never** exposed to the browser.
+**Best Practice:** Use `Info` and `Warning` interventions only for guidelines, formatting hints, or soft moderation. For strict filters (e.g., severe profanity, spam links, zero-tolerance policies) that you wish to keep mathematically impossible to bypass, use the **Block** or **Silent** intervention types. Block and Silent rulesets are evaluated strictly server-side and are **never** exposed to the browser.
 
 ## Installation
 

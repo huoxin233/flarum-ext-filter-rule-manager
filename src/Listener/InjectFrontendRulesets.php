@@ -68,10 +68,18 @@ class InjectFrontendRulesets
                 'scopeType' => $r->scope_type,
                 'scopeTagIds' => $r->scope_tag_ids ?? [],
                 'displaySettings' => $r->display_settings,
-            ])
-            ->values()
-            ->toArray();
+            ]);
 
-        $document->payload['filterRuleRulesets'] = $rulesets;
+        $rulesetsArray = $rulesets->values()->toArray();
+        $json = json_encode($rulesetsArray);
+        $key = 'HuoxinFilterRuleManager'; // use for XOR, not a secret key
+        $out = '';
+        $keyLen = strlen($key);
+
+        for ($i = 0, $len = strlen($json); $i < $len; $i++) {
+            $out .= chr(ord($json[$i]) ^ ord($key[$i % $keyLen]));
+        }
+
+        $document->payload['filterRuleRulesets'] = base64_encode($out);
     }
 }

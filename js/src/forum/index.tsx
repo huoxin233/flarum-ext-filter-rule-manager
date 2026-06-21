@@ -40,8 +40,26 @@ app.initializers.add(
     filterEngine.registerProvider('builtin', new BuiltinProvider() as any);
     filterEngine.registerTemplate('builtin', BuiltinTemplate as any);
 
-    const rulesets = Array.isArray(app.data.filterRuleRulesets) ? app.data.filterRuleRulesets : [];
-    filterEngine.loadRulesets(rulesets as Ruleset[]);
+    let rulesets: Ruleset[] = [];
+    try {
+      const payload = app.data.filterRuleRulesets;
+      if (typeof payload === 'string') {
+        const decoded = atob(payload);
+        const key = 'HuoxinFilterRuleManager';
+        const keyLen = key.length;
+        const bytes = new Uint8Array(decoded.length);
+        for (let i = 0, len = decoded.length; i < len; i++) {
+          bytes[i] = decoded.charCodeAt(i) ^ key.charCodeAt(i % keyLen);
+        }
+        const out = new TextDecoder('utf-8').decode(bytes);
+        rulesets = JSON.parse(out);
+      } else if (Array.isArray(payload)) {
+        rulesets = payload;
+      }
+    } catch (e) {
+      console.warn('[FilterRuleManager] Failed to decode rulesets payload', e);
+    }
+    filterEngine.loadRulesets(rulesets);
 
     app.filterRulePopupDispatcher = new FilterRulePopupDispatcher(filterEngine);
 
