@@ -11,6 +11,7 @@ use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
+use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -21,7 +22,8 @@ class ExecuteModerationActions
         protected RulesetMatcher $matcher,
         protected ExtensionManager $extensions,
         protected TranslatorInterface $translator,
-        protected SettingsRepositoryInterface $settings
+        protected SettingsRepositoryInterface $settings,
+        protected RulesetRepository $rulesets
     ) {
     }
 
@@ -60,7 +62,7 @@ class ExecuteModerationActions
         $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter.global_evasion_threshold', 2);
 
         // Load all active rulesets once from in-memory cache, filter per concern.
-        $allActive = Ruleset::getActiveRulesets();
+        $allActive = $this->rulesets->getActiveRulesets();
 
         $rulesets = $allActive->filter(function (Ruleset $ruleset) use ($globalAutoFlag, $globalRequireApproval) {
             return ($ruleset->auto_flag ?? $globalAutoFlag) || ($ruleset->require_approval ?? $globalRequireApproval);

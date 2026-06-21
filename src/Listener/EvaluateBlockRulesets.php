@@ -20,13 +20,15 @@ use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
+use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 
 class EvaluateBlockRulesets
 {
     public function __construct(
         protected RuleEvaluator $evaluator,
         protected RulesetMatcher $matcher,
-        protected SettingsRepositoryInterface $settings
+        protected SettingsRepositoryInterface $settings,
+        protected RulesetRepository $rulesets
     ) {
     }
 
@@ -45,7 +47,7 @@ class EvaluateBlockRulesets
         $title = $discussion ? (string) $discussion->title : '';
 
         /** @var \Illuminate\Support\Collection $rulesets */
-        $rulesets = Ruleset::getActiveRulesets()->filter(function ($ruleset) {
+        $rulesets = $this->rulesets->getActiveRulesets()->filter(function ($ruleset) {
             return $ruleset->intervention_type === 'block';
         });
 
