@@ -52,7 +52,7 @@ export default class BuiltinProvider implements FilterRuleProvider {
           if (body.startsWith('/')) {
             const last = body.lastIndexOf('/');
             if (last > 0) {
-              flags = body.substring(last + 1) || 'i';
+              flags = body.substring(last + 1);
               body = body.substring(1, last);
             }
           }
