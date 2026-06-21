@@ -13,6 +13,7 @@ use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExecuteModerationActions
@@ -68,32 +69,8 @@ class ExecuteModerationActions
             return ($ruleset->auto_flag ?? $globalAutoFlag) || ($ruleset->require_approval ?? $globalRequireApproval);
         });
 
-        $defaultRulesets = [];
-        $customMessages = [];
-        $providers = $this->evaluator->getProviders();
-        $requiresApproval = false;
-        $requiresFlag = false;
-
-        foreach ($rulesets as $ruleset) {
-            $tokens = $this->matcher->match($ruleset, $post, $event->actor, $providers);
-            if ($tokens !== null) {
-                if (! empty($ruleset->flag_message)) {
-                    $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);
-                } else {
-                    $defaultRulesets[] = $ruleset->name;
-                }
-
-                $autoFlag = $ruleset->auto_flag ?? $globalAutoFlag;
-                $requireApproval = $ruleset->require_approval ?? $globalRequireApproval;
-
-                if ($requireApproval) {
-                    $requiresApproval = true;
-                }
-                if ($autoFlag) {
-                    $requiresFlag = true;
-                }
-            }
-        }
+        [$defaultRulesets, $customMessages, $requiresApproval, $requiresFlag] =
+            $this->collectModerationMatches($rulesets, $event, $providers, $globalAutoFlag, $globalRequireApproval);
 
         $actor = $event->actor;
         $blockedRulesetName = $this->resolveEvasion($actor, $allActive, $globalEvasionActive, $globalEvasionTimeout, $globalEvasionThreshold);
@@ -115,8 +92,50 @@ class ExecuteModerationActions
             return;
         }
 
-        $flagType = 'autoMod';
+        $reasonDetail = $this->buildReasonDetail($defaultRulesets, $customMessages, $isEvasion, $blockedRulesetName);
 
+        if ($shouldApprove) {
+            $this->applyApproval($post);
+        }
+
+        if ($shouldFlag) {
+            $this->createFlag($post, $reasonDetail, 'autoMod');
+        }
+    }
+
+    private function collectModerationMatches(Collection $rulesets, Saving $event, array $providers, bool $globalAutoFlag, bool $globalRequireApproval): array
+    {
+        $defaultRulesets = [];
+        $customMessages = [];
+        $requiresApproval = false;
+        $requiresFlag = false;
+
+        foreach ($rulesets as $ruleset) {
+            $tokens = $this->matcher->match($ruleset, $event->post, $event->actor, $providers);
+            if ($tokens !== null) {
+                if (! empty($ruleset->flag_message)) {
+                    $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);
+                } else {
+                    $defaultRulesets[] = $ruleset->name;
+                }
+
+                $autoFlag = $ruleset->auto_flag ?? $globalAutoFlag;
+                $requireApproval = $ruleset->require_approval ?? $globalRequireApproval;
+
+                if ($requireApproval) {
+                    $requiresApproval = true;
+                }
+                if ($autoFlag) {
+                    $requiresFlag = true;
+                }
+            }
+        }
+
+        return [$defaultRulesets, $customMessages, $requiresApproval, $requiresFlag];
+    }
+
+    private function buildReasonDetail(array $defaultRulesets, array $customMessages, bool $isEvasion, ?string $blockedRulesetName): string
+    {
         $messages = [];
 
         if (! empty($defaultRulesets)) {
@@ -135,15 +154,7 @@ class ExecuteModerationActions
         }
 
         $reasonDetail = implode("\n\n", $messages);
-        $reasonDetail = html_entity_decode($reasonDetail, ENT_QUOTES, 'UTF-8');
-
-        if ($shouldApprove) {
-            $this->applyApproval($post);
-        }
-
-        if ($shouldFlag) {
-            $this->createFlag($post, $reasonDetail, $flagType);
-        }
+        return html_entity_decode($reasonDetail, ENT_QUOTES, 'UTF-8');
     }
 
     private function resolveEvasion($actor, $allActive, bool $globalEvasionActive, int $globalEvasionTimeout, int $globalEvasionThreshold): ?string
@@ -160,13 +171,7 @@ class ExecuteModerationActions
             return null;
         }
 
-        $maxTimeout = 0;
-        foreach ($evasionRulesets as $ruleset) {
-            $t = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
-            if ($t > $maxTimeout) {
-                $maxTimeout = $t;
-            }
-        }
+        $maxTimeout = $this->computeMaxEvasionTimeout($evasionRulesets, $globalEvasionTimeout);
 
         if ($maxTimeout <= 0) {
             return null;
@@ -179,6 +184,24 @@ class ExecuteModerationActions
             ->select('ruleset_id', 'created_at')
             ->get();
 
+        $triggered = $this->findTriggeredEvasionRuleset($evasionRulesets, $recentLogs, $globalEvasionTimeout, $globalEvasionThreshold);
+        return $triggered ? $triggered->name : null;
+    }
+
+    private function computeMaxEvasionTimeout(Collection $evasionRulesets, int $globalEvasionTimeout): int
+    {
+        $maxTimeout = 0;
+        foreach ($evasionRulesets as $ruleset) {
+            $t = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
+            if ($t > $maxTimeout) {
+                $maxTimeout = $t;
+            }
+        }
+        return $maxTimeout;
+    }
+
+    private function findTriggeredEvasionRuleset(Collection $evasionRulesets, Collection $recentLogs, int $globalEvasionTimeout, int $globalEvasionThreshold): ?Ruleset
+    {
         foreach ($evasionRulesets as $rulesetId => $ruleset) {
             $timeout = $ruleset->evasion_timeout ?? $globalEvasionTimeout;
             $threshold = $ruleset->evasion_threshold ?? $globalEvasionThreshold;
@@ -193,7 +216,7 @@ class ExecuteModerationActions
             })->count();
 
             if ($count >= max(1, $threshold)) {
-                return $ruleset->name;
+                return $ruleset;
             }
         }
 
