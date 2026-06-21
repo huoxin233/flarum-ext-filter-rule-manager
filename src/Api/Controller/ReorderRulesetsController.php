@@ -11,15 +11,15 @@
 
 namespace Huoxin\FilterRuleManager\Api\Controller;
 
-use Flarum\Http\RequestUtil;
 use Flarum\Foundation\ValidationException;
+use Flarum\Http\RequestUtil;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Database\ConnectionInterface;
 use Laminas\Diactoros\Response\JsonResponse;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Accepts an ordered list of ruleset IDs and updates each priority accordingly.
@@ -48,6 +48,7 @@ class ReorderRulesetsController implements RequestHandlerInterface
 
             if (! empty($missingIds)) {
                 $trans = $this->translator->trans('huoxin-filter-rule-manager.admin.validation.invalid_ruleset_ids');
+
                 throw new ValidationException([
                     'ids' => is_array($trans) ? $trans[0] : $trans,
                 ]);
