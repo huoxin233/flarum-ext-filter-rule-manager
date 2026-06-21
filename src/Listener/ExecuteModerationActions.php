@@ -9,9 +9,9 @@ use Flarum\Post\Event\Saving;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Model\Ruleset;
+use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
-use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -156,6 +156,7 @@ class ExecuteModerationActions
         }
 
         $reasonDetail = implode("\n\n", $messages);
+
         return html_entity_decode($reasonDetail, ENT_QUOTES, 'UTF-8');
     }
 
@@ -187,6 +188,7 @@ class ExecuteModerationActions
             ->get();
 
         $triggered = $this->findTriggeredEvasionRuleset($evasionRulesets, $recentLogs, $globalEvasionTimeout, $globalEvasionThreshold);
+
         return $triggered ? $triggered->name : null;
     }
 
@@ -199,6 +201,7 @@ class ExecuteModerationActions
                 $maxTimeout = $t;
             }
         }
+
         return $maxTimeout;
     }
 

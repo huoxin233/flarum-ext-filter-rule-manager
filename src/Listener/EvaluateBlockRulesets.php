@@ -17,10 +17,9 @@ use Flarum\Post\Exception\FloodingException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Model\FilterBlockLog;
-use Huoxin\FilterRuleManager\Model\Ruleset;
+use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
-use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 
 class EvaluateBlockRulesets
 {
