@@ -234,7 +234,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           {this.buildSettingComponent({
             type: 'number',
             setting: 'huoxin-filter.global_evasion_log_keep_days',
-            default: 30,
+            default: 0,
           })}
         </div>
         <div className="Form-group">{this.submitButton()}</div>
