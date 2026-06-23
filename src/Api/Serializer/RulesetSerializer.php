@@ -15,11 +15,10 @@ use Flarum\Api\Serializer\AbstractSerializer;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 
 /**
- * Rules are inlined as a JSON attribute rather than exposed as a JSON:API
- * relationship. This keeps the wire format symmetric with what the admin
- * editor sends back, so a round-trip (load → edit → save → reopen) preserves
- * the rules without relying on the Flarum store to reconcile relationship
- * data with the optimistic save body.
+ * @TODO: Remove this in favor of one of the API resource classes that were added.
+ *      Or extend an existing API Resource to add this to.
+ *      Or use a vanilla RequestHandlerInterface controller.
+ *      @link https://docs.flarum.org/2.x/extend/api#endpoints
  */
 class RulesetSerializer extends AbstractSerializer
 {

@@ -75,4 +75,5 @@ return [
         ->schedule(ClearOldBlockLogsCommand::class, function (ScheduleEvent $event) {
             $event->daily();
         }),
+    new Extend\ApiResource(Api\Resource\RulesetResource::class),
 ];
