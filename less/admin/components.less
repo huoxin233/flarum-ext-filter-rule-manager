@@ -1,6 +1,6 @@
 .card-style() {
-  background: var(--body-bg, @body-bg);
-  border: 1px solid var(--control-bg, @control-bg);
+  background: var(--body-bg);
+  border: 1px solid var(--control-bg);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
@@ -29,12 +29,12 @@
     &--info    { background: fade(@info-color, 15%);    color: darken(@info-color, 10%); }
     &--warning { background: fade(@warning-color, 15%); color: darken(@warning-color, 10%); }
     &--block   { background: fade(@error-color, 15%);   color: darken(@error-color, 10%); }
-    &--silent  { background: fade(@muted-color, 15%);   color: darken(@muted-color, 10%); }
+    &--silent  { background: var(--muted-color-fade-15);   color: var(--muted-color-darken-10); }
   }
 
   .ScopeBadge {
     background: rgba(0, 0, 0, 0.05);
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
 
     &--global       { background: fade(@info-color, 12%);    color: darken(@info-color, 12%); }
     &--normal_post  { background: var(--body-bg-shaded); color: var(--muted-color-light); }
@@ -47,7 +47,7 @@
 
   .StatusBadge {
     &--active   { background: fade(@success-color, 15%); color: darken(@success-color, 10%); }
-    &--inactive { background: rgba(0, 0, 0, 0.05);       color: var(--muted-color, @muted-color); }
+    &--inactive { background: rgba(0, 0, 0, 0.05);       color: var(--muted-color); }
   }
 
   .CountBadge {
@@ -57,8 +57,8 @@
     min-width: 24px;
     height: 22px;
     padding: 0 8px;
-    background: var(--primary-color, @primary-color);
-    color: var(--body-bg, @body-bg);
+    background: var(--primary-color);
+    color: var(--body-bg);
     border-radius: 11px;
     font-size: 12px;
     font-weight: 700;
@@ -71,7 +71,7 @@
 // Segmented control for inheritance (3-state)
 .RulesetEditor-segmentedControl {
   display: flex;
-  background: var(--control-bg, @control-bg);
+  background: var(--control-bg);
   border-radius: 6px;
   padding: 3px;
   gap: 3px;
@@ -84,7 +84,7 @@
     border-radius: 4px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--control-color, @control-color);
+    color: var(--control-color, var(--control-color));
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -95,16 +95,16 @@
 
     &:hover:not([class*="active"]) {
       background: rgba(0, 0, 0, 0.05);
-      color: var(--text-color, @text-color);
+      color: var(--text-color);
     }
 
     &.active, &.active-enabled, &.active-disabled {
-      background: var(--body-bg, @body-bg);
+      background: var(--body-bg);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     &.active {
-      color: var(--primary-color, @primary-color);
+      color: var(--primary-color);
     }
 
     &.active-enabled {
@@ -112,7 +112,7 @@
     }
 
     &.active-disabled {
-      color: @error-color;
+      color: var(--error-color);
     }
 
     i {
@@ -137,17 +137,17 @@
   justify-content: center;
   gap: 8px;
   padding: 10px 14px;
-  border: 2px solid var(--control-bg, @control-bg);
-  background: var(--body-bg, @body-bg);
+  border: 2px solid var(--control-bg);
+  background: var(--body-bg);
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   transition: all 150ms ease;
-  color: var(--muted-color, @muted-color);
+  color: var(--muted-color);
 
   &:hover {
-    border-color: var(--primary-color, @primary-color);
-    color: var(--text-color, @text-color);
+    border-color: var(--primary-color);
+    color: var(--text-color);
   }
 
   i { font-size: 14px; }
@@ -155,7 +155,7 @@
   &--info.active    { border-color: @info-color;    background: fade(@info-color, 10%);    color: darken(@info-color, 10%); }
   &--warning.active { border-color: @warning-color; background: fade(@warning-color, 10%); color: darken(@warning-color, 10%); }
   &--block.active   { border-color: @error-color;   background: fade(@error-color, 10%);   color: darken(@error-color, 10%); }
-  &--silent.active  { border-color: var(--muted-color, @muted-color); background: fade(@muted-color, 10%); color: darken(@muted-color, 10%); }
+  &--silent.active  { border-color: var(--muted-color); background: var(--muted-color-fade-10); color: darken(@muted-color, 10%); }
 }
 // Token hint chips
 
@@ -167,7 +167,7 @@
 
   &--empty {
     font-size: 12px;
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
     font-style: italic;
   }
 
@@ -176,7 +176,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
     margin-bottom: 6px;
   }
 
@@ -191,8 +191,8 @@
     align-items: center;
     gap: 6px;
     padding: 4px 8px;
-    background: var(--body-bg, @body-bg);
-    border: 1px solid var(--control-bg, @control-bg);
+    background: var(--body-bg);
+    border: 1px solid var(--control-bg);
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
@@ -200,7 +200,7 @@
     max-width: 100%;
 
     &:hover {
-      border-color: var(--primary-color, @primary-color);
+      border-color: var(--primary-color);
       background: fade(@info-color, 8%);
     }
 
@@ -214,7 +214,7 @@
     }
 
     &-desc {
-      color: var(--muted-color, @muted-color);
+      color: var(--muted-color);
       font-size: 11px;
       flex: 1;
       min-width: 0;
@@ -241,7 +241,7 @@
   gap: 16px;
   flex-direction: column;
   margin-top: 16px;
-  background: var(--body-bg, @body-bg);
+  background: var(--body-bg);
   border: 1px solid var(--control-bg-shaded);
   padding: 16px;
   border-radius: 6px;
@@ -434,7 +434,7 @@
     font-size: 11px;
     text-transform: uppercase;
     font-weight: bold;
-    color: @muted-color;
+    color: var(--muted-color);
     margin-bottom: 10px;
     display: block;
   }
@@ -456,9 +456,9 @@
     display: flex;
     align-items: center;
     padding: 8px 12px;
-    background: var(--body-bg, @body-bg);
-    border: 1px solid var(--control-bg, @control-bg);
-    border-radius: var(--border-radius, @border-radius);
+    background: var(--body-bg);
+    border: 1px solid var(--control-bg);
+    border-radius: var(--border-radius);
     cursor: pointer;
     transition: all 0.2s ease;
     font-weight: normal;
@@ -469,7 +469,7 @@
     }
 
     &.active {
-      border-color: var(--primary-color, @primary-color);
+      border-color: var(--primary-color);
       background: fade(@primary-color, 5%);
       font-weight: bold;
     }
@@ -500,7 +500,7 @@
   &-children {
     padding-left: 30px;
     margin-top: 5px;
-    border-left: 2px solid @control-bg;
+    border-left: 2px solid var(--control-bg);
     margin-left: 15px;
   }
 }
@@ -516,15 +516,15 @@
     display: flex;
     align-items: center;
     padding: 8px 12px;
-    background: var(--body-bg, @body-bg);
-    border: 1px solid var(--control-bg, @control-bg);
-    border-radius: var(--border-radius, @border-radius);
+    background: var(--body-bg);
+    border: 1px solid var(--control-bg);
+    border-radius: var(--border-radius);
     cursor: pointer;
     transition: all 0.2s ease;
     margin: 0;
 
     &.active {
-      border-color: var(--primary-color, @primary-color);
+      border-color: var(--primary-color);
       background: fade(@primary-color, 5%);
     }
 
@@ -557,4 +557,16 @@
       text-overflow: ellipsis;
     }
   }
+}
+
+
+[data-theme^=light] {
+  --muted-color-fade-15: fade(@muted-color-light, 15%);
+  --muted-color-darken-10: darken(@muted-color-light, 10%);
+  --muted-color-fade-10: fade(@muted-color-light, 10%);
+}
+[data-theme^=dark] {
+  --muted-color-fade-15: fade(@muted-color-dark, 15%);
+  --muted-color-darken-10: darken(@muted-color-dark, 10%);
+  --muted-color-fade-10: fade(@muted-color-dark, 10%);
 }

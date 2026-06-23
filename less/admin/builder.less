@@ -12,19 +12,19 @@
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
     margin-bottom: 8px;
   }
 
   textarea.FilterRuleManager-LinesInput {
-    background: var(--body-bg, @body-bg);
+    background: var(--body-bg);
     border: 1px solid var(--control-bg-shaded, rgba(0, 0, 0, 0.1));
     font-size: 13px;
     line-height: 1.5;
     resize: vertical;
     
     &:focus {
-      border-color: var(--primary-color, @primary-color);
+      border-color: var(--primary-color);
     }
   }
 }
@@ -60,7 +60,7 @@
 }
 
 .Expression-RuleNode {
-  background: var(--body-bg, @body-bg);
+  background: var(--body-bg);
   padding: 15px;
   border-radius: 4px;
   border: 1px solid var(--control-bg-shaded);
@@ -151,7 +151,7 @@
   .RuleBuilder-tabs {
     display: flex;
     gap: 4px;
-    background: var(--control-bg, @control-bg);
+    background: var(--control-bg);
     padding: 4px;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -169,7 +169,7 @@
     border: none;
     border-radius: 6px;
     padding: 8px 16px;
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
     font-size: 14px;
     font-weight: 600;
     transition: all 150ms ease;
@@ -183,8 +183,8 @@
     }
 
     &.active {
-      background: var(--body-bg, @body-bg);
-      color: var(--primary-color, @primary-color);
+      background: var(--body-bg);
+      color: var(--primary-color);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
       font-weight: 700;
     }
@@ -199,7 +199,7 @@
     margin-top: 15px;
   }
   .RuleBuilder-appendButton {
-    background: var(--body-bg, @body-bg);
+    background: var(--body-bg);
     border: 1px solid var(--control-bg-shaded);
     padding: 4px 12px;
   }

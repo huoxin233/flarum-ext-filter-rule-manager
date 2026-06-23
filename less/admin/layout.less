@@ -18,7 +18,7 @@
     display: inline-flex;
     flex-wrap: wrap;
     gap: 4px;
-    background: var(--control-bg, @control-bg);
+    background: var(--control-bg);
     padding: 4px;
     border-radius: 8px;
 
@@ -35,7 +35,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      color: var(--muted-color, @muted-color);
+      color: var(--muted-color);
       font-size: 14px;
       font-weight: 600;
       transition: all 150ms ease;
@@ -47,8 +47,8 @@
       }
 
       &.active {
-        background: var(--body-bg, @body-bg);
-        color: var(--primary-color, @primary-color);
+        background: var(--body-bg);
+        color: var(--primary-color);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         font-weight: 700;
       }
@@ -62,8 +62,8 @@
     .Button-badge {
       margin-left: 6px;
       padding: 0 6px;
-      background: var(--primary-color, @primary-color);
-      color: var(--body-bg, @body-bg);
+      background: var(--primary-color);
+      color: var(--body-bg);
       border-radius: 10px;
       font-size: 11px;
       font-weight: 700;
@@ -97,7 +97,7 @@
 .FilterRulePage .EmptyState {
   text-align: center;
   padding: 60px 20px;
-  color: var(--muted-color, @muted-color);
+  color: var(--muted-color);
 
   &-icon {
     font-size: 48px;
@@ -129,7 +129,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
     align-items: center;
 
     @media (max-width: 768px) {
@@ -149,7 +149,7 @@
     &:hover {
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       transform: translateY(-1px);
-      border-color: var(--primary-color, @primary-color);
+      border-color: var(--primary-color);
     }
 
     &--inactive {
@@ -169,18 +169,18 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: var(--text-color, @text-color);
+    color: var(--text-color);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
 
     &--primary {
       font-weight: 600;
-      color: var(--heading-color, @heading-color);
+      color: var(--heading-color, var(--heading-color));
     }
 
     &--muted {
-      color: var(--muted-color, @muted-color);
+      color: var(--muted-color);
       font-size: 13px;
     }
 
@@ -188,7 +188,7 @@
       justify-content: space-between;
       width: 100%;
       padding-bottom: 8px;
-      border-bottom: 1px solid var(--control-bg, @control-bg);
+      border-bottom: 1px solid var(--control-bg);
       gap: 4px;
 
       &:last-child {
@@ -200,7 +200,7 @@
         content: attr(data-label);
         font-weight: 700;
         font-size: 11px;
-        color: var(--muted-color, @muted-color);
+        color: var(--muted-color);
         text-transform: uppercase;
         margin-right: 10px;
         flex-shrink: 0;
@@ -264,12 +264,12 @@
 
       &--danger {
         background: rgba(231, 76, 60, 0.1);
-        color: @error-color;
+        color: var(--error-color);
         border: 1px solid transparent;
         
         &:hover {
-          background: @error-color;
-          color: var(--body-bg, @body-bg);
+          background: var(--error-color);
+          color: var(--body-bg);
         }
       }
     }
@@ -348,12 +348,12 @@
   &Title {
     font-size: 13px;
     font-weight: 700;
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 0 0 12px;
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--control-bg, @control-bg);
+    border-bottom: 1px solid var(--control-bg);
   }
 }
 // Scope sub-tabs
@@ -364,7 +364,7 @@
   gap: 4px;
   margin-bottom: 18px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--control-bg, @control-bg);
+  border-bottom: 1px solid var(--control-bg);
 
   .SubTab {
     display: inline-flex;
@@ -377,7 +377,7 @@
     cursor: pointer;
     font-size: 13px;
     font-weight: 600;
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
     transition: all 120ms ease;
 
     &:hover {
@@ -387,7 +387,7 @@
     &.active {
       background: fade(@primary-color, 20%);
       border-color: fade(@primary-color, 50%);
-      color: var(--primary-color, @primary-color);
+      color: var(--primary-color);
     }
   }
 
@@ -408,7 +408,7 @@
 
   .SubTab.active .SubTab-count {
     background: fade(@primary-color, 25%);
-    color: var(--primary-color, @primary-color);
+    color: var(--primary-color);
   }
 }
 

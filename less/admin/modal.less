@@ -7,7 +7,7 @@
 }
 
 .RulesetEditor-section {
-  background: var(--body-bg, @body-bg);
+  background: var(--body-bg);
   border: none;
   border-radius: var(--border-radius);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
@@ -20,7 +20,7 @@
     gap: 12px;
     margin-bottom: 20px;
     padding-bottom: 12px;
-    border-bottom: 1px solid var(--control-bg-shaded, @control-bg);
+    border-bottom: 1px solid var(--control-bg-shaded, var(--control-bg));
 
     &--with-toggle {
       justify-content: space-between;
@@ -37,11 +37,11 @@
       margin: 0;
       font-size: 18px;
       font-weight: 700;
-      color: var(--heading-color, @heading-color);
+      color: var(--heading-color, var(--heading-color));
     }
 
     i {
-      color: var(--primary-color, @primary-color);
+      color: var(--primary-color);
       font-size: 18px;
     }
   }
@@ -53,22 +53,22 @@
     > label {
       display: block;
       font-weight: 600;
-      color: var(--heading-color, @heading-color);
+      color: var(--heading-color, var(--heading-color));
       margin-bottom: 8px;
       font-size: 14px;
     }
   }
 
   .FormControl {
-    background: var(--control-bg, @control-bg);
+    background: var(--control-bg);
     border: 2px solid transparent;
     border-radius: var(--border-radius);
-    color: var(--control-color, @control-color);
+    color: var(--control-color, var(--control-color));
     transition: all 0.2s ease;
     
     &:focus {
-      background: var(--body-bg, @body-bg);
-      border-color: var(--primary-color, @primary-color);
+      background: var(--body-bg);
+      border-color: var(--primary-color);
       box-shadow: none;
       outline: none;
     }
@@ -76,7 +76,7 @@
 
   .helpText {
     font-size: 12px;
-    color: var(--muted-color, @muted-color);
+    color: var(--muted-color);
     margin-top: 6px;
   }
 }
@@ -102,13 +102,13 @@
   gap: 10px;
   justify-content: flex-end;
   padding-top: 12px;
-  border-top: 1px solid var(--control-bg, @control-bg);
+  border-top: 1px solid var(--control-bg);
   margin-top: 8px;
 }
 
 .RulesetEditor-divider {
   border: none;
-  border-top: 1px solid var(--control-bg-shaded, @control-bg);
+  border-top: 1px solid var(--control-bg-shaded, var(--control-bg));
   margin: 20px 0;
 }
 
@@ -122,14 +122,14 @@
 
   .RulesetEditor-discardIcon {
     font-size: 3rem;
-    color: var(--error-color, @error-color);
+    color: var(--error-color, var(--error-color));
     margin-bottom: 20px;
   }
 
   .RulesetEditor-discardTitle {
     margin-bottom: 10px;
     font-weight: bold;
-    color: var(--heading-color, @heading-color);
+    color: var(--heading-color, var(--heading-color));
   }
 
   .RulesetEditor-discardMessage {
