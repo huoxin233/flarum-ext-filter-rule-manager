@@ -9,7 +9,7 @@
 
 import Component, { ComponentAttrs } from 'flarum/common/Component';
 import app from 'flarum/admin/app';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import classList from 'flarum/common/utils/classList';
 import Stream from 'flarum/common/utils/Stream';
 import type Mithril from 'mithril';
@@ -81,7 +81,7 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
         <label className={classList('InlineTagSelector-item', { active: selected })}>
           <input type="checkbox" checked={selected} onchange={(e: Event) => this.toggleTag(id, (e.target as HTMLInputElement).checked)} />
           <span className="InlineTagSelector-icon" style={{ backgroundColor: tag.color() }}>
-            {tag.icon() && icon(tag.icon() as string)}
+            {tag.icon() && <Icon name={tag.icon() as string} />}
           </span>
           <span className="InlineTagSelector-name">{tag.name()}</span>
         </label>

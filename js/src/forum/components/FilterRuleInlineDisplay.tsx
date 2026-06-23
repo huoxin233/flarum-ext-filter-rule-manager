@@ -10,7 +10,7 @@
 import app from 'flarum/forum/app';
 import Component, { ComponentAttrs } from 'flarum/common/Component';
 import filterEngine from '../../common/FilterEngine';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import type Mithril from 'mithril';
 
 export interface FilterRuleInlineDisplayAttrs extends ComponentAttrs {
@@ -106,7 +106,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
             }}
             title={String(app.translator.trans('core.lib.error.dismiss_button')) || 'Dismiss'}
           >
-            {icon('fas fa-times')}
+            <Icon name="fas fa-times" />
           </button>
         </div>
       );

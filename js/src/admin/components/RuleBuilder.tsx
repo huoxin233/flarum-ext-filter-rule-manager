@@ -12,7 +12,7 @@ import Component, { ComponentAttrs } from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 import Select from 'flarum/common/components/Select';
 import Switch from 'flarum/common/components/Switch';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import { parseExpression, stringifyExpression } from '../utils/ExpressionParser';
 import { ASTNode } from '../../common/FilterEngine';
 import type Mithril from 'mithril';
@@ -241,7 +241,7 @@ class NodeView extends Component<NodeViewAttrs> {
             onchange(createEmptyRule(providers));
           }}
         >
-          {icon('fas fa-plus')} {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.add_rule')}
+          <Icon name="fas fa-plus" /> {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.add_rule')}
         </Button>
       );
     }
@@ -373,7 +373,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
               if (!this.parseError) this.mode = 'visual';
             }}
           >
-            {icon('fas fa-project-diagram')} {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.visual_builder')}
+            <Icon name="fas fa-project-diagram" /> {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.visual_builder')}
           </Button>
           <Button
             className={`Button RuleBuilder-tabButton ${this.mode === 'editor' ? 'active' : ''}`}
@@ -382,10 +382,9 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
               this.mode = 'editor';
             }}
           >
-            {icon('fas fa-code')} {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.expression_editor')}
+            <Icon name="fas fa-code" /> {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.expression_editor')}
           </Button>
         </div>
-
         {this.parseError && (
           <div className="Alert Alert--error RuleBuilder-errorAlert">
             <strong>{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.parse_error')}</strong> {this.parseError}
@@ -393,7 +392,6 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
             {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.parse_error_help')}
           </div>
         )}
-
         {this.mode === 'visual' ? (
           <div className="RuleBuilder-visual">
             {[

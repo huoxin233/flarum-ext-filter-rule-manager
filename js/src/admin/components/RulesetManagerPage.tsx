@@ -13,7 +13,7 @@ import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import extractText from 'flarum/common/utils/extractText';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import type Mithril from 'mithril';
 import type Model from 'flarum/common/Model';
 import type { ASTNode } from '../../common/FilterEngine';
@@ -351,46 +351,39 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             aria-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.move_down'))}
           />
         </div>
-
         <div
           className="CardList-item-cell CardList-item-cell--primary"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.name')}
         >
           {ruleset.name()}
         </div>
-
         <div className="CardList-item-cell" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.intervention')}>
           <span className={`InterventionBadge InterventionBadge--${intervention}`}>
-            {icon(this.interventionIcon(intervention))}
+            <Icon name={this.interventionIcon(intervention)} />
             {app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}`)}
           </span>
         </div>
-
         <div className="CardList-item-cell" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.scope')}>
           <span className={`ScopeBadge ScopeBadge--${scope}`}>{app.translator.trans(`huoxin-filter-rule-manager.admin.scopes.${scope}`)}</span>
         </div>
-
         <div
           className="CardList-item-cell CardList-item-cell--muted"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.display')}
         >
           {app.translator.trans(`huoxin-filter-rule-manager.admin.displays.${display}`)}
         </div>
-
         <div
           className="CardList-item-cell CardList-item-cell--muted CardList-item-cell--rules"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.rules')}
         >
           <span className="CountBadge">{rulesCount}</span>
         </div>
-
         <div
           className="CardList-item-cell CardList-item-cell--switch"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.active')}
         >
           <Switch state={isActive} disabled={isTogglingThis} onchange={(val: boolean) => this.toggleActive(ruleset, val)} />
         </div>
-
         <div className="CardList-item-actions">
           <Button
             className="Button"

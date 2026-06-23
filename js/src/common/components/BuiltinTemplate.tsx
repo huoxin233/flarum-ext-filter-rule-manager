@@ -9,7 +9,7 @@
 
 import app from 'flarum/common/app';
 import Component, { ComponentAttrs } from 'flarum/common/Component';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import type Mithril from 'mithril';
 
 export interface BuiltinTemplateAttrs extends ComponentAttrs {
@@ -49,7 +49,7 @@ export default class BuiltinTemplate extends Component<BuiltinTemplateAttrs> {
       <div className={`FilterRuleManager-item FilterRuleManager-item--${variant} FilterRuleManager-item--${alert.type}`} style={style}>
         {iconName !== 'none' && (
           <span className="FilterRuleManager-item-icon" style={iconStyle}>
-            {icon(iconName)}
+            <Icon name={iconName} />
           </span>
         )}
         <div className="FilterRuleManager-item-content">

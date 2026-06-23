@@ -9,7 +9,7 @@
 
 import app from 'flarum/admin/app';
 import Component, { ComponentAttrs } from 'flarum/common/Component';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import Select from 'flarum/common/components/Select';
 import type Mithril from 'mithril';
 
@@ -68,10 +68,10 @@ class ColorPickerInput extends Component<ColorPickerInputAttrs> {
             />
             <div className="ColorPicker-actions">
               <div className="ColorPicker-action" onclick={() => onchange('transparent')} title="Set transparent">
-                {icon('fas fa-eye-slash')}
+                <Icon name="fas fa-eye-slash" />
               </div>
               <div className="ColorPicker-action" onclick={() => onchange('')} title="Clear to default">
-                {icon('fas fa-eraser')}
+                <Icon name="fas fa-eraser" />
               </div>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon')}</label>
             <div className="IconPickerInput">
               <div className="IconPicker-preview" onclick={() => (this.showIconPicker = !this.showIconPicker)}>
-                {icon(displaySetting('icon') || defaultStyles.icon)}
+                <Icon name={displaySetting('icon') || defaultStyles.icon} />
               </div>
               <div className="IconPickerInput-input">
                 <input
@@ -168,7 +168,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
                 />
                 <div className="IconPicker-actions">
                   <div className="IconPicker-action" onclick={() => displaySetting('icon', '')} title="Clear to default">
-                    {icon('fas fa-eraser')}
+                    <Icon name="fas fa-eraser" />
                   </div>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
                       }}
                       title="No Icon"
                     >
-                      {icon('fas fa-ban')} {String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_no_icon')) || 'None'}
+                      <Icon name="fas fa-ban" /> {String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_no_icon')) || 'None'}
                     </button>
                     {COMMON_ICONS.map((iconClass) => (
                       <button
@@ -197,7 +197,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
                         }}
                         title={iconClass}
                       >
-                        {icon(iconClass)}
+                        <Icon name={iconClass} />
                       </button>
                     ))}
                   </div>

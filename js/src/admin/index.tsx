@@ -57,7 +57,7 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
 
   app.store.models['filter-rule-rulesets'] = Ruleset;
 
-  app.extensionData.for('huoxin-filter-rule-manager').registerPage(RulesetManagerPage as any);
+  app.registry.for('huoxin-filter-rule-manager').registerPage(RulesetManagerPage as any);
   /*
     // Temporarily removed until Flarum natively supports a "Nobody" permission.
     // Currently, Flarum Admins inherently bypass all permissions.

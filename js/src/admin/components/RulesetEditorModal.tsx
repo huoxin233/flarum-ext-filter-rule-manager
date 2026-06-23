@@ -8,14 +8,16 @@
  */
 
 import app from 'flarum/admin/app';
-import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
+import { IFormModalAttrs } from 'flarum/common/components/FormModal';
+import Form from 'flarum/common/components/Form';
+import FormModal from 'flarum/common/components/FormModal';
 import Button from 'flarum/common/components/Button';
 import Switch from 'flarum/common/components/Switch';
 import Select from 'flarum/common/components/Select';
 import GroupBadge from 'flarum/common/components/GroupBadge';
 import type { ASTNode } from '../../common/FilterEngine';
 import Stream from 'flarum/common/utils/Stream';
-import icon from 'flarum/common/helpers/icon';
+import Icon from 'flarum/common/components/Icon';
 import type Mithril from 'mithril';
 import type Model from 'flarum/common/Model';
 
@@ -25,7 +27,7 @@ import filterEngine from '../../common/FilterEngine';
 import InlineTagSelector from './InlineTagSelector';
 import { parseExpression } from '../utils/ExpressionParser';
 
-export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
+export interface RulesetEditorModalAttrs extends IFormModalAttrs {
   ruleset?: Model & Record<string, any>;
   providers: Record<string, unknown>[];
   onsave?: () => void;
@@ -46,7 +48,7 @@ export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
  * in `this.providers`. Clicking a chip inserts `{{token}}` at the textarea
  * cursor.
  */
-export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
+export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttrs> {
   static readonly isDismissibleViaBackdropClick = false;
   static readonly isDismissibleViaEscKey = false;
 
@@ -161,7 +163,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     if (this.showingDiscardConfirmation) {
       return (
         <div className="Modal-body">
-          <div className="Form">
+          <Form>
             <div className="RulesetEditor-discardConfirmation">
               <i className="fas fa-exclamation-triangle RulesetEditor-discardIcon"></i>
               <h3 className="RulesetEditor-discardTitle">{app.translator.trans('huoxin-filter-rule-manager.admin.unsaved_changes_title')}</h3>
@@ -189,14 +191,14 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                 </Button>
               </div>
             </div>
-          </div>
+          </Form>
         </div>
       );
     }
 
     return (
       <div className="Modal-body">
-        <div className="Form">
+        <Form>
           {this.generalSection()}
           {this.scopeSection()}
           {this.displaySection()}
@@ -204,7 +206,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
           {this.rulesSection()}
           {this.validationBlock()}
           {this.actionsBlock()}
-        </div>
+        </Form>
       </div>
     );
   }
@@ -214,19 +216,17 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     return (
       <div className="Form-group">
         <label>{app.translator.trans(labelKey)}</label>
-
         <div className="RulesetEditor-segmentedControl">
           <button type="button" className={`segmented-option ${val === null ? 'active' : ''}`} onclick={() => stream(null)}>
-            {icon('fas fa-globe')} {app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default')}
+            <Icon name="fas fa-globe" /> {app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default')}
           </button>
           <button type="button" className={`segmented-option ${val === true ? 'active-enabled' : ''}`} onclick={() => stream(true)}>
-            {icon('fas fa-check')} {app.translator.trans('huoxin-filter-rule-manager.admin.force_enabled')}
+            <Icon name="fas fa-check" /> {app.translator.trans('huoxin-filter-rule-manager.admin.force_enabled')}
           </button>
           <button type="button" className={`segmented-option ${val === false ? 'active-disabled' : ''}`} onclick={() => stream(false)}>
-            {icon('fas fa-times')} {app.translator.trans('huoxin-filter-rule-manager.admin.force_disabled')}
+            <Icon name="fas fa-times" /> {app.translator.trans('huoxin-filter-rule-manager.admin.force_disabled')}
           </button>
         </div>
-
         <div className="helpText">{app.translator.trans(helpKey)}</div>
       </div>
     );
@@ -381,7 +381,6 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
           <i className="fas fa-eye"></i>
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_display')}</h4>
         </div>
-
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_intervention_type')}</label>
           <div className="RulesetEditor-interventionSelector">
@@ -397,16 +396,14 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                   }
                 }}
               >
-                {icon(this.interventionIcon(value))}
+                <Icon name={this.interventionIcon(value)} />
                 <span>{app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${value}`)}</span>
               </button>
             ))}
           </div>
           <div className="helpText">{app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}_help`)}</div>
         </div>
-
         <hr className="RulesetEditor-divider" />
-
         {intervention !== 'silent' && (
           <div>
             <div className="Form-group">
