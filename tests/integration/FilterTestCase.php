@@ -5,6 +5,10 @@ namespace Huoxin\FilterRuleManager\Tests\integration;
 use Carbon\Carbon;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
+use Flarum\User\User;
+use Flarum\Tags\Tag;
+use Flarum\Discussion\Discussion;
+use Flarum\Post\Post;
 
 abstract class FilterTestCase extends TestCase
 {
@@ -23,7 +27,7 @@ abstract class FilterTestCase extends TestCase
 
         // 2. Prepare common database state (Users)
         $this->prepareDatabase([
-            'users' => [
+            User::class => [
                 ['id' => 1, 'username' => 'admin', 'email' => 'admin@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 2, 'username' => 'normalUser1', 'email' => 'normal1@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 3, 'username' => 'normalUser2', 'email' => 'normal2@machine.local', 'is_email_confirmed' => 1],
@@ -33,14 +37,14 @@ abstract class FilterTestCase extends TestCase
                 ['id' => 7, 'username' => 'normalUser6', 'email' => 'normal6@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 8, 'username' => 'normalUser7', 'email' => 'normal7@machine.local', 'is_email_confirmed' => 1],
             ],
-            'tags' => [
+            Tag::class => [
                 ['id' => 1, 'name' => 'General', 'slug' => 'general', 'position' => 0],
                 ['id' => 2, 'name' => 'Gaming', 'slug' => 'gaming', 'position' => 1],
             ],
-            'discussions' => [
+            Discussion::class => [
                 ['id' => 1, 'title' => 'Test Discussion', 'created_at' => Carbon::now()->toDateTimeString(), 'user_id' => 1, 'first_post_id' => 1, 'comment_count' => 1, 'is_approved' => 1],
             ],
-            'posts' => [
+            Post::class => [
                 ['id' => 1, 'discussion_id' => 1, 'user_id' => 1, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->toDateTimeString()],
             ],
         ]);

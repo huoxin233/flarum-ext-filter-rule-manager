@@ -3,6 +3,7 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 
 class RuleOperatorTest extends FilterTestCase
 {
@@ -91,9 +92,7 @@ class RuleOperatorTest extends FilterTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function and_logic_requires_all_rules_to_match()
     {
         // Only contains apple (one of the AND rules)
@@ -108,9 +107,7 @@ class RuleOperatorTest extends FilterTestCase
         $this->assertEquals('Blocked by AND', $body['errors'][0]['detail']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function or_logic_requires_any_rule_to_match()
     {
         // Contains only one OR rule
@@ -125,9 +122,7 @@ class RuleOperatorTest extends FilterTestCase
         $this->assertEquals(422, $response->getStatusCode(), 'Should block because dog is present');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function not_logic_inverts_rule_matching()
     {
         // Contains bird but also cage (should NOT block)

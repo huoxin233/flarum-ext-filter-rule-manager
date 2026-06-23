@@ -3,6 +3,9 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
+use Flarum\Discussion\Discussion;
+use Flarum\Post\Post;
 
 class ScopeTest extends FilterTestCase
 {
@@ -11,7 +14,7 @@ class ScopeTest extends FilterTestCase
         parent::setUp();
 
         $this->prepareDatabase([
-            'discussions' => [
+            Discussion::class => [
                 // Private discussion (for User 3)
                 ['id' => 2, 'title' => 'Private Discussion', 'created_at' => Carbon::now()->toDateTimeString(), 'user_id' => 3, 'first_post_id' => 2, 'comment_count' => 1, 'is_private' => 1],
                 // Normal discussion with Gaming tag
@@ -23,7 +26,7 @@ class ScopeTest extends FilterTestCase
                 ['discussion_id' => 1, 'tag_id' => 1],
                 ['discussion_id' => 3, 'tag_id' => 2],
             ],
-            'posts' => [
+            Post::class => [
                 ['id' => 2, 'discussion_id' => 2, 'user_id' => 3, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 ['id' => 3, 'discussion_id' => 3, 'user_id' => 1, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 ['id' => 4, 'discussion_id' => 4, 'user_id' => 4, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
@@ -89,9 +92,7 @@ class ScopeTest extends FilterTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function private_ruleset_only_triggers_on_private_discussions()
     {
         // Normal discussion (ID 1) bypasses private rule
@@ -106,9 +107,7 @@ class ScopeTest extends FilterTestCase
         $this->assertEquals('Blocked by Private', $body['errors'][0]['detail']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function normal_ruleset_only_triggers_on_normal_discussions()
     {
         // Private discussion (ID 4) bypasses normal rule
@@ -123,9 +122,7 @@ class ScopeTest extends FilterTestCase
         $this->assertEquals('Blocked by Normal', $body['errors'][0]['detail']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function tag_ruleset_only_triggers_on_specific_tags()
     {
         // Discussion 1 (General tag) bypasses Gaming tag rule

@@ -3,6 +3,8 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
+use Flarum\Post\Post;
 
 class BlockPostTest extends FilterTestCase
 {
@@ -11,7 +13,7 @@ class BlockPostTest extends FilterTestCase
         parent::setUp();
 
         $this->prepareDatabase([
-            'posts' => [
+            Post::class => [
                 ['id' => 1, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Clean post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 ['id' => 2, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>This contains blockword</p></t>', 'is_approved' => 1, 'number' => 2, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
             ],
@@ -41,9 +43,7 @@ class BlockPostTest extends FilterTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function posting_clean_content_is_not_blocked()
     {
         $response = $this->submitReply('This is a completely clean post.', 2);
@@ -51,9 +51,7 @@ class BlockPostTest extends FilterTestCase
         $this->assertEquals(201, $response->getStatusCode());
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function posting_restricted_word_blocks_post_and_logs_it()
     {
         $response = $this->submitReply('This contains blockword which triggers a block.', 3);
@@ -74,9 +72,7 @@ class BlockPostTest extends FilterTestCase
         $this->assertEquals(1, $log->ruleset_id, 'Ruleset ID should be logged');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function editing_clean_post_to_include_blockword_is_blocked()
     {
         $response = $this->send(
@@ -95,9 +91,7 @@ class BlockPostTest extends FilterTestCase
         $this->assertEquals(422, $response->getStatusCode(), 'Editing a post to include a blockword should be blocked');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function hiding_or_recovering_post_with_blockword_does_not_trigger_block()
     {
         // Hide it

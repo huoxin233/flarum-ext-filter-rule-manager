@@ -5,6 +5,7 @@ namespace Huoxin\FilterRuleManager\Tests\unit;
 use Huoxin\FilterRuleManager\Provider\BuiltinProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use PHPUnit\Framework\Attributes\Test;
 
 class BuiltinProviderTest extends TestCase
 {
@@ -23,9 +24,7 @@ class BuiltinProviderTest extends TestCase
         $this->provider = new BuiltinProvider($translator);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_evaluates_contains_word_correctly()
     {
         $config = ['words' => ['apple', 'banana']];
@@ -37,9 +36,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('apple', $result['matched_word']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_evaluates_regex_correctly()
     {
         // Notice we don't include delimiters, the provider should add them automatically
@@ -53,9 +50,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('555-1234', $result['matched_string']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_handles_explicit_regex_delimiters()
     {
         // Provider shouldn't add delimiters if they already start with /
@@ -67,9 +62,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('BAD', $result['matched_string']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function it_handles_legacy_config_structures()
     {
         // Old structure used 'word' instead of 'words'
@@ -86,9 +79,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('99', $result2['matched_string']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scan_all_aggregates_multiple_matches()
     {
         $config = [
@@ -103,9 +94,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('apple, cherry', $result['matched_word']);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function scan_all_aggregates_multiple_regex_matches()
     {
         $config = [

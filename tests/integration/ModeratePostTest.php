@@ -4,6 +4,10 @@ namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use PHPUnit\Framework\Attributes\Test;
+use Flarum\User\User;
+use Flarum\Post\Post;
+use Flarum\Flags\Flag;
 
 class ModeratePostTest extends FilterTestCase
 {
@@ -12,7 +16,7 @@ class ModeratePostTest extends FilterTestCase
         parent::setUp();
 
         $this->prepareDatabase([
-            'users' => [
+            User::class => [
                 ['id' => 8, 'username' => 'user8', 'email' => 'user8@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 9, 'username' => 'user9', 'email' => 'user9@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 10, 'username' => 'user10', 'email' => 'user10@machine.local', 'is_email_confirmed' => 1],
@@ -20,7 +24,7 @@ class ModeratePostTest extends FilterTestCase
                 ['id' => 12, 'username' => 'user12', 'email' => 'user12@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 13, 'username' => 'user13', 'email' => 'user13@machine.local', 'is_email_confirmed' => 1],
             ],
-            'posts' => [
+            Post::class => [
                 // Existing post to test edits
                 ['id' => 2, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Clean post</p></t>', 'is_approved' => 1, 'number' => 2, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 // User 10: unapproved post to test approval clearing logs
@@ -30,7 +34,7 @@ class ModeratePostTest extends FilterTestCase
                 // User 2: unapproved post without a flag
                 ['id' => 5, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Unapproved but clean</p></t>', 'is_approved' => 0, 'number' => 5, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
             ],
-            'flags' => [
+            Flag::class => [
                 ['id' => 1, 'post_id' => 4, 'type' => 'autoMod', 'user_id' => null, 'reason' => null, 'reason_detail' => 'Matched custom: existing', 'created_at' => Carbon::now()->toDateTimeString()],
             ],
             'filter_rulesets' => [
@@ -214,9 +218,7 @@ class ModeratePostTest extends FilterTestCase
         ]);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function posting_clean_content_publishes_normally()
     {
         $response = $this->submitReply('This is a completely clean post.', 8);
@@ -232,9 +234,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertNull($flag, 'Clean post should not have any flags');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function posting_triggers_both_approval_and_flag()
     {
         // Notice we include both words from the OR ruleset 1
@@ -256,9 +256,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals('Matched custom: word_both, apple', $flag->reason_detail);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function posting_triggers_flag_only()
     {
         $response = $this->submitReply('This contains word_flag which only flags.', 4);
@@ -276,9 +274,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertNotNull($flag, 'autoMod flag should be created');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function posting_triggers_approval_only_without_flag()
     {
         $response = $this->submitReply('This contains word_approval which only approves.', 5);
@@ -296,9 +292,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertNull($flag, 'No flag should be created for approval-only ruleset');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function editing_clean_post_to_restricted_word_triggers_moderation()
     {
         $response = $this->send(
@@ -323,9 +317,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertNotNull($flag, 'Flag should be created for edited post');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function starting_discussion_with_restricted_word_hides_discussion()
     {
         $response = $this->send(
@@ -358,9 +350,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals(0, $discussion->is_approved, 'Discussion should be unapproved');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function evasion_detection_forces_flag_and_approval_despite_clean_content()
     {
         // Notice we are sending completely CLEAN content, but the user is in the filter_rule_block_logs (within 15 mins)
@@ -381,9 +371,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertStringContainsString('evasion', $flag->reason_detail, 'Flag reason should mention filter evasion');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function evasion_detection_ignores_expired_timeout()
     {
         // User 8 was blocked 10 mins ago, but default global timeout is 5 mins.
@@ -397,9 +385,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals(1, $post->is_approved, 'Post should be approved because evasion timeout expired');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function evasion_detection_ignores_inactive_rulesets()
     {
         // User 9 was blocked 2 mins ago by Ruleset 4. Ruleset 4 is inactive, so evasion should not trigger.
@@ -413,9 +399,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals(1, $post->is_approved, 'Post should be approved because evasion ruleset is inactive');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function approving_a_post_clears_user_evasion_logs()
     {
         $response = $this->send(
@@ -437,9 +421,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals(1, $log->is_cleared, 'User block logs should be cleared when their post is approved');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function hiding_or_recovering_post_does_not_trigger_moderation()
     {
         $response = $this->submitReply('This contains word_flag which only flags.', 2);
@@ -477,9 +459,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals(1, $flagsCount, 'Hiding/recovering post should not create duplicate moderation flags');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function editing_post_with_existing_automod_flag_does_not_duplicate_flag()
     {
         $response = $this->send(
@@ -501,9 +481,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals(1, $flagsCount, 'Editing a post that already has an autoMod flag should not duplicate it');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function editing_unapproved_post_adds_automod_flag()
     {
         $response = $this->send(
@@ -528,9 +506,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertNotNull($flag, 'An autoMod flag should be added when editing an unapproved post to contain forbidden words');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function flag_message_decodes_html_entities()
     {
         $response = $this->submitReply('I use AT&T.', 2);
@@ -544,9 +520,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals('Brand: AT&T', $flag->reason_detail, 'Flag reason detail should decode HTML entities like &amp;');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function evasion_detection_requires_threshold_to_be_met()
     {
         // User 12 has 2 block logs for Ruleset 6 (Threshold is 3).
@@ -561,9 +535,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertNull($flag, 'No flag should be created because evasion threshold is not met');
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function evasion_detection_triggers_when_threshold_is_met()
     {
         // User 13 has 3 block logs for Ruleset 6 (Threshold is 3).
