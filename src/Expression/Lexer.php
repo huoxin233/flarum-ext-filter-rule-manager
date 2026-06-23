@@ -4,13 +4,11 @@ namespace Huoxin\FilterRuleManager\Expression;
 
 class Lexer
 {
-    private string $input;
     private int $length;
     private int $position = 0;
 
-    public function __construct(string $input)
+    public function __construct(private string $input)
     {
-        $this->input = $input;
         $this->length = strlen($input);
     }
 

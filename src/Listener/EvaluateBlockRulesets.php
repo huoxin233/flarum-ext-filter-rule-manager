@@ -94,7 +94,7 @@ class EvaluateBlockRulesets
                     ->orderBy('created_at', 'desc')
                     ->first();
 
-                if ($lastBlock && Carbon::parse($lastBlock->created_at)->diffInSeconds(Carbon::now()) < 10) {
+                if ($lastBlock && Carbon::parse($lastBlock->created_at)->diffInSeconds(Carbon::now(), true) < 10) {
                     throw new FloodingException();
                 }
 

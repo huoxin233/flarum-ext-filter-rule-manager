@@ -27,7 +27,7 @@ class Token
 
     public function __construct(
         public string $type,
-        public mixed $value = null,
+        public ?mixed $value = null,
         public int $position = 0
     ) {
     }

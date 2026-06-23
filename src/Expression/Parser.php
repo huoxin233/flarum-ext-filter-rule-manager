@@ -4,14 +4,11 @@ namespace Huoxin\FilterRuleManager\Expression;
 
 class Parser
 {
-    /** @var Token[] */
-    private array $tokens;
     private int $position = 0;
     private int $length;
 
-    public function __construct(array $tokens)
+    public function __construct(private array $tokens)
     {
-        $this->tokens = $tokens;
         $this->length = count($tokens);
     }
 
