@@ -9,11 +9,6 @@
 
 import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
-import Composer from 'flarum/forum/components/Composer';
-import ComposerBody from 'flarum/forum/components/ComposerBody';
-import DiscussionComposer from 'flarum/forum/components/DiscussionComposer';
-import ReplyComposer from 'flarum/forum/components/ReplyComposer';
-import EditPostComposer from 'flarum/forum/components/EditPostComposer';
 import CommentPost from 'flarum/forum/components/CommentPost';
 import ItemList from 'flarum/common/utils/ItemList';
 import type Mithril from 'mithril';
@@ -64,24 +59,24 @@ app.initializers.add(
     app.filterRulePopupDispatcher = new FilterRulePopupDispatcher(filterEngine);
 
     // ── Start/stop polling on composer mount/unmount ─────────────────────────
-    extend(ComposerBody.prototype, 'oncreate', function () {
+    extend('flarum/forum/components/ComposerBody', 'oncreate', function () {
       filterEngine.start();
     });
 
-    extend(ComposerBody.prototype, 'onremove', function () {
+    extend('flarum/forum/components/ComposerBody', 'onremove', function () {
       filterEngine.stop();
       if (app.filterRulePopupDispatcher) app.filterRulePopupDispatcher.dismissAll();
     });
 
     // ── `header_banner` and `sidebar` mode: injected via ComposerBody.headerItems ──────────
-    extend(ComposerBody.prototype, 'headerItems', function (items: ItemList<Mithril.Children>) {
+    extend('flarum/forum/components/ComposerBody', 'headerItems', function (items: ItemList<Mithril.Children>) {
       if (!filterEngine.hasAlerts) return;
       items.add('filter-rule-header-banner', <FilterRuleInlineDisplay variant="header_banner" />, -10);
       items.add('filter-rule-sidebar', <FilterRuleInlineDisplay variant="sidebar" />, -20);
     });
 
     // ── `banner` mode: injected at the top of #composer ─────────────────────
-    extend(Composer.prototype, 'oncreate', function (this: Composer & { alertBannerHost?: HTMLElement | null }) {
+    extend('flarum/forum/components/Composer', 'oncreate', function (this: Composer & { alertBannerHost?: HTMLElement | null }) {
       const composerEl = document.getElementById('composer');
       if (!composerEl || this.alertBannerHost) return;
 
@@ -94,7 +89,7 @@ app.initializers.add(
       });
     });
 
-    extend(Composer.prototype, 'onremove', function (this: Composer & { alertBannerHost?: HTMLElement | null }) {
+    extend('flarum/forum/components/Composer', 'onremove', function (this: Composer & { alertBannerHost?: HTMLElement | null }) {
       if (!this.alertBannerHost) return;
       try {
         m.mount(this.alertBannerHost, null);
