@@ -431,8 +431,8 @@ export class FilterEngine {
         recipientsField && typeof (recipientsField as any).toArray === 'function'
           ? (recipientsField as any).toArray()
           : Array.isArray(recipientsField)
-          ? recipientsField
-          : [];
+            ? recipientsField
+            : [];
 
       const fieldsIsPrivate = resolveField(safeComposer.fields?.isPrivate);
 
