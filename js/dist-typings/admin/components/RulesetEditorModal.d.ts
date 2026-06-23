@@ -1,9 +1,9 @@
-/// <reference types="flarum/@types/translator-icu-rich" />
-import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
+import { IFormModalAttrs } from 'flarum/common/components/FormModal';
+import FormModal from 'flarum/common/components/FormModal';
 import Stream from 'flarum/common/utils/Stream';
 import type Mithril from 'mithril';
 import type Model from 'flarum/common/Model';
-export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
+export interface RulesetEditorModalAttrs extends IFormModalAttrs {
     ruleset?: Model & Record<string, any>;
     providers: Record<string, unknown>[];
     onsave?: () => void;
@@ -23,7 +23,7 @@ export interface RulesetEditorModalAttrs extends IInternalModalAttrs {
  * in `this.providers`. Clicking a chip inserts `{{token}}` at the textarea
  * cursor.
  */
-export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
+export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttrs> {
     static readonly isDismissibleViaBackdropClick = false;
     static readonly isDismissibleViaEscKey = false;
     ruleset?: Model & Record<string, any>;
@@ -59,7 +59,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     oncreate(vnode: Mithril.VnodeDOM<RulesetEditorModalAttrs, this>): void;
     onremove(vnode: Mithril.VnodeDOM<RulesetEditorModalAttrs, this>): void;
     className(): string;
-    title(): import("@askvortsov/rich-icu-message-formatter").NestedStringArray;
+    title(): string | any[];
     content(): Mithril.Children;
     nullableBooleanSelect(labelKey: string, helpKey: string, stream: Stream<boolean | null>): Mithril.Children;
     generalSection(): Mithril.Children;
@@ -78,7 +78,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     isDirty(): boolean;
     hide(): void;
     canSave(): boolean;
-    validationError(): import("@askvortsov/rich-icu-message-formatter").NestedStringArray | null;
+    validationError(): string | any[] | null;
     onsubmit(e: Event): void;
     save(): Promise<void>;
 }
