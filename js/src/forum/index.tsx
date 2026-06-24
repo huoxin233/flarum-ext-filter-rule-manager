@@ -9,11 +9,8 @@
 
 import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
-import CommentPost from 'flarum/forum/components/CommentPost';
-import Composer from 'flarum/forum/components/Composer';
-import DiscussionComposer from 'flarum/forum/components/DiscussionComposer';
-import ReplyComposer from 'flarum/forum/components/ReplyComposer';
-import EditPostComposer from 'flarum/forum/components/EditPostComposer';
+import type CommentPost from 'flarum/forum/components/CommentPost';
+import type Composer from 'flarum/forum/components/Composer';
 import ItemList from 'flarum/common/utils/ItemList';
 import type Mithril from 'mithril';
 import type { Ruleset } from '../common/FilterEngine';
@@ -122,8 +119,8 @@ app.initializers.add(
     });
 
     // ── Warning confirmation on submit ───────────────────────────────────────
-    [DiscussionComposer, ReplyComposer, EditPostComposer].forEach((Cls: any) => {
-      override(Cls.prototype as any, 'onsubmit', function (this: any, original: Function) {
+    ['flarum/forum/components/DiscussionComposer', 'flarum/forum/components/ReplyComposer', 'flarum/forum/components/EditPostComposer'].forEach((moduleName) => {
+      override(moduleName, 'onsubmit', function (this: any, original: Function) {
         filterEngine.clearBlockResults();
 
         const warnings = filterEngine.activeAlerts.filter((a) => a.ruleset.interventionType === 'warning');
@@ -161,7 +158,7 @@ app.initializers.add(
     });
 
     if (app.initializers.has('flarum-flags')) {
-      override(CommentPost.prototype, 'flagReason', function (this: CommentPost, original: Function, flag: any) {
+      override('flarum/forum/components/CommentPost', 'flagReason', function (this: CommentPost, original: Function, flag: any) {
         if (flag.type() === 'autoMod') {
           const detail = flag.reasonDetail();
           return [
