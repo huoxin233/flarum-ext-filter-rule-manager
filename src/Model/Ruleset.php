@@ -43,6 +43,8 @@ class Ruleset extends AbstractModel
 {
     use ScopeVisibilityTrait;
 
+    public $timestamps = true;
+
     protected $table = 'filter_rulesets';
 
     protected $casts = [

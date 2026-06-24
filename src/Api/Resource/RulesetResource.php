@@ -9,8 +9,8 @@ use Huoxin\FilterRuleManager\Expression\Lexer;
 use Huoxin\FilterRuleManager\Expression\Parser;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Database\Eloquent\Builder;
-use Tobscure\JsonApi\Exception\InvalidParameterException;
 use Tobyz\JsonApiServer\Context;
+use Flarum\Foundation\ValidationException;
 
 /**
  * @extends Resource\AbstractDatabaseResource<Ruleset>
@@ -32,12 +32,12 @@ class RulesetResource extends Resource\AbstractDatabaseResource
         $query->whereVisibleTo($context->getActor());
     }
 
-    public function creating(object $model, Context $context): ?object
+    public function create(object $model, Context $context): object
     {
         if ($model->priority === null) {
             $model->priority = ((int) Ruleset::max('priority')) + 10;
         }
-        return $model;
+        return parent::create($model, $context);
     }
 
     public function endpoints(): array
@@ -45,6 +45,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
         return [
             Endpoint\Create::make()
                 ->can('createRuleset'),
+            Endpoint\Show::make(),
             Endpoint\Update::make()
                 ->can('update'),
             Endpoint\Delete::make()
@@ -63,7 +64,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                 ->set(function (Ruleset $model, $value) {
                     $name = trim((string) $value);
                     if ($name === '') {
-                        throw new InvalidParameterException('Ruleset name cannot be empty.');
+                        throw new ValidationException(['name' => 'Ruleset name cannot be empty.']);
                     }
                     $model->name = $name;
                 }),
@@ -71,6 +72,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                 ->writable(),
             Schema\Str::make('expression')
                 ->writable()
+                ->nullable()
                 ->set(function (Ruleset $model, $value) {
                     $expression = trim((string) $value);
                     $model->expression = $expression;
@@ -83,14 +85,15 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                             $ast = $parser->parse();
                             $model->compiled_ast = $ast->toArray();
                         } catch (\Exception $e) {
-                            throw new InvalidParameterException('Invalid expression syntax: '.$e->getMessage());
+                            throw new ValidationException(['expression' => 'Invalid expression syntax: '.$e->getMessage()]);
                         }
                     } else {
                         $model->compiled_ast = null;
                     }
                 }),
             Schema\Arr::make('compiledAst')
-                ->property('compiled_ast'),
+                ->property('compiled_ast')
+                ->nullable(),
             Schema\Str::make('interventionType')
                 ->property('intervention_type')
                 ->writable()
@@ -104,7 +107,8 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                     $model->display_mode = in_array($value, ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], true) ? $value : ($model->display_mode ?? 'banner');
                 }),
             Schema\Str::make('message')
-                ->writable(),
+                ->writable()
+                ->nullable(),
             Schema\Str::make('flagMessage')
                 ->property('flag_message')
                 ->writable()
@@ -174,9 +178,11 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                 ->nullable(),
 
             Schema\DateTime::make('createdAt')
-                ->property('created_at'),
+                ->property('created_at')
+                ->nullable(),
             Schema\DateTime::make('updatedAt')
-                ->property('updated_at'),
+                ->property('updated_at')
+                ->nullable(),
         ];
     }
 
