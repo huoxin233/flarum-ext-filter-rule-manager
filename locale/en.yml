@@ -209,7 +209,7 @@ huoxin-filter-rule-manager:
     config_words_placeholder: "spam\nphishing\ngiveaway"
     config_words_help: "One word or phrase per line. The rule triggers if the post contains any of them (case-insensitive). The first match is available as '{{matched_word}}' in the alert message."
     config_patterns_label: "Regex patterns"
-    config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]{20,}$"
+    config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]'{20,}'$"
     config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as '{{matched_pattern}}' and '{{matched_string}}'."
 
     rule_scan_all: "Find all matches"
