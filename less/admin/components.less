@@ -29,7 +29,7 @@
     &--info    { background: fade(@info-color, 15%);    color: darken(@info-color, 10%); }
     &--warning { background: fade(@warning-color, 15%); color: darken(@warning-color, 10%); }
     &--block   { background: fade(@error-color, 15%);   color: darken(@error-color, 10%); }
-    &--silent  { background: var(--muted-color-fade-15);   color: var(--muted-color-darken-10); }
+    &--silent  { background: var(--control-bg);   color: var(--text-color); }
   }
 
   .ScopeBadge {
@@ -155,7 +155,7 @@
   &--info.active    { border-color: @info-color;    background: fade(@info-color, 10%);    color: darken(@info-color, 10%); }
   &--warning.active { border-color: @warning-color; background: fade(@warning-color, 10%); color: darken(@warning-color, 10%); }
   &--block.active   { border-color: @error-color;   background: fade(@error-color, 10%);   color: darken(@error-color, 10%); }
-  &--silent.active  { border-color: var(--muted-color); background: var(--muted-color-fade-10); color: darken(@muted-color, 10%); }
+  &--silent.active  { border-color: var(--muted-color); background: var(--control-bg); color: var(--text-color); }
 }
 // Token hint chips
 
@@ -559,14 +559,3 @@
   }
 }
 
-
-[data-theme^=light] {
-  --muted-color-fade-15: fade(@muted-color-light, 15%);
-  --muted-color-darken-10: darken(@muted-color-light, 10%);
-  --muted-color-fade-10: fade(@muted-color-light, 10%);
-}
-[data-theme^=dark] {
-  --muted-color-fade-15: fade(@muted-color-dark, 15%);
-  --muted-color-darken-10: darken(@muted-color-dark, 10%);
-  --muted-color-fade-10: fade(@muted-color-dark, 10%);
-}
