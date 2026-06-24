@@ -83,7 +83,7 @@ export class FilterEngine {
   public displayModes: Record<string, string> = {};
   public activeAlerts: ActiveAlert[] = [];
   public blockResults: BlockResult[] = [];
-  public intervalId: number | null = null;
+  public debounceTimer: number | null = null;
   public hasAlerts: boolean = false;
 
   private _lastStateKey: string | null = null;
@@ -219,15 +219,24 @@ export class FilterEngine {
   }
 
   start(): void {
-    if (this.intervalId) return;
-    setTimeout(() => this.evaluate(), 0);
-    this.intervalId = window.setInterval(() => this.evaluate(), 300);
+    // Perform an initial evaluation immediately on start
+    this.evaluate();
+  }
+
+  debouncedEvaluate(): void {
+    if (this.debounceTimer) {
+      window.clearTimeout(this.debounceTimer);
+    }
+    this.debounceTimer = window.setTimeout(() => {
+      this.evaluate();
+      this.debounceTimer = null;
+    }, 300);
   }
 
   stop(): void {
-    if (this.intervalId) {
-      window.clearInterval(this.intervalId);
-      this.intervalId = null;
+    if (this.debounceTimer) {
+      window.clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
     }
     this.activeAlerts = [];
     this.blockResults = [];

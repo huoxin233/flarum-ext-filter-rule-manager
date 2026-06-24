@@ -62,13 +62,28 @@ app.initializers.add(
 
     app.filterRulePopupDispatcher = new FilterRulePopupDispatcher(filterEngine);
 
-    // ── Start/stop polling on composer mount/unmount ─────────────────────────
+    let composerStreamDependency: any = null;
+
+    // ── Evaluate on composer mount and listen to stream updates ───────────────
     extend('flarum/forum/components/ComposerBody', 'oncreate', function () {
       filterEngine.start();
+
+      // Hook into the reactive Mithril stream to catch all content changes instantly.
+      // This catches normal typing, extension insertions, and raw stream mutations.
+      const stream = app.composer && app.composer.fields && app.composer.fields.content;
+      if (stream && typeof stream.map === 'function') {
+        composerStreamDependency = stream.map(() => {
+          filterEngine.debouncedEvaluate();
+        });
+      }
     });
 
     extend('flarum/forum/components/ComposerBody', 'onremove', function () {
       filterEngine.stop();
+      if (composerStreamDependency && typeof composerStreamDependency.end === 'function') {
+        composerStreamDependency.end(true);
+        composerStreamDependency = null;
+      }
       if (app.filterRulePopupDispatcher) app.filterRulePopupDispatcher.dismissAll();
     });
 
