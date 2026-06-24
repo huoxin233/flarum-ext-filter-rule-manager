@@ -16,7 +16,7 @@ class BuiltinProviderTest extends TestCase
     {
         parent::setUp();
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(function ($id) {
             return $id;
         });
