@@ -104,7 +104,7 @@ huoxin-filter-rule-manager:
     ruleset_bypass_groups: "跳过以下用户组"
     ruleset_bypass_groups_help: "属于这些用户组的用户将完全跳过该规则集的检查。"
     ruleset_message: "提示内容"
-    ruleset_message_placeholder: "您的帖子包含违规词汇：{{matched_word}}"
+    ruleset_message_placeholder: "您的帖子包含违规词汇：'{{matched_word}}'"
     ruleset_is_active: "开启"
 
     ruleset_evaluate_title_label: "检查主题标题"
@@ -123,7 +123,7 @@ huoxin-filter-rule-manager:
     ruleset_evasion_threshold: "触发阈值（拦截次数）"
     ruleset_evasion_threshold_help: "在检测时长内需达到多少次拦截才会触发规避惩罚。"
     ruleset_flag_message: "自定义举报/审核理由"
-    ruleset_flag_message_placeholder: "例如：命中违规词汇：{{matched_word}}"
+    ruleset_flag_message_placeholder: "例如：命中违规词汇：'{{matched_word}}'"
     ruleset_flag_message_help: "可选。定义触发此规则集时管理团队看到的具体理由。留空则使用默认通用理由。"
     ruleset_evaluate_all_rules: "匹配所有规则（聚合变量）"
     ruleset_evaluate_all_rules_help: "开启后，引擎将检查此规则集中的所有规则，即使已经找到匹配项。这允许您收集所有命中的变量用于自定义消息。如果关闭，引擎在找到第一个匹配项后就会立即停止，以提高性能。"
@@ -132,7 +132,7 @@ huoxin-filter-rule-manager:
     force_enabled: "强制开启"
     force_disabled: "强制关闭"
 
-    message_help: "您可以使用 {{token}} 插入规则提取的变量值。变量内容会自动进行 HTML 转义；模板本身以可信方式渲染，允许使用简单的 HTML（如 <br>）。"
+    message_help: "您可以使用 '{{token}}' 插入规则提取的变量值。变量内容会自动进行 HTML 转义；模板本身以可信方式渲染，允许使用简单的 HTML（如 '<br>'）。"
     preview: "预览"
     preview_placeholder: "提示内容将显示在这里。"
 
@@ -207,10 +207,10 @@ huoxin-filter-rule-manager:
 
     config_words_label: "单词 / 短语"
     config_words_placeholder: "垃圾邮件\n钓鱼\n抽奖"
-    config_words_help: "每行一个单词或短语。如果帖子包含其中任意一个（不区分大小写），则触发规则。首个命中的词汇将作为 {{matched_word}} 变量用于提示内容。"
+    config_words_help: "每行一个单词或短语。如果帖子包含其中任意一个（不区分大小写），则触发规则。首个命中的词汇将作为 '{{matched_word}}' 变量用于提示内容。"
     config_patterns_label: "正则表达式模式"
     config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]{20,}$"
-    config_patterns_help: "每行一个模式。裸模式将进行不区分大小写的匹配；可使用 /pattern/flags 这种 PCRE 完整格式以获得更精确的控制。首个匹配项将作为 {{matched_pattern}} 和 {{matched_string}} 变量提供。"
+    config_patterns_help: "每行一个模式。裸模式将进行不区分大小写的匹配；可使用 /pattern/flags 这种 PCRE 完整格式以获得更精确的控制。首个匹配项将作为 '{{matched_pattern}}' 和 '{{matched_string}}' 变量提供。"
 
     rule_scan_all: "匹配所有结果"
     rule_scan_all_help: "开启后，系统将找出文本中所有匹配的词汇或正则模式。如果关闭，则在匹配到第一个结果后立即停止，以提高处理性能。"
