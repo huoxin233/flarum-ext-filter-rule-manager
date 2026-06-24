@@ -2,7 +2,6 @@
 
 namespace Huoxin\FilterRuleManager\Api\Resource;
 
-use Flarum\Api\Context;
 use Flarum\Api\Endpoint;
 use Flarum\Api\Resource;
 use Flarum\Api\Schema;
@@ -11,7 +10,7 @@ use Huoxin\FilterRuleManager\Expression\Parser;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Database\Eloquent\Builder;
 use Tobscure\JsonApi\Exception\InvalidParameterException;
-use Tobyz\JsonApiServer\Context as OriginalContext;
+use Tobyz\JsonApiServer\Context;
 
 /**
  * @extends Resource\AbstractDatabaseResource<Ruleset>
@@ -28,7 +27,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
         return Ruleset::class;
     }
 
-    public function scope(Builder $query, OriginalContext $context): void
+    public function scope(Builder $query, Context $context): void
     {
         $query->whereVisibleTo($context->getActor());
     }
