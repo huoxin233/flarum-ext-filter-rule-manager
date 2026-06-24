@@ -9,6 +9,7 @@
 
 import app from 'flarum/common/app';
 import type Mithril from 'mithril';
+import extractText from 'flarum/common/utils/extractText';
 
 export interface ASTNode {
   type: string;
@@ -469,7 +470,26 @@ export class FilterEngine {
    */
   interpolate(template: string | string[], tokens: Record<string, string> | undefined): string {
     if (!template) return '';
-    const strTemplate = Array.isArray(template) ? template.join('') : String(template);
+    let strTemplate = Array.isArray(template) ? template.join('') : String(template);
+
+    // If the template strictly matches a Flarum translation key format (e.g. namespace.key)
+    // we translate it first and inject the tokens natively into the translator.
+    if (/^[a-zA-Z0-9\-_]+(?:\.[a-zA-Z0-9\-_]+)+$/.test(strTemplate) && typeof app !== 'undefined' && app.translator && app.translator.trans) {
+      try {
+        const translated = app.translator.trans(strTemplate, tokens || {});
+        if (typeof translated === 'string' && translated !== strTemplate && translated !== '') {
+          strTemplate = translated;
+        } else if (Array.isArray(translated) && translated.length > 0) {
+          const textOnly = extractText(translated);
+          if (textOnly && textOnly !== strTemplate) {
+            strTemplate = textOnly;
+          }
+        }
+      } catch (e) {
+        // Fallback to original string on ICU parse error
+      }
+    }
+
     return strTemplate.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       if (!tokens || !Object.prototype.hasOwnProperty.call(tokens, key)) return match;
       return escapeHtml(tokens[key]);

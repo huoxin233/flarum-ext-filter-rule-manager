@@ -33,7 +33,7 @@ export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
   title(): Mithril.Children {
     const type = this.attrs.type || 'info';
     const settings = this.attrs.displaySettings || {};
-    if (settings.title) return app.translator.trans(settings.title as string);
+    if (settings.title) return settings.title;
     return app.translator.trans(`huoxin-filter-rule-manager.forum.modal_title_${type}`);
   }
 

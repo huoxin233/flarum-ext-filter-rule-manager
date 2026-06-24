@@ -85,7 +85,7 @@ huoxin-filter-rule-manager:
     ruleset_display_mode: "显示模式"
     ruleset_display_template: "显示模板"
     ruleset_custom_title: "自定义标题"
-    ruleset_custom_title_help: "可选。用于覆盖弹窗和提示条中的默认标题。"
+    ruleset_custom_title_help: "可选。用于覆盖弹窗和提示条中的默认标题。支持填写翻译键值。"
     ruleset_toast_theme: "悬浮提示主题"
     ruleset_toast_theme_auto: "自动（根据干预方式）"
     ruleset_toast_theme_success: "成功（绿色）"
@@ -124,7 +124,7 @@ huoxin-filter-rule-manager:
     ruleset_evasion_threshold_help: "在检测时长内需达到多少次拦截才会触发规避惩罚。"
     ruleset_flag_message: "自定义举报/审核理由"
     ruleset_flag_message_placeholder: "例如：命中违规词汇：'{{matched_word}}'"
-    ruleset_flag_message_help: "可选。定义触发此规则集时管理团队看到的具体理由。留空则使用默认通用理由。"
+    ruleset_flag_message_help: "可选。定义触发此规则集时管理团队看到的具体理由。留空则使用默认通用理由。支持填写翻译键值。"
     ruleset_evaluate_all_rules: "匹配所有规则（聚合变量）"
     ruleset_evaluate_all_rules_help: "开启后，引擎将检查此规则集中的所有规则，即使已经找到匹配项。这允许您收集所有命中的变量用于自定义消息。如果关闭，引擎在找到第一个匹配项后就会立即停止，以提高性能。"
 
@@ -132,7 +132,7 @@ huoxin-filter-rule-manager:
     force_enabled: "强制开启"
     force_disabled: "强制关闭"
 
-    message_help: "您可以使用 '{{token}}' 插入规则提取的变量值。变量内容会自动进行 HTML 转义；模板本身以可信方式渲染，允许使用简单的 HTML（如 '<br>'）。"
+    message_help: "您可以使用 '{{token}}' 插入规则提取的变量值。变量内容会自动进行 HTML 转义；模板本身以可信方式渲染，允许使用简单的 HTML（如 '<br>'）。支持填写翻译键值。"
     preview: "预览"
     preview_placeholder: "提示内容将显示在这里。"
 
