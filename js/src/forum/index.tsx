@@ -10,6 +10,10 @@
 import app from 'flarum/forum/app';
 import { extend, override } from 'flarum/common/extend';
 import CommentPost from 'flarum/forum/components/CommentPost';
+import Composer from 'flarum/forum/components/Composer';
+import DiscussionComposer from 'flarum/forum/components/DiscussionComposer';
+import ReplyComposer from 'flarum/forum/components/ReplyComposer';
+import EditPostComposer from 'flarum/forum/components/EditPostComposer';
 import ItemList from 'flarum/common/utils/ItemList';
 import type Mithril from 'mithril';
 import type { Ruleset } from '../common/FilterEngine';
