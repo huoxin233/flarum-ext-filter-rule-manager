@@ -38,7 +38,12 @@
                 "name": "fas fa-filter",
                 "color": "#fff",
                 "backgroundColor": "#9A2424"
-            }
+            },
+            "database-support": [
+                "mysql",
+                "pgsql",
+                "sqlite"
+            ]
         },
         "flarum-cli": {
             "modules": {
