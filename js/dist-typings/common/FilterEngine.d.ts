@@ -146,5 +146,5 @@ export declare class FilterEngine {
     interpolate(template: string | string[], tokens: Record<string, string> | undefined): string;
     alertsChanged(oldAlerts: ActiveAlert[], newAlerts: ActiveAlert[]): boolean;
 }
-declare const _default: FilterEngine;
-export default _default;
+declare const filterEngine: FilterEngine;
+export default filterEngine;

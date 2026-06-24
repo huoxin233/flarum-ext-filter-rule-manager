@@ -1,4 +1,1 @@
-import Model from 'flarum/common/Model';
-declare class Ruleset extends Model {
-}
-export { Ruleset };
+export { default as extend } from './extend';
