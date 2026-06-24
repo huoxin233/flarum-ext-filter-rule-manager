@@ -85,6 +85,7 @@ huoxin-filter-rule-manager:
     ruleset_display_mode: "显示模式"
     ruleset_display_template: "显示模板"
     ruleset_custom_title: "自定义标题"
+    ruleset_custom_title_placeholder: "例如：警告！"
     ruleset_custom_title_help: "可选。用于覆盖弹窗和提示条中的默认标题。支持填写翻译键值。"
     ruleset_toast_theme: "悬浮提示主题"
     ruleset_toast_theme_auto: "自动（根据干预方式）"
