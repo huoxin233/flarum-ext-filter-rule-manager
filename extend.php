@@ -43,10 +43,6 @@ return [
 
     // ── API routes (admin only) ───────────────────────────────────────────────
     (new Extend\Routes('api'))
-        ->get('/filter-rule-rulesets', 'filter-rule.rulesets.index', Controller\ListRulesetsController::class)
-        ->post('/filter-rule-rulesets', 'filter-rule.rulesets.create', Controller\CreateRulesetController::class)
-        ->patch('/filter-rule-rulesets/{id}', 'filter-rule.rulesets.update', Controller\UpdateRulesetController::class)
-        ->delete('/filter-rule-rulesets/{id}', 'filter-rule.rulesets.delete', Controller\DeleteRulesetController::class)
         ->post('/filter-rule-rulesets/reorder', 'filter-rule.rulesets.reorder', Controller\ReorderRulesetsController::class)
         ->get('/filter-rule-providers', 'filter-rule.providers.index', Controller\ListProvidersController::class),
 
