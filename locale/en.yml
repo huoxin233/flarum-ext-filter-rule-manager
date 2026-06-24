@@ -85,6 +85,7 @@ huoxin-filter-rule-manager:
     ruleset_display_mode: "Display mode"
     ruleset_display_template: "Display Template"
     ruleset_custom_title: "Custom Title"
+    ruleset_custom_title_placeholder: "e.g. Warning!"
     ruleset_custom_title_help: "Optional. Overrides the default translated title for modals and toasts. Supports translation keys."
     ruleset_toast_theme: "Toast Theme"
     ruleset_toast_theme_auto: "Auto (Based on Intervention)"
