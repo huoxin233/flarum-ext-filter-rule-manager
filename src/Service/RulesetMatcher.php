@@ -49,6 +49,21 @@ class RulesetMatcher
             return null;
         }
 
+        $targetContent = $this->getTargetContent($ruleset, $post, $discussion);
+
+        if ($providers === null) {
+            $providers = $this->evaluator->getProviders();
+        }
+
+        return $this->evaluator->evaluateRuleset($ruleset, $targetContent, $providers);
+    }
+
+    public function getTargetContent(Ruleset $ruleset, Post $post, $discussion = null): string
+    {
+        if ($discussion === null) {
+            $discussion = $post->discussion;
+        }
+
         $content = (string) $post->content;
         $title = $discussion ? (string) $discussion->title : '';
 
@@ -59,17 +74,12 @@ class RulesetMatcher
                 || $discussion->first_post_id === null;
         }
 
-        $targetContent = $content;
         $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
 
         if ($evaluateTitle && $title !== '' && $isFirstPost) {
-            $targetContent = $title."\n\n".$content;
+            return $title."\n\n".$content;
         }
 
-        if ($providers === null) {
-            $providers = $this->evaluator->getProviders();
-        }
-
-        return $this->evaluator->evaluateRuleset($ruleset, $targetContent, $providers);
+        return $content;
     }
 }

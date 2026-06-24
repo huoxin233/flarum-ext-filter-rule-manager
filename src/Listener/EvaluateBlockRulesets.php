@@ -60,17 +60,7 @@ class EvaluateBlockRulesets
                 continue;
             }
 
-            $targetContent = $content; // targetContent used for the block log
-            $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
-            $isFirstPost = false;
-            if ($discussion) {
-                $isFirstPost = $post->number === 1
-                    || $discussion->first_post_id === $post->id
-                    || $discussion->first_post_id === null;
-            }
-            if ($evaluateTitle && $title !== '' && $isFirstPost) {
-                $targetContent = $title."\n\n".$content;
-            }
+            $targetContent = $this->matcher->getTargetContent($ruleset, $post, $discussion);
 
             $triggered[] = [
                 'ruleset_id' => $ruleset->id,
