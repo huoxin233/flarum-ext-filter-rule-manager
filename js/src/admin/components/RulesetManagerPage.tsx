@@ -57,6 +57,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         app.request<Record<string, any>>({
           method: 'GET',
           url: app.forum.attribute('apiUrl') + '/filter-rule-providers',
+          extract: false,
         }),
       ]);
 
