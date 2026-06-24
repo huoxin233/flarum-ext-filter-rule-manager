@@ -54,7 +54,7 @@ export default class BuiltinTemplate extends Component<BuiltinTemplateAttrs> {
           </span>
         )}
         <div className="FilterRuleManager-item-content">
-          {settings.title && <strong className="FilterRuleManager-item-title">{app.translator.trans(settings.title)}</strong>}
+          {settings.title && <strong className="FilterRuleManager-item-title">{settings.title}</strong>}
           <span className="FilterRuleManager-item-message">{m.trust(alert.message)}</span>
         </div>
       </div>

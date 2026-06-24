@@ -169,6 +169,13 @@ class RuleEvaluator
 
     public function interpolate(string $template, array $tokens): string
     {
+        if (preg_match('/^[a-zA-Z0-9\-_]+(?:\.[a-zA-Z0-9\-_]+)+$/', $template)) {
+            $trans = resolve('translator')->trans($template, $tokens);
+            if ($trans !== $template && $trans !== '') {
+                $template = is_array($trans) ? $trans[0] : $trans;
+            }
+        }
+
         return preg_replace_callback('/\{\{(\w+)\}\}/', function (array $m) use ($tokens) {
             if (isset($tokens[$m[1]])) {
                 $val = $tokens[$m[1]];

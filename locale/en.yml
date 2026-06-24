@@ -85,7 +85,7 @@ huoxin-filter-rule-manager:
     ruleset_display_mode: "Display mode"
     ruleset_display_template: "Display Template"
     ruleset_custom_title: "Custom Title"
-    ruleset_custom_title_help: "Optional. Overrides the default translated title for modals and toasts."
+    ruleset_custom_title_help: "Optional. Overrides the default translated title for modals and toasts. Supports translation keys."
     ruleset_toast_theme: "Toast Theme"
     ruleset_toast_theme_auto: "Auto (Based on Intervention)"
     ruleset_toast_theme_success: "Success (Green)"
@@ -124,7 +124,7 @@ huoxin-filter-rule-manager:
     ruleset_evasion_threshold_help: "Number of blocks required within the timeout period to trigger evasion."
     ruleset_flag_message: "Custom Flag/Approval Reason"
     ruleset_flag_message_placeholder: "e.g. Matched words: '{{matched_word}}'"
-    ruleset_flag_message_help: "Optional. Define a custom flag or approval reason string for moderators to see when this ruleset triggers. If empty, the default group message will be used."
+    ruleset_flag_message_help: "Optional. Define a custom flag or approval reason string for moderators to see when this ruleset triggers. If empty, the default group message will be used. Supports translation keys."
     ruleset_evaluate_all_rules: "Evaluate all rules (Aggregate tokens)"
     ruleset_evaluate_all_rules_help: "If enabled, the engine will evaluate every rule in this ruleset even if a match is already found. This allows you to gather tokens from multiple rules for your custom flag message. If disabled, the ruleset stops evaluating as soon as its condition is met, improving performance."
 
@@ -132,7 +132,7 @@ huoxin-filter-rule-manager:
     force_enabled: "Force Enabled"
     force_disabled: "Force Disabled"
 
-    message_help: "Use '{{token}}' to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like '<br>'."
+    message_help: "Use '{{token}}' to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like '<br>'. Supports translation keys."
     preview: "Preview"
     preview_placeholder: "Your message will appear here."
 
