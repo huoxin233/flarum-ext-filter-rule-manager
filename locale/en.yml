@@ -104,7 +104,7 @@ huoxin-filter-rule-manager:
     ruleset_bypass_groups: "Bypass Groups"
     ruleset_bypass_groups_help: "Users in these groups will bypass this ruleset completely."
     ruleset_message: "Message"
-    ruleset_message_placeholder: "Your post contains a restricted word: {{matched_word}}"
+    ruleset_message_placeholder: "Your post contains a restricted word: '{{matched_word}}'"
     ruleset_is_active: "Enabled"
 
     ruleset_evaluate_title_label: "Evaluate Discussion Title"
@@ -123,7 +123,7 @@ huoxin-filter-rule-manager:
     ruleset_evasion_threshold: "Evasion Threshold (blocks)"
     ruleset_evasion_threshold_help: "Number of blocks required within the timeout period to trigger evasion."
     ruleset_flag_message: "Custom Flag/Approval Reason"
-    ruleset_flag_message_placeholder: "e.g. Matched words: {{matched_word}}"
+    ruleset_flag_message_placeholder: "e.g. Matched words: '{{matched_word}}'"
     ruleset_flag_message_help: "Optional. Define a custom flag or approval reason string for moderators to see when this ruleset triggers. If empty, the default group message will be used."
     ruleset_evaluate_all_rules: "Evaluate all rules (Aggregate tokens)"
     ruleset_evaluate_all_rules_help: "If enabled, the engine will evaluate every rule in this ruleset even if a match is already found. This allows you to gather tokens from multiple rules for your custom flag message. If disabled, the ruleset stops evaluating as soon as its condition is met, improving performance."
@@ -132,7 +132,7 @@ huoxin-filter-rule-manager:
     force_enabled: "Force Enabled"
     force_disabled: "Force Disabled"
 
-    message_help: "Use {{token}} to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like <br>."
+    message_help: "Use '{{token}}' to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like '<br>'."
     preview: "Preview"
     preview_placeholder: "Your message will appear here."
 
@@ -207,10 +207,10 @@ huoxin-filter-rule-manager:
 
     config_words_label: "Words / phrases"
     config_words_placeholder: "spam\nphishing\ngiveaway"
-    config_words_help: "One word or phrase per line. The rule triggers if the post contains any of them (case-insensitive). The first match is available as {{matched_word}} in the alert message."
+    config_words_help: "One word or phrase per line. The rule triggers if the post contains any of them (case-insensitive). The first match is available as '{{matched_word}}' in the alert message."
     config_patterns_label: "Regex patterns"
     config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]{20,}$"
-    config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as {{matched_pattern}} and {{matched_string}}."
+    config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as '{{matched_pattern}}' and '{{matched_string}}'."
 
     rule_scan_all: "Find all matches"
     rule_scan_all_help: "If enabled, this rule will gather every matched word or pattern in your list. If disabled, it returns quickly on the first match to save processing time."
