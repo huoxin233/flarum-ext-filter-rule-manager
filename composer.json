@@ -25,6 +25,16 @@
             "role": "Developer"
         }
     ],
+    "funding": [
+        {
+            "type": "buymeacoffee",
+            "url": "https://www.buymeacoffee.com/huoxin"
+        },
+        {
+            "type": "ko-fi",
+            "url": "https://ko-fi.com/huoxin"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Huoxin\\FilterRuleManager\\": "src/"
@@ -41,8 +51,14 @@
             },
             "database-support": [
                 "mysql",
+                "mariadb",
                 "pgsql",
                 "sqlite"
+            ],
+            "optional-dependencies": [
+                "flarum/approval",
+                "flarum/flags",
+                "flarum/tags"
             ]
         },
         "flarum-cli": {
