@@ -383,8 +383,8 @@ export function stringifyExpression(ast: ASTNode | null | undefined): string {
                 typeof v === 'string'
                   ? `"${(v as string).replace(/"/g, '\\"')}"`
                   : Array.isArray(v)
-                    ? `[${v.map((item: unknown) => (typeof item === 'string' ? `"${item.replace(/"/g, '\\"')}"` : item)).join(', ')}]`
-                    : v
+                  ? `[${v.map((item: unknown) => (typeof item === 'string' ? `"${item.replace(/"/g, '\\"')}"` : item)).join(', ')}]`
+                  : v
               }`
           )
           .join(', ') +

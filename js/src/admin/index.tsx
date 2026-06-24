@@ -29,7 +29,6 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   filterEngine.registerProvider('builtin', new BuiltinProvider() as any);
   filterEngine.registerTemplate('builtin', BuiltinTemplate as any, BuiltinTemplateSettings as any);
 
-
   /*
     // Temporarily removed until Flarum natively supports a "Nobody" permission.
     // Currently, Flarum Admins inherently bypass all permissions.
