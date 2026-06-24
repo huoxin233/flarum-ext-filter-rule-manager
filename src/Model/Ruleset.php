@@ -12,7 +12,6 @@
 namespace Huoxin\FilterRuleManager\Model;
 
 use Flarum\Database\AbstractModel;
-use Flarum\Database\ScopeVisibilityTrait;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -41,7 +40,6 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Ruleset extends AbstractModel
 {
-    use ScopeVisibilityTrait;
 
     public $timestamps = true;
 

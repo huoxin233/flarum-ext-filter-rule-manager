@@ -29,7 +29,6 @@ class RulesetResource extends Resource\AbstractDatabaseResource
 
     public function scope(Builder $query, Context $context): void
     {
-        $query->whereVisibleTo($context->getActor());
     }
 
     public function create(object $model, Context $context): object
@@ -45,12 +44,14 @@ class RulesetResource extends Resource\AbstractDatabaseResource
         return [
             Endpoint\Create::make()
                 ->can('createRuleset'),
-            Endpoint\Show::make(),
+            Endpoint\Show::make()
+                ->can('administrate'),
             Endpoint\Update::make()
                 ->can('update'),
             Endpoint\Delete::make()
                 ->can('delete'),
             Endpoint\Index::make()
+                ->can('administrate')
                 ->paginate(),
         ];
     }
