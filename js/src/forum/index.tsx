@@ -119,30 +119,32 @@ app.initializers.add(
     });
 
     // ── Warning confirmation on submit ───────────────────────────────────────
-    ['flarum/forum/components/DiscussionComposer', 'flarum/forum/components/ReplyComposer', 'flarum/forum/components/EditPostComposer'].forEach((moduleName) => {
-      override(moduleName, 'onsubmit', function (this: any, original: Function) {
-        filterEngine.clearBlockResults();
+    ['flarum/forum/components/DiscussionComposer', 'flarum/forum/components/ReplyComposer', 'flarum/forum/components/EditPostComposer'].forEach(
+      (moduleName) => {
+        override(moduleName, 'onsubmit', function (this: any, original: Function) {
+          filterEngine.clearBlockResults();
 
-        const warnings = filterEngine.activeAlerts.filter((a) => a.ruleset.interventionType === 'warning');
+          const warnings = filterEngine.activeAlerts.filter((a) => a.ruleset.interventionType === 'warning');
 
-        if (warnings.length === 0) {
-          return original();
-        }
+          if (warnings.length === 0) {
+            return original();
+          }
 
-        const self = this;
-        app.modal.show(FilterRuleWarningModal, {
-          alerts: warnings,
-          onconfirm() {
-            app.modal.close();
-            original.call(self);
-          },
-          oncancel() {
-            app.modal.close();
-            self.loaded();
-          },
+          const self = this;
+          app.modal.show(FilterRuleWarningModal, {
+            alerts: warnings,
+            onconfirm() {
+              app.modal.close();
+              original.call(self);
+            },
+            oncancel() {
+              app.modal.close();
+              self.loaded();
+            },
+          });
         });
-      });
-    });
+      }
+    );
 
     // ── Intercept filter_rule_block errors via the documented hook ──────────────
     override(app, 'requestErrorCatch' as any, function (this: any, original: Function, error: any) {
