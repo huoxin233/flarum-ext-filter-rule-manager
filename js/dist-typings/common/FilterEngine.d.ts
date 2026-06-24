@@ -60,7 +60,7 @@ export declare class FilterEngine {
     displayModes: Record<string, string>;
     activeAlerts: ActiveAlert[];
     blockResults: BlockResult[];
-    intervalId: number | null;
+    debounceTimer: number | null;
     hasAlerts: boolean;
     private _lastStateKey;
     private _subscribers;
@@ -126,6 +126,7 @@ export declare class FilterEngine {
     }[];
     loadRulesets(rulesets: Ruleset[]): void;
     start(): void;
+    debouncedEvaluate(): void;
     stop(): void;
     setBlockResults(filterRules: Record<string, unknown>[]): void;
     clearBlockResults(): void;
