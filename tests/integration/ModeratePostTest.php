@@ -349,7 +349,14 @@ class ModeratePostTest extends FilterTestCase
 
         $body = json_decode($response->getBody()->getContents(), true);
         $discussionId = Arr::get($body, 'data.id');
-        $postId = Arr::get($body, 'included.0.id');
+        
+        $postId = null;
+        foreach (Arr::get($body, 'included', []) as $included) {
+            if ($included['type'] === 'posts') {
+                $postId = $included['id'];
+                break;
+            }
+        }
 
         $discussion = $this->database()->table('discussions')->where('id', $discussionId)->first();
         $post = $this->database()->table('posts')->where('id', $postId)->first();
