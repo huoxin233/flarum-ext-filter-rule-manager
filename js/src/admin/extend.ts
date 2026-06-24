@@ -3,7 +3,7 @@ import RulesetManagerPage from './components/RulesetManagerPage';
 import Ruleset from './models/Ruleset';
 import app from 'flarum/admin/app';
 
-export default [
+const extenders = [
   new Extend.Store().add('filter-rule-rulesets', Ruleset),
   new Extend.Admin()
     .page(RulesetManagerPage as any)
@@ -53,3 +53,5 @@ export default [
       min: 1,
     })),
 ];
+
+export default extenders;
