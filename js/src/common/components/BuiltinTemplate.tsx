@@ -7,8 +7,9 @@
  * file that was distributed with this source code.
  */
 
-import app from 'flarum/common/app';
 import Component, { ComponentAttrs } from 'flarum/common/Component';
+
+declare const app: any;
 import Icon from 'flarum/common/components/Icon';
 import type Mithril from 'mithril';
 

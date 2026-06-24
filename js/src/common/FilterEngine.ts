@@ -7,8 +7,9 @@
  * file that was distributed with this source code.
  */
 
-import app from 'flarum/common/app';
 import type Mithril from 'mithril';
+
+declare const app: any;
 
 export interface ASTNode {
   type: string;
@@ -189,7 +190,7 @@ export class FilterEngine {
   getRegisteredFrontendTypes(): { provider: string; providerLabel: string; type: string; label: string }[] {
     const types: { provider: string; providerLabel: string; type: string; label: string }[] = [];
 
-    // `app` is imported natively.
+    // `app` is available globally.
 
     for (const [name, provider] of Object.entries(this.providers)) {
       if (typeof provider.getSupportedTypes !== 'function') continue;
@@ -486,4 +487,5 @@ export class FilterEngine {
   }
 }
 
-export default new FilterEngine();
+const filterEngine = new FilterEngine();
+export default filterEngine;
