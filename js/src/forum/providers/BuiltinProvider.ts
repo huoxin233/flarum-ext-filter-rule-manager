@@ -7,6 +7,7 @@
  * file that was distributed with this source code.
  */
 
+import app from 'flarum/forum/app';
 import type { FilterRuleProvider } from '../../common/FilterEngine';
 
 /**
@@ -21,7 +22,7 @@ import type { FilterRuleProvider } from '../../common/FilterEngine';
  */
 export default class BuiltinProvider implements FilterRuleProvider {
   getSupportedTypes(): string[] {
-    return ['contains_word', 'regex'];
+    return ['contains_word', 'regex', 'group'];
   }
 
   evaluate(type: string, content: string, config: Record<string, unknown>): Record<string, string> | null {
@@ -73,6 +74,24 @@ export default class BuiltinProvider implements FilterRuleProvider {
           matched_string: matchedStrings.join(', '),
         };
       }
+    }
+
+    if (type === 'group') {
+      const user = app.session.user;
+      if (!user) return null;
+
+      const userGroups = user.groups() ? user.groups().map((g: any) => parseInt(String(g.id()), 10)) : [];
+      let targetGroups = config.groupIds || [];
+      if (!Array.isArray(targetGroups)) targetGroups = [targetGroups];
+
+      const targets = targetGroups.map((id: any) => parseInt(String(id), 10));
+      const intersect = userGroups.filter((g) => targets.includes(g));
+
+      if (intersect.length > 0) {
+        return { matched_group: intersect.join(', ') };
+      }
+
+      return null;
     }
 
     return null;
