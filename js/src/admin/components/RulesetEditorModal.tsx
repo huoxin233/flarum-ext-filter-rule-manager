@@ -403,6 +403,13 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
             ))}
           </div>
           <div className="helpText">{app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}_help`)}</div>
+          {(intervention === 'info' || intervention === 'warning') && (
+            <div className="Alert Alert--warning RulesetEditor-warningAlert">
+              <p>
+                <i className="fas fa-exclamation-circle"></i> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_exposed_warning_text')}
+              </p>
+            </div>
+          )}
         </div>
 
         <hr className="RulesetEditor-divider" />

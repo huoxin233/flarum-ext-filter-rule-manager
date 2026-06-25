@@ -115,6 +115,7 @@ huoxin-filter-rule-manager:
     ruleset_require_approval: "匹配时进入审核队列"
     ruleset_require_approval_help: "开启后，帖子将被隐藏，直到被管理团队批准。（需要 flarum/approval 扩展）"
     ruleset_approval_without_flag_warning: "在不开启自动举报的情况下要求审核，意味着帖子会被隐藏，但管理团队不会在举报队列中收到通知。"
+    ruleset_exposed_warning_text: "因为此操作模式不会在后端拦截帖子，其规则配置将被发送到前端进行本地匹配。尽管配置已被混淆，但有技术能力的用户仍可解密并查看您的过滤规则。"
     ruleset_block_cascade: "触发此规则集后停止后续匹配"
     ruleset_block_cascade_help: "适用于所有执行动作。用于在匹配成功后立即短路终止后续相关规则集的检查。"
     ruleset_evasion_active: "开启恶意绕过检测"

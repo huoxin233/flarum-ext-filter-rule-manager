@@ -115,6 +115,7 @@ huoxin-filter-rule-manager:
     ruleset_require_approval: "Require approval on match"
     ruleset_require_approval_help: "If enabled, the post will be hidden until approved by a moderator. (Requires flarum/approval)"
     ruleset_approval_without_flag_warning: "Requiring approval without auto-flagging means the post will be hidden, but moderators will not be notified via the flag queue."
+    ruleset_exposed_warning_text: "Because this intervention does not block the post from saving, the rule configuration is sent to the frontend for evaluation. Although obfuscated, technically-savvy users can decrypt it to see your rules."
     ruleset_block_cascade: "Stop evaluating subsequent rulesets when this one triggers"
     ruleset_block_cascade_help: "Applies to all intervention types. Use to short-circuit a chain of related rulesets."
     ruleset_evasion_active: "Enable Evasion Detection"
