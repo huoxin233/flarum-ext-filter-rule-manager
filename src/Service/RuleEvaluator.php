@@ -3,6 +3,7 @@
 namespace Huoxin\FilterRuleManager\Service;
 
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Illuminate\Contracts\Container\Container;
@@ -24,26 +25,26 @@ class RuleEvaluator
         return $this->container->make(FilterRuleProvider::REGISTRY_KEY);
     }
 
-    public function evaluateRuleset(Ruleset $ruleset, string $content, array $providers): ?array
+    public function evaluateRuleset(Ruleset $ruleset, EvaluationContext $context, array $providers): ?array
     {
         $ast = $ruleset->compiled_ast;
         if (empty($ast)) {
             return null;
         }
 
-        return $this->evaluateAST($ast, $content, $providers, $ruleset);
+        return $this->evaluateAST($ast, $context, $providers, $ruleset);
     }
 
-    public function evaluateAST(array $node, string $content, array $providers, Ruleset $ruleset): ?array
+    public function evaluateAST(array $node, EvaluationContext $context, array $providers, Ruleset $ruleset): ?array
     {
         if ($node['type'] === 'logical') {
-            $left = $this->evaluateAST($node['left'], $content, $providers, $ruleset);
+            $left = $this->evaluateAST($node['left'], $context, $providers, $ruleset);
 
             if ($node['operator'] === 'OR') {
                 if ($left !== null && ! $ruleset->evaluate_all_rules) {
                     return $left;
                 }
-                $right = $this->evaluateAST($node['right'], $content, $providers, $ruleset);
+                $right = $this->evaluateAST($node['right'], $context, $providers, $ruleset);
 
                 if ($left !== null && $right !== null) {
                     return $this->mergeResults([$left, $right]);
@@ -56,7 +57,7 @@ class RuleEvaluator
                 if ($left === null) {
                     return null;
                 }
-                $right = $this->evaluateAST($node['right'], $content, $providers, $ruleset);
+                $right = $this->evaluateAST($node['right'], $context, $providers, $ruleset);
                 if ($right === null) {
                     return null;
                 }
@@ -66,13 +67,13 @@ class RuleEvaluator
         }
 
         if ($node['type'] === 'not') {
-            $result = $this->evaluateAST($node['node'], $content, $providers, $ruleset);
+            $result = $this->evaluateAST($node['node'], $context, $providers, $ruleset);
 
             return $result === null ? [] : null;
         }
 
         if ($node['type'] === 'rule') {
-            return $this->evaluateRuleNode($node, $content, $providers);
+            return $this->evaluateRuleNode($node, $context, $providers);
         }
 
         return null;
@@ -98,7 +99,7 @@ class RuleEvaluator
         return $merged;
     }
 
-    public function evaluateRuleNode(array $node, string $content, array $providers): ?array
+    public function evaluateRuleNode(array $node, EvaluationContext $context, array $providers): ?array
     {
         $provider = $providers[$node['provider']] ?? null;
         if ($provider === null) {
@@ -117,7 +118,7 @@ class RuleEvaluator
             } else {
                 $config = ['operator' => $node['operator'], 'value' => $node['value']];
             }
-            $result = $provider->evaluate($node['ruleType'], $content, $config);
+            $result = $provider->evaluate($node['ruleType'], $config, $context);
 
             return $result;
         } catch (\Throwable $e) {
