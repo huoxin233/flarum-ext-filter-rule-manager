@@ -11,6 +11,7 @@ import app from 'flarum/admin/app';
 import type Mithril from 'mithril';
 import WordsListConfig from '../components/config/WordsListConfig';
 import PatternsListConfig from '../components/config/PatternsListConfig';
+import GroupListConfig from '../components/config/GroupListConfig';
 
 /**
  * Admin-side view of the builtin provider. Mirrors the type catalogue exposed
@@ -38,19 +39,21 @@ import PatternsListConfig from '../components/config/PatternsListConfig';
  */
 export default class BuiltinProvider {
   getSupportedTypes(): string[] {
-    return ['contains_word', 'regex'];
+    return ['contains_word', 'regex', 'group'];
   }
 
   getTypeLabels(): Record<string, string> {
     return {
       contains_word: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_contains_word')),
       regex: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_regex')),
+      group: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_group')),
     };
   }
 
   getConfigComponent(type: string): any {
     if (type === 'contains_word') return WordsListConfig;
     if (type === 'regex') return PatternsListConfig;
+    if (type === 'group') return GroupListConfig;
     return null;
   }
 
@@ -68,6 +71,9 @@ export default class BuiltinProvider {
         { name: 'matched_pattern', description: 'The first listed regex pattern that matched.' },
         { name: 'matched_string', description: 'The substring of the post content that matched.' },
       ];
+    }
+    if (type === 'group') {
+      return [{ name: 'matched_group', description: 'The user group ID that triggered the rule.' }];
     }
     return [];
   }

@@ -206,6 +206,10 @@ huoxin-filter-rule-manager:
     # ── Built-in Rules Config ──────────────────────────────────────────────
     type_contains_word: "包含以下词汇"
     type_regex: "匹配正则表达式"
+    type_group: "用户属于指定用户组"
+
+    config_groups_label: "选择用户组"
+    config_groups_help: "如果发帖用户属于所选任意一个用户组，则触发该规则。命中的用户组 ID 将作为 '{{matched_group}}' 变量提供。"
 
     config_words_label: "单词 / 短语"
     config_words_placeholder: "垃圾邮件\n钓鱼\n抽奖"

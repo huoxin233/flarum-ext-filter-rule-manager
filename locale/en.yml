@@ -206,6 +206,10 @@ huoxin-filter-rule-manager:
     # ── Built-in Rules Config ──────────────────────────────────────────────
     type_contains_word: "Contains word(s)"
     type_regex: "Matches regex pattern(s)"
+    type_group: "User in Group(s)"
+
+    config_groups_label: "Select Groups"
+    config_groups_help: "The rule triggers if the user belongs to any of the selected groups. The matched group ID is available as '{{matched_group}}'."
 
     config_words_label: "Words / phrases"
     config_words_placeholder: "spam\nphishing\ngiveaway"

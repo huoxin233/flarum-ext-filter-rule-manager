@@ -34,12 +34,13 @@ class BuiltinProvider implements RuleProviderInterface
         return [
             'contains_word' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_contains_word'),
             'regex' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_regex'),
+            'group' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_group'),
         ];
     }
 
     public function getSupportedBackendTypes(): array
     {
-        return ['contains_word', 'regex'];
+        return ['contains_word', 'regex', 'group'];
     }
 
     /**
@@ -62,6 +63,12 @@ class BuiltinProvider implements RuleProviderInterface
             return [
                 ['name' => 'matched_pattern', 'description' => 'The first listed regex pattern that matched.'],
                 ['name' => 'matched_string',  'description' => 'The substring of the post content that matched.'],
+            ];
+        }
+
+        if ($type === 'group') {
+            return [
+                ['name' => 'matched_group', 'description' => 'The user group ID that triggered the rule.'],
             ];
         }
 
@@ -118,6 +125,27 @@ class BuiltinProvider implements RuleProviderInterface
                     'matched_pattern' => implode(', ', $matchedPatterns),
                     'matched_string' => implode(', ', $matchedStrings),
                 ];
+            }
+
+            return null;
+        }
+
+        if ($type === 'group') {
+            if ($context->actor === null) {
+                return null;
+            }
+
+            $userGroups = $context->actor->groups->pluck('id')->toArray();
+            $targetGroups = $config['groupIds'] ?? [];
+            if (! is_array($targetGroups)) {
+                $targetGroups = [$targetGroups];
+            }
+
+            $targetGroups = array_map('intval', $targetGroups);
+            $intersect = array_intersect($userGroups, $targetGroups);
+
+            if (count($intersect) > 0) {
+                return ['matched_group' => implode(', ', $intersect)];
             }
 
             return null;
