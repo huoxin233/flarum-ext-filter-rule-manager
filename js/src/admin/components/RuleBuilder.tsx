@@ -54,55 +54,53 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
 
     return (
       <div className="Expression-LogicalNode" key={node._key}>
-        {[
-          <NodeView
-            key={node.left ? node.left._key : 'l'}
-            node={node.left}
-            onchange={(v: ASTNode | null) => {
-              if (v === null) onchange(node.right || null);
-              else onchange({ ...node, left: v });
-            }}
-            providers={providers}
-          />,
+        <NodeView
+          key={node.left ? node.left._key : 'l'}
+          node={node.left}
+          onchange={(v: ASTNode | null) => {
+            if (v === null) onchange(node.right || null);
+            else onchange({ ...node, left: v });
+          }}
+          providers={providers}
+        />
 
-          isAnd ? (
-            <div className="LogicalNode-andContainer" key="and">
-              <div className="LogicalNode-connector"></div>
-              <Button
-                className="Button Button--basic LogicalNode-andButton"
-                onclick={() => {
-                  onchange({ ...node, operator: 'OR' });
-                }}
-              >
-                {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.and')}
-              </Button>
-              <div className="LogicalNode-connector"></div>
-            </div>
-          ) : null,
+        {isAnd ? (
+          <div className="LogicalNode-andContainer" key="and">
+            <div className="LogicalNode-connector"></div>
+            <Button
+              className="Button Button--basic LogicalNode-andButton"
+              onclick={() => {
+                onchange({ ...node, operator: 'OR' });
+              }}
+            >
+              {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.and')}
+            </Button>
+            <div className="LogicalNode-connector"></div>
+          </div>
+        ) : null}
 
-          isOr ? (
-            <div className="LogicalNode-orContainer" key="or">
-              <Button
-                className="Button Button--basic LogicalNode-orButton"
-                onclick={() => {
-                  onchange({ ...node, operator: 'AND' });
-                }}
-              >
-                {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.or')}
-              </Button>
-            </div>
-          ) : null,
+        {isOr ? (
+          <div className="LogicalNode-orContainer" key="or">
+            <Button
+              className="Button Button--basic LogicalNode-orButton"
+              onclick={() => {
+                onchange({ ...node, operator: 'AND' });
+              }}
+            >
+              {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.or')}
+            </Button>
+          </div>
+        ) : null}
 
-          <NodeView
-            key={node.right ? node.right._key : 'r'}
-            node={node.right}
-            onchange={(v: ASTNode | null) => {
-              if (v === null) onchange(node.left || null);
-              else onchange({ ...node, right: v });
-            }}
-            providers={providers}
-          />,
-        ].filter(Boolean)}
+        <NodeView
+          key={node.right ? node.right._key : 'r'}
+          node={node.right}
+          onchange={(v: ASTNode | null) => {
+            if (v === null) onchange(node.left || null);
+            else onchange({ ...node, right: v });
+          }}
+          providers={providers}
+        />
       </div>
     );
   }
@@ -394,53 +392,51 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
         )}
         {this.mode === 'visual' ? (
           <div className="RuleBuilder-visual">
-            {[
-              <NodeView
-                key={this.ast ? this.ast._key : 'root'}
-                node={this.ast}
-                onchange={(newAst: ASTNode | null) => {
-                  this.ast = newAst;
-                  this.syncToEditor();
-                }}
-                providers={providers}
-              />,
-              this.ast ? (
-                <div className="RuleBuilder-appendButtons" key="appendButtons">
-                  <Button
-                    className="Button Button--basic RuleBuilder-appendButton"
-                    onclick={() => {
-                      const newLogical = {
-                        _key: nodeIdCounter++,
-                        type: 'logical',
-                        operator: 'AND',
-                        left: this.ast || undefined,
-                        right: createEmptyRule(providers),
-                      };
-                      this.ast = newLogical;
-                      this.syncToEditor();
-                    }}
-                  >
-                    {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.and')}
-                  </Button>
-                  <Button
-                    className="Button Button--basic RuleBuilder-appendButton"
-                    onclick={() => {
-                      const newLogical = {
-                        _key: nodeIdCounter++,
-                        type: 'logical',
-                        operator: 'OR',
-                        left: this.ast || undefined,
-                        right: createEmptyRule(providers),
-                      };
-                      this.ast = newLogical;
-                      this.syncToEditor();
-                    }}
-                  >
-                    {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.or')}
-                  </Button>
-                </div>
-              ) : null,
-            ].filter(Boolean)}
+            <NodeView
+              key={this.ast ? this.ast._key : 'root'}
+              node={this.ast}
+              onchange={(newAst: ASTNode | null) => {
+                this.ast = newAst;
+                this.syncToEditor();
+              }}
+              providers={providers}
+            />
+            {this.ast ? (
+              <div className="RuleBuilder-appendButtons" key="appendButtons">
+                <Button
+                  className="Button Button--basic RuleBuilder-appendButton"
+                  onclick={() => {
+                    const newLogical = {
+                      _key: nodeIdCounter++,
+                      type: 'logical',
+                      operator: 'AND',
+                      left: this.ast || undefined,
+                      right: createEmptyRule(providers),
+                    };
+                    this.ast = newLogical;
+                    this.syncToEditor();
+                  }}
+                >
+                  {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.and')}
+                </Button>
+                <Button
+                  className="Button Button--basic RuleBuilder-appendButton"
+                  onclick={() => {
+                    const newLogical = {
+                      _key: nodeIdCounter++,
+                      type: 'logical',
+                      operator: 'OR',
+                      left: this.ast || undefined,
+                      right: createEmptyRule(providers),
+                    };
+                    this.ast = newLogical;
+                    this.syncToEditor();
+                  }}
+                >
+                  {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.or')}
+                </Button>
+              </div>
+            ) : null}
           </div>
         ) : (
           <div className="RuleBuilder-editor">
