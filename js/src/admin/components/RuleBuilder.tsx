@@ -258,7 +258,7 @@ class NodeView extends Component<NodeViewAttrs> {
             providers={providers}
             onNegateChange={(v: boolean) => {
               if (v) {
-                onchange({ type: 'not', node: node });
+                onchange({ _key: nodeIdCounter++, type: 'not', node: node });
               }
             }}
           />
