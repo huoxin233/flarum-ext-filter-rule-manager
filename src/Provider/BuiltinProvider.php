@@ -35,12 +35,13 @@ class BuiltinProvider implements RuleProviderInterface
             'contains_word' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_contains_word'),
             'regex' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_regex'),
             'group' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_group'),
+            'word_count' => $this->translator->trans('huoxin-filter-rule-manager.admin.type_word_count'),
         ];
     }
 
     public function getSupportedBackendTypes(): array
     {
-        return ['contains_word', 'regex', 'group'];
+        return ['contains_word', 'regex', 'group', 'word_count'];
     }
 
     /**
@@ -62,13 +63,19 @@ class BuiltinProvider implements RuleProviderInterface
         if ($type === 'regex') {
             return [
                 ['name' => 'matched_pattern', 'description' => 'The first listed regex pattern that matched.'],
-                ['name' => 'matched_string',  'description' => 'The substring of the post content that matched.'],
+                ['name' => 'matched_string', 'description' => 'The substring of the post content that matched.'],
             ];
         }
 
         if ($type === 'group') {
             return [
                 ['name' => 'matched_group', 'description' => 'The user group ID that triggered the rule.'],
+            ];
+        }
+
+        if ($type === 'word_count') {
+            return [
+                ['name' => 'word_count', 'description' => 'The calculated word count of the post.'],
             ];
         }
 
@@ -146,6 +153,46 @@ class BuiltinProvider implements RuleProviderInterface
 
             if (count($intersect) > 0) {
                 return ['matched_group' => implode(', ', $intersect)];
+            }
+
+            return null;
+        }
+
+        if ($type === 'word_count') {
+            $text = $context->content;
+
+            if (! empty($config['exclude_mentions'])) {
+                // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
+                $text = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $text);
+                $text = preg_replace('/@\w+/', '', $text);
+            }
+
+            // Remove URLs to avoid them skewing word counts
+            $text = preg_replace('#https?://[^\s]+#i', '', $text);
+
+            // CJK Character Range:
+            // Chinese: \x{4e00}-\x{9fa5}
+            // Japanese: \x{3040}-\x{309F} (Hiragana), \x{30A0}-\x{30FF} (Katakana)
+            // Korean: \x{AC00}-\x{D7AF} (Hangul)
+            $cjkRegex = '/[\x{4e00}-\x{9fa5}\x{3040}-\x{309F}\x{30A0}-\x{30FF}\x{AC00}-\x{D7AF}]/u';
+
+            preg_match_all($cjkRegex, $text, $cjkMatches);
+            $cjkCount = count($cjkMatches[0] ?? []);
+
+            $latinText = preg_replace($cjkRegex, ' ', $text);
+            $latinCount = str_word_count($latinText);
+
+            $count = $cjkCount + $latinCount;
+
+            $min = isset($config['min']) && $config['min'] !== '' ? (int) $config['min'] : null;
+            $max = isset($config['max']) && $config['max'] !== '' ? (int) $config['max'] : null;
+
+            if ($min !== null && $count < $min) {
+                return ['word_count' => (string) $count];
+            }
+
+            if ($max !== null && $count > $max) {
+                return ['word_count' => (string) $count];
             }
 
             return null;

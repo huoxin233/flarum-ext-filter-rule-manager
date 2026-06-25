@@ -126,4 +126,52 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('foo, bar', $result['matched_pattern']);
         $this->assertEquals('foo, bar', $result['matched_string']);
     }
+
+    #[Test]
+    public function it_evaluates_word_count_correctly()
+    {
+        $config = ['min' => 2, 'max' => 5];
+
+        // Should return null (not block) since 3 words is between 2 and 5
+        $this->assertNull($this->evaluate('word_count', 'One two three.', $config));
+
+        // Less than min
+        $resultMin = $this->evaluate('word_count', 'One.', $config);
+        $this->assertIsArray($resultMin);
+        $this->assertEquals('1', $resultMin['word_count']);
+
+        // Greater than max
+        $resultMax = $this->evaluate('word_count', 'One two three four five six.', $config);
+        $this->assertIsArray($resultMax);
+        $this->assertEquals('6', $resultMax['word_count']);
+    }
+
+    #[Test]
+    public function it_evaluates_cjk_character_count_correctly()
+    {
+        $config = ['max' => 4];
+
+        // "你好" is 2 chars + "world" is 1 word = 3
+        $this->assertNull($this->evaluate('word_count', '你好 world', $config));
+
+        // 5 CJK chars > 4
+        $resultMax = $this->evaluate('word_count', '一二三四五', $config);
+        $this->assertIsArray($resultMax);
+        $this->assertEquals('5', $resultMax['word_count']);
+    }
+
+    #[Test]
+    public function it_strips_mentions_if_configured()
+    {
+        $config = ['min' => 2, 'exclude_mentions' => true];
+
+        // "Hello @"User Name"#123" -> without mention it's just "Hello" (1 word) < 2
+        $result = $this->evaluate('word_count', 'Hello @"User Name"#123', $config);
+        $this->assertIsArray($result);
+        $this->assertEquals('1', $result['word_count']);
+
+        // With mentions NOT excluded
+        $config2 = ['min' => 2];
+        $this->assertNull($this->evaluate('word_count', 'Hello @"User Name"#123', $config2));
+    }
 }

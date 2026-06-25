@@ -22,7 +22,7 @@ import type { FilterRuleProvider } from '../../common/FilterEngine';
  */
 export default class BuiltinProvider implements FilterRuleProvider {
   getSupportedTypes(): string[] {
-    return ['contains_word', 'regex', 'group'];
+    return ['contains_word', 'regex', 'group', 'word_count'];
   }
 
   evaluate(type: string, content: string, config: Record<string, unknown>): Record<string, string> | null {
@@ -89,6 +89,43 @@ export default class BuiltinProvider implements FilterRuleProvider {
 
       if (intersect.length > 0) {
         return { matched_group: intersect.join(', ') };
+      }
+
+      return null;
+    }
+
+    if (type === 'word_count') {
+      let text = String(content || '');
+
+      if (config.exclude_mentions) {
+        text = text.replace(/@"?[^"#\n]+"?#(?:p)?\d+/g, '');
+        text = text.replace(/@\w+/g, '');
+      }
+
+      text = text.replace(/https?:\/\/[^\s]+/gi, '');
+
+      // Match CJK characters
+      const cjkRegex = /[\u4E00-\u9FA5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g;
+      const cjkMatches = text.match(cjkRegex) || [];
+      const cjkCount = cjkMatches.length;
+
+      // Match Latin words
+      const latinText = text.replace(cjkRegex, ' ');
+      // Simple word split, filtering out empty strings
+      const latinWords = latinText.split(/\s+/).filter((w) => w.length > 0);
+      const latinCount = latinWords.length;
+
+      const count = cjkCount + latinCount;
+
+      const min = config.min !== undefined && config.min !== '' ? parseInt(String(config.min), 10) : null;
+      const max = config.max !== undefined && config.max !== '' ? parseInt(String(config.max), 10) : null;
+
+      if (min !== null && !isNaN(min) && count < min) {
+        return { word_count: String(count) };
+      }
+
+      if (max !== null && !isNaN(max) && count > max) {
+        return { word_count: String(count) };
       }
 
       return null;
