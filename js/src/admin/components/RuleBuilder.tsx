@@ -53,9 +53,8 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
     const isOr = node.operator === 'OR';
 
     return (
-      <div className="Expression-LogicalNode" key={node._key}>
+      <div className="Expression-LogicalNode">
         <NodeView
-          key={node.left ? node.left._key : 'l'}
           node={node.left}
           onchange={(v: ASTNode | null) => {
             if (v === null) onchange(node.right || null);
@@ -65,7 +64,7 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
         />
 
         {isAnd ? (
-          <div className="LogicalNode-andContainer" key="and">
+          <div className="LogicalNode-andContainer">
             <div className="LogicalNode-connector"></div>
             <Button
               className="Button Button--basic LogicalNode-andButton"
@@ -80,7 +79,7 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
         ) : null}
 
         {isOr ? (
-          <div className="LogicalNode-orContainer" key="or">
+          <div className="LogicalNode-orContainer">
             <Button
               className="Button Button--basic LogicalNode-orButton"
               onclick={() => {
@@ -93,7 +92,6 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
         ) : null}
 
         <NodeView
-          key={node.right ? node.right._key : 'r'}
           node={node.right}
           onchange={(v: ASTNode | null) => {
             if (v === null) onchange(node.left || null);
@@ -188,6 +186,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
 
       return (
         <ConfigComponent
+          key={node._key}
           config={configObj}
           type={node.ruleType}
           onchange={(newConfig: Record<string, unknown>) => {
@@ -250,7 +249,7 @@ class NodeView extends Component<NodeViewAttrs> {
 
     if (node.type === 'rule') {
       return (
-        <div className="NodeView-ruleContainer" key={node._key}>
+        <div className="NodeView-ruleContainer">
           <RuleNodeView
             node={node}
             isNegated={false}
@@ -269,7 +268,7 @@ class NodeView extends Component<NodeViewAttrs> {
     if (node.type === 'not') {
       if (node.node && node.node.type === 'rule') {
         return (
-          <div className="NodeView-ruleContainer" key={node._key}>
+          <div className="NodeView-ruleContainer">
             <RuleNodeView
               node={node.node}
               isNegated={true}
@@ -289,12 +288,9 @@ class NodeView extends Component<NodeViewAttrs> {
       }
 
       return (
-        <div className="Expression-NotNode" key={node._key}>
-          <div className="NotNode-label" key="label">
-            {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.not')}
-          </div>
+        <div className="Expression-NotNode">
+          <div className="NotNode-label">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.not')}</div>
           <NodeView
-            key={node.node ? node.node._key : 'n'}
             node={node.node}
             onchange={(v: ASTNode | null) => {
               if (v === null) onchange(null);
@@ -393,7 +389,6 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
         {this.mode === 'visual' ? (
           <div className="RuleBuilder-visual">
             <NodeView
-              key={this.ast ? this.ast._key : 'root'}
               node={this.ast}
               onchange={(newAst: ASTNode | null) => {
                 this.ast = newAst;
@@ -402,7 +397,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
               providers={providers}
             />
             {this.ast ? (
-              <div className="RuleBuilder-appendButtons" key="appendButtons">
+              <div className="RuleBuilder-appendButtons">
                 <Button
                   className="Button Button--basic RuleBuilder-appendButton"
                   onclick={() => {
