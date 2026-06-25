@@ -13,6 +13,7 @@ namespace Huoxin\FilterRuleManager\Service;
 
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 
 class RulesetMatcher
@@ -55,7 +56,9 @@ class RulesetMatcher
             $providers = $this->evaluator->getProviders();
         }
 
-        return $this->evaluator->evaluateRuleset($ruleset, $targetContent, $providers);
+        $context = new EvaluationContext($targetContent, $actor, $post);
+
+        return $this->evaluator->evaluateRuleset($ruleset, $context, $providers);
     }
 
     public function getTargetContent(Ruleset $ruleset, Post $post, $discussion = null): string

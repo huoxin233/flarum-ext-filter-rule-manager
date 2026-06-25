@@ -11,6 +11,8 @@
 
 namespace Huoxin\FilterRuleManager\Provider;
 
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
+
 /**
  * Implement this interface to supply backend (block) rule evaluation logic.
  *
@@ -29,15 +31,15 @@ interface RuleProviderInterface
     public function getSupportedBackendTypes(): array;
 
     /**
-     * Evaluate a single rule against post content.
+     * Evaluate a single rule against the evaluation context.
      *
-     * @param string $type   The rule type string (one of getSupportedBackendTypes())
-     * @param string $content The raw post content
+     * @param string $type    The rule type string (one of getSupportedBackendTypes())
      * @param array  $config  Rule config JSON decoded to array
+     * @param EvaluationContext $context The context object containing content, actor, and post
      *
      * @return array|null  null = not triggered; array (may be empty) = triggered with tokens
      */
-    public function evaluate(string $type, string $content, array $config): ?array;
+    public function evaluate(string $type, array $config, EvaluationContext $context): ?array;
 
     /**
      * Human-readable labels for each supported type (shown in admin rule builder).

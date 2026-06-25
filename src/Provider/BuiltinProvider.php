@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Provider;
 
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -67,7 +68,7 @@ class BuiltinProvider implements RuleProviderInterface
         return [];
     }
 
-    public function evaluate(string $type, string $content, array $config): ?array
+    public function evaluate(string $type, array $config, EvaluationContext $context): ?array
     {
         $scanAll = $config['scan_all'] ?? false;
 
@@ -78,7 +79,7 @@ class BuiltinProvider implements RuleProviderInterface
             }
             $matches = [];
             foreach ($words as $word) {
-                if (stripos($content, $word) !== false) {
+                if (stripos($context->content, $word) !== false) {
                     $matches[] = $word;
                     if (! $scanAll) {
                         break;
@@ -104,7 +105,7 @@ class BuiltinProvider implements RuleProviderInterface
                     ? $pattern
                     : '/'.str_replace('/', '\/', $pattern).'/i';
 
-                if (@preg_match($regex, $content, $matches)) {
+                if (@preg_match($regex, $context->content, $matches)) {
                     $matchedPatterns[] = $pattern;
                     $matchedStrings[] = $matches[0] ?? '';
                     if (! $scanAll) {
