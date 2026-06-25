@@ -207,6 +207,7 @@ huoxin-filter-rule-manager:
     type_contains_word: "Contains word(s)"
     type_regex: "Matches regex pattern(s)"
     type_group: "User in Group(s)"
+    type_word_count: "Word Count Limit"
 
     config_groups_label: "Select Groups"
     config_groups_help: "The rule triggers if the user belongs to any of the selected groups. The matched group ID is available as '{{matched_group}}'."
@@ -217,6 +218,11 @@ huoxin-filter-rule-manager:
     config_patterns_label: "Regex patterns"
     config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]'{20,}'$"
     config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as '{{matched_pattern}}' and '{{matched_string}}'."
+
+    config_word_count_min: "Minimum words/characters"
+    config_word_count_max: "Maximum words/characters"
+    config_word_count_help: "Note: CJK text (Chinese/Japanese/Korean) is counted character by character. Other text (English, numbers, etc.) is counted by word boundaries (spaces). e.g., 'hello world' is 2 words, while '你好' is 2 characters."
+    config_exclude_mentions: "Exclude Mentions (@username)"
 
     rule_scan_all: "Find all matches"
     rule_scan_all_help: "If enabled, this rule will gather every matched word or pattern in your list. If disabled, it returns quickly on the first match to save processing time."

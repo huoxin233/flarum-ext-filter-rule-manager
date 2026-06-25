@@ -12,6 +12,7 @@ import type Mithril from 'mithril';
 import WordsListConfig from '../components/config/WordsListConfig';
 import PatternsListConfig from '../components/config/PatternsListConfig';
 import GroupListConfig from '../components/config/GroupListConfig';
+import WordCountConfig from '../components/config/WordCountConfig';
 
 /**
  * Admin-side view of the builtin provider. Mirrors the type catalogue exposed
@@ -39,7 +40,7 @@ import GroupListConfig from '../components/config/GroupListConfig';
  */
 export default class BuiltinProvider {
   getSupportedTypes(): string[] {
-    return ['contains_word', 'regex', 'group'];
+    return ['contains_word', 'regex', 'group', 'word_count'];
   }
 
   getTypeLabels(): Record<string, string> {
@@ -47,6 +48,7 @@ export default class BuiltinProvider {
       contains_word: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_contains_word')),
       regex: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_regex')),
       group: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_group')),
+      word_count: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_word_count')),
     };
   }
 
@@ -54,6 +56,7 @@ export default class BuiltinProvider {
     if (type === 'contains_word') return WordsListConfig;
     if (type === 'regex') return PatternsListConfig;
     if (type === 'group') return GroupListConfig;
+    if (type === 'word_count') return WordCountConfig;
     return null;
   }
 
@@ -74,6 +77,9 @@ export default class BuiltinProvider {
     }
     if (type === 'group') {
       return [{ name: 'matched_group', description: 'The user group ID that triggered the rule.' }];
+    }
+    if (type === 'word_count') {
+      return [{ name: 'word_count', description: 'The calculated word count of the post.' }];
     }
     return [];
   }
