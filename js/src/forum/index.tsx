@@ -39,20 +39,34 @@ app.initializers.add(
     let rulesets: Ruleset[] = [];
     try {
       const payload = app.data.filterRuleRulesets;
-      const obfuscateActive = app.forum.attribute('filterRuleObfuscateActive');
 
-      if (obfuscateActive !== false && typeof payload === 'string') {
-        const decoded = atob(payload);
-        const key = String(app.forum.attribute('filterRuleObfuscateKey') || 'HuoxinFilterRuleManager');
-        const keyLen = key.length;
-        const bytes = new Uint8Array(decoded.length);
-        for (let i = 0, len = decoded.length; i < len; i++) {
-          bytes[i] = decoded.charCodeAt(i) ^ key.charCodeAt(i % keyLen);
+      if (payload) {
+        // Extract forum attributes
+        let forumAttrs: Record<string, any> = {};
+        if (app.forum) {
+          forumAttrs = app.forum.data.attributes || {};
+        } else if (app.data.resources) {
+          const forumPayload = app.data.resources.find((r: any) => r.type === 'forums' && r.id === '1');
+          if (forumPayload && forumPayload.attributes) {
+            forumAttrs = forumPayload.attributes;
+          }
         }
-        const out = new TextDecoder('utf-8').decode(bytes);
-        rulesets = JSON.parse(out);
-      } else if (Array.isArray(payload)) {
-        rulesets = payload;
+
+        const obfuscateActive = forumAttrs.filterRuleObfuscateActive;
+
+        if (obfuscateActive !== false && typeof payload === 'string') {
+          const decoded = atob(payload);
+          const key = String(forumAttrs.filterRuleObfuscateKey || 'HuoxinFilterRuleManager');
+          const keyLen = key.length;
+          const bytes = new Uint8Array(decoded.length);
+          for (let i = 0, len = decoded.length; i < len; i++) {
+            bytes[i] = decoded.charCodeAt(i) ^ key.charCodeAt(i % keyLen);
+          }
+          const out = new TextDecoder('utf-8').decode(bytes);
+          rulesets = JSON.parse(out);
+        } else if (Array.isArray(payload)) {
+          rulesets = payload;
+        }
       }
     } catch (e) {
       console.warn('[FilterRuleManager] Failed to decode rulesets payload', e);
