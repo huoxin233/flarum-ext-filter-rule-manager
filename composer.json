@@ -1,19 +1,21 @@
 {
     "name": "huoxin/filter-rule-manager",
-    "description": "A powerful, AST-based moderation and filtering engine for Flarum.",
+    "description": "A powerful and customizable AST-based moderation and filtering engine for Flarum.",
     "keywords": [
         "flarum",
         "moderation",
         "filter",
         "rule",
         "manager",
-        "automod"
+        "automod",
+        "AST"
     ],
     "type": "flarum-extension",
     "license": "GPL-3.0-or-later",
     "support": {
         "issues": "https://github.com/huoxin233/flarum-ext-filter-rule-manager/issues",
-        "source": "https://github.com/huoxin233/flarum-ext-filter-rule-manager"
+        "source": "https://github.com/huoxin233/flarum-ext-filter-rule-manager",
+        "forum": "https://discuss.flarum.org/d/39451"
     },
     "require": {
         "flarum/core": "^1.2.0"

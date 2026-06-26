@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Total Downloads](https://img.shields.io/packagist/dt/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Review](https://floxum.com/extension/huoxin/filter-rule-manager/badge/review)](https://floxum.com/extension/huoxin/filter-rule-manager) [![Review Score](https://floxum.com/extension/huoxin/filter-rule-manager/badge/review-score)](https://floxum.com/extension/huoxin/filter-rule-manager)
 
-A powerful, AST-based moderation and filtering engine for [Flarum](https://flarum.org).
+A powerful and customizable AST-based moderation and filtering engine for [Flarum](https://flarum.org).
 
 Filter Rule Manager goes beyond simple word replacements. It allows forum administrators to build complex, logical rulesets that can dynamically evaluate post content, automatically flag suspicious behavior, require manual approval, or block posts entirely.
 
@@ -28,7 +28,7 @@ Filter Rule Manager is built to give Flarum administrators fine-grained control 
 
 **Frontend Evaluation Disclosure:** Filter Rule Manager evaluates `Info` and `Warning` rulesets instantly on the client-side to provide real-time feedback to users as they type. To achieve this, the system injects the full logic (including compiled word lists, regex patterns, and match conditions) of all active **Info** and **Warning** rulesets into the page payload for authenticated users.
 
-To prevent casual snooping, **this payload is obfuscated** (using a Base64 XOR cipher) before it is sent to the browser. A normal user inspecting the page source or DevTools will only see a scrambled string. However, because the decryption key is necessarily shipped to the browser, a highly determined programmer could theoretically reverse-engineer the JavaScript and decrypt the payload. 
+To prevent casual snooping, **this payload is obfuscated** (using a Base64 XOR cipher) before it is sent to the browser. A normal user inspecting the page source or DevTools will only see a scrambled string. However, because the decryption key is necessarily shipped to the browser, a highly determined programmer could theoretically reverse-engineer the JavaScript and decrypt the payload.
 
 **Best Practice:** Use `Info` and `Warning` interventions only for guidelines, formatting hints, or soft moderation. For strict filters (e.g., severe profanity, spam links, zero-tolerance policies) that you wish to keep mathematically impossible to bypass, use the **Block** or **Silent** intervention types. Block and Silent rulesets are evaluated strictly server-side and are **never** exposed to the browser.
 
@@ -70,4 +70,4 @@ Filter Rule Manager is built to be extended! If you are an extension developer a
 
 - [Packagist](https://packagist.org/packages/huoxin/filter-rule-manager)
 - [GitHub](https://github.com/huoxin233/flarum-ext-filter-rule-manager)
-- [Discuss](https://discuss.flarum.org/d/39451-filter-rule-manager)
+- [Discuss](https://discuss.flarum.org/d/39451)
