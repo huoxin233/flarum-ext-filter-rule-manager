@@ -40,7 +40,6 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Ruleset extends AbstractModel
 {
-
     public $timestamps = true;
 
     protected $table = 'filter_rulesets';

@@ -13,9 +13,9 @@ namespace Huoxin\FilterRuleManager\Tests\unit;
 
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Provider\BuiltinProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use PHPUnit\Framework\Attributes\Test;
 
 class BuiltinProviderTest extends TestCase
 {
@@ -37,6 +37,7 @@ class BuiltinProviderTest extends TestCase
     private function evaluate(string $type, string $content, array $config): ?array
     {
         $context = new EvaluationContext($content);
+
         return $this->provider->evaluate($type, $config, $context);
     }
 

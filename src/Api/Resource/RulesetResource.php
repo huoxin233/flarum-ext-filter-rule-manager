@@ -14,12 +14,12 @@ namespace Huoxin\FilterRuleManager\Api\Resource;
 use Flarum\Api\Endpoint;
 use Flarum\Api\Resource;
 use Flarum\Api\Schema;
+use Flarum\Foundation\ValidationException;
 use Huoxin\FilterRuleManager\Expression\Lexer;
 use Huoxin\FilterRuleManager\Expression\Parser;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Database\Eloquent\Builder;
 use Tobyz\JsonApiServer\Context;
-use Flarum\Foundation\ValidationException;
 
 /**
  * @extends Resource\AbstractDatabaseResource<Ruleset>
@@ -45,6 +45,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
         if ($model->priority === null) {
             $model->priority = ((int) Ruleset::max('priority')) + 10;
         }
+
         return parent::create($model, $context);
     }
 

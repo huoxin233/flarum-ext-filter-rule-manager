@@ -12,8 +12,8 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
-use PHPUnit\Framework\Attributes\Test;
 use Flarum\Post\Post;
+use PHPUnit\Framework\Attributes\Test;
 
 class BlockPostTest extends FilterTestCase
 {
