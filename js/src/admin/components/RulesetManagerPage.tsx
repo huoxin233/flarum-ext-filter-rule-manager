@@ -167,31 +167,37 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         </div>
 
         <div className="Form-group">
-          {this.buildSettingComponent({
-            type: 'boolean',
-            setting: 'huoxin-filter.global_evaluate_title',
-            label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title')),
-            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title_help')),
-            default: true,
-          })}
+          <Switch
+            state={
+              this.setting('huoxin-filter.global_evaluate_title', '1')() === '1' ||
+              this.setting('huoxin-filter.global_evaluate_title', '1')() === true
+            }
+            onchange={(val: boolean) => this.setting('huoxin-filter.global_evaluate_title')(val ? '1' : '0')}
+          >
+            {app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title')}
+          </Switch>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title_help')}</div>
         </div>
         <div className="Form-group">
-          {this.buildSettingComponent({
-            type: 'boolean',
-            setting: 'huoxin-filter.global_auto_flag',
-            label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag')),
-            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag_help')),
-            default: true,
-          })}
+          <Switch
+            state={this.setting('huoxin-filter.global_auto_flag', '1')() === '1' || this.setting('huoxin-filter.global_auto_flag', '1')() === true}
+            onchange={(val: boolean) => this.setting('huoxin-filter.global_auto_flag')(val ? '1' : '0')}
+          >
+            {app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag')}
+          </Switch>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag_help')}</div>
         </div>
         <div className="Form-group">
-          {this.buildSettingComponent({
-            type: 'boolean',
-            setting: 'huoxin-filter.global_require_approval',
-            label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval')),
-            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval_help')),
-            default: true,
-          })}
+          <Switch
+            state={
+              this.setting('huoxin-filter.global_require_approval', '1')() === '1' ||
+              this.setting('huoxin-filter.global_require_approval', '1')() === true
+            }
+            onchange={(val: boolean) => this.setting('huoxin-filter.global_require_approval')(val ? '1' : '0')}
+          >
+            {app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval')}
+          </Switch>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval_help')}</div>
         </div>
 
         {requireApproval && !autoFlag ? (
@@ -206,13 +212,16 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <hr className="RulesetEditor-divider" />
 
         <div className="Form-group">
-          {this.buildSettingComponent({
-            type: 'boolean',
-            setting: 'huoxin-filter.global_evasion_active',
-            label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active')),
-            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active_help')),
-            default: false,
-          })}
+          <Switch
+            state={
+              this.setting('huoxin-filter.global_evasion_active', '0')() === '1' ||
+              this.setting('huoxin-filter.global_evasion_active', '0')() === true
+            }
+            onchange={(val: boolean) => this.setting('huoxin-filter.global_evasion_active')(val ? '1' : '0')}
+          >
+            {app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active')}
+          </Switch>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active_help')}</div>
         </div>
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_timeout')}</label>
@@ -245,13 +254,13 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <hr className="RulesetEditor-divider" />
 
         <div className="Form-group">
-          {this.buildSettingComponent({
-            type: 'boolean',
-            setting: 'huoxin-filter.obfuscate_active',
-            label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active')),
-            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active_help')),
-            default: true,
-          })}
+          <Switch
+            state={this.setting('huoxin-filter.obfuscate_active', '1')() === '1' || this.setting('huoxin-filter.obfuscate_active', '1')() === true}
+            onchange={(val: boolean) => this.setting('huoxin-filter.obfuscate_active')(val ? '1' : '0')}
+          >
+            {app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active')}
+          </Switch>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active_help')}</div>
         </div>
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_key')}</label>
