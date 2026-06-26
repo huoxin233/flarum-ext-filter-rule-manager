@@ -15,6 +15,7 @@ use Flarum\Frontend\Document;
 use Flarum\Http\RequestUtil;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Psr\Http\Message\ServerRequestInterface;
+use Flarum\Settings\SettingsRepositoryInterface;
 
 /**
  * Injects active info/warning rulesets (with their rules) into the forum
@@ -29,6 +30,10 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class InjectFrontendRulesets
 {
+    public function __construct(
+        protected SettingsRepositoryInterface $settings
+    ) {}
+
     public function __invoke(Document $document, ServerRequestInterface $request): void
     {
         $actor = RequestUtil::getActor($request);
@@ -71,15 +76,24 @@ class InjectFrontendRulesets
             ]);
 
         $rulesetsArray = $rulesets->values()->toArray();
-        $json = json_encode($rulesetsArray);
-        $key = 'HuoxinFilterRuleManager'; // use for XOR, not a secret key
-        $out = '';
-        $keyLen = strlen($key);
+        $isObfuscated = (bool) $this->settings->get('huoxin-filter.obfuscate_active', true);
 
-        for ($i = 0, $len = strlen($json); $i < $len; $i++) {
-            $out .= chr(ord($json[$i]) ^ ord($key[$i % $keyLen]));
+        if ($isObfuscated) {
+            $json = json_encode($rulesetsArray);
+            $key = $this->settings->get('huoxin-filter.obfuscate_key', 'HuoxinFilterRuleManager');
+            if (empty($key)) {
+                $key = 'HuoxinFilterRuleManager';
+            }
+            $out = '';
+            $keyLen = strlen($key);
+
+            for ($i = 0, $len = strlen($json); $i < $len; $i++) {
+                $out .= chr(ord($json[$i]) ^ ord($key[$i % $keyLen]));
+            }
+
+            $document->payload['filterRuleRulesets'] = base64_encode($out);
+        } else {
+            $document->payload['filterRuleRulesets'] = $rulesetsArray;
         }
-
-        $document->payload['filterRuleRulesets'] = base64_encode($out);
     }
 }

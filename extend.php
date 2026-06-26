@@ -67,7 +67,11 @@ return [
         ->default('huoxin-filter.global_evasion_active', false)
         ->default('huoxin-filter.global_evasion_timeout', 5)
         ->default('huoxin-filter.global_evasion_threshold', 2)
-        ->default('huoxin-filter.global_evasion_log_keep_days', 30),
+        ->default('huoxin-filter.global_evasion_log_keep_days', 30)
+        ->default('huoxin-filter.obfuscate_active', true)
+        ->default('huoxin-filter.obfuscate_key', 'HuoxinFilterRuleManager')
+        ->serializeToForum('filterRuleObfuscateActive', 'huoxin-filter.obfuscate_active', 'boolval', true)
+        ->serializeToForum('filterRuleObfuscateKey', 'huoxin-filter.obfuscate_key', 'strval', 'HuoxinFilterRuleManager'),
 
     // ── Prune old block logs command ──────────────────────────────────────
     (new Extend\Console())

@@ -77,6 +77,10 @@ huoxin-filter-rule-manager:
       global_evasion_threshold_help: "Number of blocks required within the timeout period to trigger an evasion penalty. (Default: 2)"
       global_evasion_log_keep_days: "Evasion Log Retention (days)"
       global_evasion_log_keep_days_help: "Set to 0 to disable log clearing and keep logs forever. (Default: 0)"
+      obfuscate_active: "Enable Frontend Payload Obfuscation"
+      obfuscate_active_help: "If enabled, the JSON payload of the Info and Warning filter rules sent to the browser is XOR obfuscated. This obscures the rules from from casual inspection."
+      obfuscate_key: "Custom Obfuscation Key"
+      obfuscate_key_help: "WARNING: This key is sent to the frontend for decoding. DO NOT use passwords or sensitive secrets!"
 
     # ── Form labels ────────────────────────────────────────────────────────
     ruleset_name: "Name"
