@@ -150,17 +150,71 @@ class BuiltinProviderTest extends TestCase
     }
 
     #[Test]
-    public function it_strips_mentions_if_configured()
+    public function it_strips_mentions_by_default()
     {
-        $config = ['min' => 2, 'exclude_mentions' => true];
+        $config = ['min' => 2];
 
         // "Hello @"User Name"#123" -> without mention it's just "Hello" (1 word) < 2
         $result = $this->evaluate('word_count', 'Hello @"User Name"#123', $config);
         $this->assertIsArray($result);
         $this->assertEquals('1', $result['word_count']);
 
-        // With mentions NOT excluded
-        $config2 = ['min' => 2];
+        // With mentions explicitly NOT excluded
+        $config2 = ['min' => 2, 'exclude_mentions' => false];
         $this->assertNull($this->evaluate('word_count', 'Hello @"User Name"#123', $config2));
+    }
+
+    #[Test]
+    public function it_strips_urls_by_default()
+    {
+        $config = ['min' => 2];
+
+        // "Check http://example.com" -> URL is removed, left with "Check" (1 word)
+        $result = $this->evaluate('word_count', 'Check http://example.com', $config);
+        $this->assertIsArray($result);
+        $this->assertEquals('1', $result['word_count']);
+
+        // "Check https://www.google.com/search?q=hello"
+        $result2 = $this->evaluate('word_count', 'Check https://www.google.com/search?q=hello', $config);
+        $this->assertIsArray($result2);
+        $this->assertEquals('1', $result2['word_count']);
+
+        // With exclude_urls set to false
+        $config3 = ['min' => 2, 'exclude_urls' => false];
+        // "Check http://example.com" -> URL is kept, so "Check http://example.com" (2 words)
+        $this->assertNull($this->evaluate('word_count', 'Check http://example.com', $config3));
+    }
+
+    #[Test]
+    public function it_evaluates_group_correctly()
+    {
+        $config = ['groupIds' => [3, 4]];
+
+        // User belongs to group 4
+        $userWithGroup = new \Flarum\User\User();
+        $groups = new \Illuminate\Database\Eloquent\Collection([
+            (object) ['id' => 1],
+            (object) ['id' => 4],
+        ]);
+        $userWithGroup->setRelation('groups', $groups);
+
+        $context1 = new EvaluationContext('', $userWithGroup);
+        $result = $this->provider->evaluate('group', $config, $context1);
+        $this->assertIsArray($result);
+        $this->assertEquals('4', $result['matched_group']);
+
+        // User does not belong to target groups
+        $userWithoutGroup = new \Flarum\User\User();
+        $groupsEmpty = new \Illuminate\Database\Eloquent\Collection([
+            (object) ['id' => 1],
+        ]);
+        $userWithoutGroup->setRelation('groups', $groupsEmpty);
+
+        $context2 = new EvaluationContext('', $userWithoutGroup);
+        $this->assertNull($this->provider->evaluate('group', $config, $context2));
+
+        // Unauthenticated User (actor is null)
+        $context3 = new EvaluationContext('');
+        $this->assertNull($this->provider->evaluate('group', $config, $context3));
     }
 }
