@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
@@ -349,7 +358,7 @@ class ModeratePostTest extends FilterTestCase
 
         $body = json_decode($response->getBody()->getContents(), true);
         $discussionId = Arr::get($body, 'data.id');
-        
+
         $postId = null;
         foreach (Arr::get($body, 'included', []) as $included) {
             if ($included['type'] === 'posts') {

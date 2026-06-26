@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace Huoxin\FilterRuleManager\Tests\unit;
 
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
@@ -17,10 +26,10 @@ class RuleEvaluatorTest extends TestCase
     protected function setUp(): void
     {
         $container = new Container();
-        
+
         // Mock translator
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->method('trans')->willReturnCallback(function($key, $tokens) {
+        $this->translator->method('trans')->willReturnCallback(function ($key, $tokens) {
             if ($key === 'test.namespace.key') {
                 return 'Translated: {{matched_word}}';
             }
@@ -29,15 +38,17 @@ class RuleEvaluatorTest extends TestCase
 
         // We use a singleton binding in container so resolve('translator') works if needed, 
         // though it's technically a global helper we emulate it here.
-        if (!function_exists('resolve')) {
+        if (! function_exists('resolve')) {
             // Emulate Laravel's resolve() if missing in raw unit tests
-            require_once __DIR__ . '/setup.php'; // or just rely on Flarum's bootstrap if it runs
+            require_once __DIR__.'/setup.php'; // or just rely on Flarum's bootstrap if it runs
         }
-        
+
         $container->instance('translator', $this->translator);
 
-        $this->evaluator = new class($container, new NullLogger(), $this->translator) extends RuleEvaluator {
-            public function __construct($container, $logger, $translator) {
+        $this->evaluator = new class ($container, new NullLogger(), $this->translator) extends RuleEvaluator
+        {
+            public function __construct($container, $logger, $translator)
+            {
                 parent::__construct($container, $logger, $translator);
             }
             // Override interpolate to use our injected translator instead of resolve() 
@@ -50,10 +61,10 @@ class RuleEvaluatorTest extends TestCase
                         $template = is_array($trans) ? $trans[0] : $trans;
                     }
                 }
-                
+
                 return parent::interpolate($template, $tokens);
             }
-            
+
             // Expose protected/private methods for testing
             public function testMergeResults(array $results): array
             {
