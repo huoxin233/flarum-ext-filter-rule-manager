@@ -46,11 +46,9 @@ class BuiltinProvider implements RuleProviderInterface
 
     /**
      * Tokens this provider exposes per rule type, for use in ruleset messages.
-     * This method is NOT part of RuleProviderInterface so that older 3rd-party
-     * providers remain compatible — ListProvidersController checks for it via
-     * `method_exists` before calling.
      *
-     * @return array<string, list<array{name:string, description:string}>>
+     * @param string $type The rule type being evaluated
+     * @return list<array{name:string, description:string}>
      */
     public function getProvidedTokens(string $type): array
     {

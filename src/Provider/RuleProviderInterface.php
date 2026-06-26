@@ -17,8 +17,11 @@ use Huoxin\FilterRuleManager\Model\EvaluationContext;
  * Implement this interface to supply backend (block) rule evaluation logic.
  *
  * Register via:
- *   (new \Huoxin\FilterRuleManager\Extend\FilterRuleProvider())
- *       ->registerProvider('my-extension-id', MyProvider::class)
+ *
+ * ```php
+ * (new \Huoxin\FilterRuleManager\Extend\FilterRuleProvider())
+ *     ->registerProvider('my-extension-id', MyProvider::class)
+ * ```
  */
 interface RuleProviderInterface
 {
