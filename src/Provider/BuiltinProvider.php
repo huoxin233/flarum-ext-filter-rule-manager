@@ -161,14 +161,18 @@ class BuiltinProvider implements RuleProviderInterface
         if ($type === 'word_count') {
             $text = $context->content;
 
-            if (! empty($config['exclude_mentions'])) {
+            $excludeMentions = $config['exclude_mentions'] ?? true;
+            if ($excludeMentions) {
                 // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
                 $text = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $text);
                 $text = preg_replace('/@\w+/', '', $text);
             }
 
-            // Remove URLs to avoid them skewing word counts
-            $text = preg_replace('#https?://[^\s]+#i', '', $text);
+            $excludeUrls = $config['exclude_urls'] ?? true;
+            if ($excludeUrls) {
+                // Remove URLs to avoid them skewing word counts
+                $text = preg_replace('#https?://[^\s]+#i', '', $text);
+            }
 
             // CJK Character Range:
             // Chinese: \x{4e00}-\x{9fa5}
