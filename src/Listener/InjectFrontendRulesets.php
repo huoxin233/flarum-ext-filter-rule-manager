@@ -13,9 +13,9 @@ namespace Huoxin\FilterRuleManager\Listener;
 
 use Flarum\Frontend\Document;
 use Flarum\Http\RequestUtil;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Psr\Http\Message\ServerRequestInterface;
-use Flarum\Settings\SettingsRepositoryInterface;
 
 /**
  * Injects active info/warning rulesets (with their rules) into the forum
@@ -32,7 +32,8 @@ class InjectFrontendRulesets
 {
     public function __construct(
         protected SettingsRepositoryInterface $settings
-    ) {}
+    ) {
+    }
 
     public function __invoke(Document $document, ServerRequestInterface $request): void
     {

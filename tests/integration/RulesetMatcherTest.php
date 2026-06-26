@@ -12,10 +12,10 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
-use PHPUnit\Framework\Attributes\Test;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
 use Flarum\User\User;
+use PHPUnit\Framework\Attributes\Test;
 
 class RulesetMatcherTest extends FilterTestCase
 {

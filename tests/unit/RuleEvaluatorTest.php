@@ -33,10 +33,11 @@ class RuleEvaluatorTest extends TestCase
             if ($key === 'test.namespace.key') {
                 return 'Translated: {{matched_word}}';
             }
+
             return $key;
         });
 
-        // We use a singleton binding in container so resolve('translator') works if needed, 
+        // We use a singleton binding in container so resolve('translator') works if needed,
         // though it's technically a global helper we emulate it here.
         if (! function_exists('resolve')) {
             // Emulate Laravel's resolve() if missing in raw unit tests
@@ -45,13 +46,13 @@ class RuleEvaluatorTest extends TestCase
 
         $container->instance('translator', $this->translator);
 
-        $this->evaluator = new class ($container, new NullLogger(), $this->translator) extends RuleEvaluator
-        {
+        $this->evaluator = new class($container, new NullLogger(), $this->translator) extends RuleEvaluator {
             public function __construct($container, $logger, $translator)
             {
                 parent::__construct($container, $logger, $translator);
             }
-            // Override interpolate to use our injected translator instead of resolve() 
+
+            // Override interpolate to use our injected translator instead of resolve()
             // to avoid global dependency issues in pure unit tests.
             public function interpolate(string $template, array $tokens): string
             {
@@ -72,6 +73,7 @@ class RuleEvaluatorTest extends TestCase
                 $reflection = new \ReflectionClass(RuleEvaluator::class);
                 $method = $reflection->getMethod('mergeResults');
                 $method->setAccessible(true);
+
                 return $method->invoke($this, $results);
             }
         };
