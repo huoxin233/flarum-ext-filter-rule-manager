@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
@@ -117,7 +126,7 @@ class RulesetMatcherTest extends FilterTestCase
         // Since Ruleset 2 cascades, Ruleset 3 should NEVER run.
         // Therefore, the post should succeed (201) and just be flagged, rather than being blocked (422).
         $response = $this->submitReply('This is a cascade_test post.', 3, 1);
-        
+
         // Assert the post was successfully created (not blocked by Ruleset 3)
         $this->assertEquals(201, $response->getStatusCode());
 

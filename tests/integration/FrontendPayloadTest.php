@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of huoxin/filter-rule-manager.
+ *
+ * Copyright (c) 2026 huoxin.
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
@@ -56,18 +65,18 @@ class FrontendPayloadTest extends TestCase
 
         // Extract the payload
         preg_match('/"filterRuleRulesets":\s*(".*?"|\[.*?\])/', $html, $matches);
-        
+
         $this->assertNotEmpty($matches, 'filterRuleRulesets should be present in the payload');
-        
+
         $payloadValue = $matches[1];
-        
+
         // Ensure it is a string (quotes) and NOT an array (brackets)
         $this->assertStringStartsWith('"', $payloadValue, 'Payload should be a string (obfuscated)');
-        
+
         // Strip quotes and decode
         $base64 = trim($payloadValue, '"');
         $decoded = base64_decode($base64);
-        
+
         // It shouldn't be plain readable JSON without XORing it first
         $this->assertStringNotContainsString('badword', $decoded);
     }
@@ -83,14 +92,14 @@ class FrontendPayloadTest extends TestCase
         $html = $response->getBody()->getContents();
 
         preg_match('/"filterRuleRulesets":\s*(".*?"|\[.*?\])/', $html, $matches);
-        
+
         $this->assertNotEmpty($matches, 'filterRuleRulesets should be present in the payload');
-        
+
         $payloadValue = $matches[1];
-        
+
         // Ensure it is an array bracket
         $this->assertStringStartsWith('[', $payloadValue, 'Payload should be a plain JSON array');
-        
+
         // It should contain the cleartext word since it is not obfuscated
         $this->assertStringContainsString('badword', $payloadValue);
     }
@@ -104,11 +113,11 @@ class FrontendPayloadTest extends TestCase
         $html = $response->getBody()->getContents();
 
         preg_match('/"filterRuleRulesets":\s*(".*?"|\[.*?\])/', $html, $matches);
-        
+
         $this->assertNotEmpty($matches, 'filterRuleRulesets should be present in the payload');
-        
+
         $payloadValue = $matches[1];
-        
+
         // Ensure it is an empty array
         $this->assertEquals('[]', $payloadValue, 'Payload should be empty for guests');
     }
