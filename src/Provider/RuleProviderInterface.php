@@ -47,4 +47,12 @@ interface RuleProviderInterface
      * @return array<string, string>  ['type_string' => 'Human Label']
      */
     public function getBackendTypeLabels(): array;
+
+    /**
+     * Tokens this provider exposes per rule type, for use in ruleset messages.
+     *
+     * @param string $type The rule type
+     * @return array  A list of associative arrays with 'name' and 'description' keys
+     */
+    public function getProvidedTokens(string $type): array;
 }
