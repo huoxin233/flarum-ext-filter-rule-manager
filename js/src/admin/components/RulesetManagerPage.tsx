@@ -241,6 +241,27 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             default: 0,
           })}
         </div>
+
+        <hr className="RulesetEditor-divider" />
+
+        <div className="Form-group">
+          {this.buildSettingComponent({
+            type: 'boolean',
+            setting: 'huoxin-filter.obfuscate_active',
+            label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active')),
+            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active_help')),
+            default: true,
+          })}
+        </div>
+        <div className="Form-group">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_key')}</label>
+          {this.buildSettingComponent({
+            type: 'string',
+            setting: 'huoxin-filter.obfuscate_key',
+            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_key_help')),
+            default: 'HuoxinFilterRuleManager',
+          })}
+        </div>
         <div className="Form-group">{this.submitButton()}</div>
       </div>
     );

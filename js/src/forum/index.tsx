@@ -39,9 +39,11 @@ app.initializers.add(
     let rulesets: Ruleset[] = [];
     try {
       const payload = app.data.filterRuleRulesets;
-      if (typeof payload === 'string') {
+      const obfuscateActive = app.forum.attribute('filterRuleObfuscateActive');
+
+      if (obfuscateActive !== false && typeof payload === 'string') {
         const decoded = atob(payload);
-        const key = 'HuoxinFilterRuleManager';
+        const key = String(app.forum.attribute('filterRuleObfuscateKey') || 'HuoxinFilterRuleManager');
         const keyLen = key.length;
         const bytes = new Uint8Array(decoded.length);
         for (let i = 0, len = decoded.length; i < len; i++) {

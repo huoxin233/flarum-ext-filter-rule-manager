@@ -77,6 +77,10 @@ huoxin-filter-rule-manager:
       global_evasion_threshold_help: "在检测时长内需达到多少次拦截才会触发规避惩罚。（默认：2）"
       global_evasion_log_keep_days: "恶意绕过日志保留天数"
       global_evasion_log_keep_days_help: "设置为 0 以禁用日志清理，永久保留日志。（默认：0）"
+      obfuscate_active: "启用前端有效载荷混淆"
+      obfuscate_active_help: "开启后，发送到浏览器的 提示 (Info) 和 警告 (Warning) 过滤规则 JSON 数据将经过 XOR 混淆，防止普通用户直接查看到过滤规则。"
+      obfuscate_key: "自定义混淆密钥"
+      obfuscate_key_help: "警告：此密钥将被发送至前端用于解码。请勿使用密码或任何敏感密钥！"
 
     # ── Form labels ────────────────────────────────────────────────────────
     ruleset_name: "名称"
