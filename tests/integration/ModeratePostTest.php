@@ -12,11 +12,11 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
+use Flarum\Flags\Flag;
+use Flarum\Post\Post;
+use Flarum\User\User;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Attributes\Test;
-use Flarum\User\User;
-use Flarum\Post\Post;
-use Flarum\Flags\Flag;
 
 class ModeratePostTest extends FilterTestCase
 {

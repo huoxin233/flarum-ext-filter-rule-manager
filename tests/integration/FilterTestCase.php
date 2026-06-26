@@ -12,12 +12,12 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
+use Flarum\Discussion\Discussion;
+use Flarum\Post\Post;
+use Flarum\Tags\Tag;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
 use Flarum\User\User;
-use Flarum\Tags\Tag;
-use Flarum\Discussion\Discussion;
-use Flarum\Post\Post;
 
 abstract class FilterTestCase extends TestCase
 {

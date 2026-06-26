@@ -11,8 +11,6 @@
 
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
-use Flarum\Group\Group;
-use Flarum\Testing\integration\TestCase;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use PHPUnit\Framework\Attributes\Test;
 
