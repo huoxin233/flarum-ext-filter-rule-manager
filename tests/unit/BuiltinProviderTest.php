@@ -36,6 +36,7 @@ class BuiltinProviderTest extends TestCase
     private function evaluate(string $type, string $content, array $config): ?array
     {
         $context = new EvaluationContext($content);
+
         return $this->provider->evaluate($type, $config, $context);
     }
 
