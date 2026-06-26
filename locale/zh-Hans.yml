@@ -227,6 +227,9 @@ huoxin-filter-rule-manager:
     config_word_count_max: "最多字数/词数"
     config_word_count_help: "提示：中日韩文字将按单个字符计算；其他文本（英文、数字等）按空格切分的单词计算。例如，'hello world' 记为 2 个单词，'你好' 记为 2 个字符。"
     config_exclude_mentions: "忽略 @提及"
+    config_exclude_mentions_help: "开启后，类似 @username 的提及文本将不计入字数统计。"
+    config_exclude_urls: "忽略网址链接 (http://...)"
+    config_exclude_urls_help: "开启后，系统将在计算字数前自动剔除网址链接，以防止长链接虚增字数。"
 
     rule_scan_all: "匹配所有结果"
     rule_scan_all_help: "开启后，系统将找出文本中所有匹配的词汇或正则模式。如果关闭，则在匹配到第一个结果后立即停止，以提高处理性能。"

@@ -100,12 +100,16 @@ export default class BuiltinProvider implements FilterRuleProvider {
     if (type === 'word_count') {
       let text = String(content || '');
 
-      if (config.exclude_mentions) {
+      const excludeMentions = config.exclude_mentions ?? true;
+      if (excludeMentions) {
         text = text.replace(/@"?[^"#\n]+"?#(?:p)?\d+/g, '');
         text = text.replace(/@\w+/g, '');
       }
 
-      text = text.replace(/https?:\/\/[^\s]+/gi, '');
+      const excludeUrls = config.exclude_urls ?? true;
+      if (excludeUrls) {
+        text = text.replace(/https?:\/\/[^\s]+/gi, '');
+      }
 
       // Match CJK characters
       const cjkRegex = /[\u4E00-\u9FA5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g;

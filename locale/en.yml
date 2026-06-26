@@ -227,6 +227,9 @@ huoxin-filter-rule-manager:
     config_word_count_max: "Maximum words/characters"
     config_word_count_help: "Note: CJK text (Chinese/Japanese/Korean) is counted character by character. Other text (English, numbers, etc.) is counted by word boundaries (spaces). e.g., 'hello world' is 2 words, while '你好' is 2 characters."
     config_exclude_mentions: "Exclude Mentions (@username)"
+    config_exclude_mentions_help: "If enabled, mentions like @username will not be counted towards the length limit."
+    config_exclude_urls: "Exclude URLs (http://...)"
+    config_exclude_urls_help: "If enabled, URLs will be stripped before counting to prevent long links from artificially inflating word counts."
 
     rule_scan_all: "Find all matches"
     rule_scan_all_help: "If enabled, this rule will gather every matched word or pattern in your list. If disabled, it returns quickly on the first match to save processing time."
