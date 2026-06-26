@@ -139,6 +139,10 @@ class ExecuteModerationActions
                 if ($autoFlag) {
                     $requiresFlag = true;
                 }
+
+                if ($ruleset->block_cascade) {
+                    break;
+                }
             }
         }
 

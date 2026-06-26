@@ -45,10 +45,7 @@ class EvaluateBlockRulesets
         $discussion = $post->discussion;
         $title = $discussion ? (string) $discussion->title : '';
 
-        /** @var \Illuminate\Support\Collection $rulesets */
-        $rulesets = $this->rulesets->getActiveRulesets()->filter(function ($ruleset) {
-            return $ruleset->intervention_type === 'block';
-        });
+        $rulesets = $this->rulesets->getActiveRulesets();
 
         $providers = $this->evaluator->getProviders();
 
@@ -60,17 +57,19 @@ class EvaluateBlockRulesets
                 continue;
             }
 
-            $targetContent = $this->matcher->getTargetContent($ruleset, $post, $discussion);
+            if ($ruleset->intervention_type === 'block') {
+                $targetContent = $this->matcher->getTargetContent($ruleset, $post, $discussion);
 
-            $triggered[] = [
-                'ruleset_id' => $ruleset->id,
-                'display_mode' => $ruleset->display_mode,
-                'intervention_type' => 'block',
-                'message' => $this->evaluator->interpolate($ruleset->message, $tokens),
-                'tokens' => $tokens,
-                'content' => $targetContent,
-                'display_settings' => $ruleset->display_settings,
-            ];
+                $triggered[] = [
+                    'ruleset_id' => $ruleset->id,
+                    'display_mode' => $ruleset->display_mode,
+                    'intervention_type' => 'block',
+                    'message' => $this->evaluator->interpolate($ruleset->message, $tokens),
+                    'tokens' => $tokens,
+                    'content' => $targetContent,
+                    'display_settings' => $ruleset->display_settings,
+                ];
+            }
 
             if ($ruleset->block_cascade) {
                 break;
