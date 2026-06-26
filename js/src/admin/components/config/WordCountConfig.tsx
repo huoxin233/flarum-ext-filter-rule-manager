@@ -9,9 +9,15 @@
 
 import app from 'flarum/admin/app';
 import Component from 'flarum/common/Component';
+import type { ComponentAttrs } from 'flarum/common/Component';
 import Switch from 'flarum/common/components/Switch';
 
-export default class WordCountConfig extends Component {
+export interface IWordCountConfigAttrs extends ComponentAttrs {
+  config?: Record<string, any>;
+  onchange: (config: Record<string, any>) => void;
+}
+
+export default class WordCountConfig extends Component<IWordCountConfigAttrs> {
   min!: string;
   max!: string;
   excludeMentions!: boolean;

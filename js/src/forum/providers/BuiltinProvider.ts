@@ -9,6 +9,7 @@
 
 import app from 'flarum/forum/app';
 import type { FilterRuleProvider } from '../../common/FilterEngine';
+import type Group from 'flarum/common/models/Group';
 
 /**
  * Forum-side BuiltinProvider — handles real-time evaluation against the
@@ -80,12 +81,14 @@ export default class BuiltinProvider implements FilterRuleProvider {
       const user = app.session.user;
       if (!user) return null;
 
-      const userGroups = user.groups() ? user.groups().map((g: any) => parseInt(String(g.id()), 10)) : [];
+      const groups = user.groups();
+      const userGroups = groups ? groups.filter((g): g is Group => g != null).map((g) => parseInt(String(g.id()), 10)) : [];
+
       let targetGroups = config.groupIds || [];
       if (!Array.isArray(targetGroups)) targetGroups = [targetGroups];
 
-      const targets = targetGroups.map((id: any) => parseInt(String(id), 10));
-      const intersect = userGroups.filter((g) => targets.includes(g));
+      const targets = (targetGroups as unknown[]).map((id) => parseInt(String(id), 10));
+      const intersect = userGroups.filter((g: number) => targets.includes(g));
 
       if (intersect.length > 0) {
         return { matched_group: intersect.join(', ') };
