@@ -9,6 +9,7 @@ export default class WordCountConfig extends Component<IWordCountConfigAttrs> {
     min: string;
     max: string;
     excludeMentions: boolean;
+    excludeUrls: boolean;
     oninit(vnode: any): void;
     view(): JSX.Element;
     updateConfig(key: string, value: any): void;
