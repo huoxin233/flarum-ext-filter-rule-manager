@@ -8,12 +8,14 @@ use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Illuminate\Contracts\Container\Container;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RuleEvaluator
 {
     public function __construct(
         protected Container $container,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
+        protected TranslatorInterface $translator
     ) {
     }
 
@@ -171,7 +173,7 @@ class RuleEvaluator
     public function interpolate(string $template, array $tokens): string
     {
         if (preg_match('/^[a-zA-Z0-9\-_]+(?:\.[a-zA-Z0-9\-_]+)+$/', $template)) {
-            $trans = resolve('translator')->trans($template, $tokens);
+            $trans = $this->translator->trans($template, $tokens);
             if ($trans !== $template && $trans !== '') {
                 $template = is_array($trans) ? $trans[0] : $trans;
             }
