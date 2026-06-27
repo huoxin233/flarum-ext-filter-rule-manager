@@ -10,7 +10,6 @@
 import app from 'flarum/admin/app';
 
 import filterEngine from '../common/FilterEngine';
-import RulesetManagerPage from './components/RulesetManagerPage';
 import BuiltinProvider from './providers/BuiltinProvider';
 import BuiltinTemplate from '../common/components/BuiltinTemplate';
 import BuiltinTemplateSettings from './components/BuiltinTemplateSettings';

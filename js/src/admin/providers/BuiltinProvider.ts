@@ -30,7 +30,7 @@ import WordCountConfig from '../components/config/WordCountConfig';
  *   getTypeLabels(): { [type]: string }
  *     - Human label for each type, shown in the rule builder picker.
  *
- *   getConfigComponent(type): MithrilComponentClass | null
+ *   getConfigComponent(type): Mithril.ComponentTypes<any, any> | null
  *     - When present and non-null, the rule builder mounts this component
  *       to edit the rule's config. The component receives:
  *         attrs.config:   the current config object (POJO)
@@ -52,7 +52,7 @@ export default class BuiltinProvider {
     };
   }
 
-  getConfigComponent(type: string): any {
+  getConfigComponent(type: string): Mithril.ComponentTypes<any, any> | null {
     if (type === 'contains_word') return WordsListConfig;
     if (type === 'regex') return PatternsListConfig;
     if (type === 'group') return GroupListConfig;
