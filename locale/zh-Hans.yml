@@ -90,7 +90,7 @@ huoxin-filter-rule-manager:
     ruleset_display_template: "显示模板"
     ruleset_custom_title: "自定义标题"
     ruleset_custom_title_placeholder: "例如：警告！"
-    ruleset_custom_title_help: "可选。用于覆盖弹窗和提示条中的默认标题。支持填写翻译键值。"
+    ruleset_custom_title_help: "可选。用于覆盖弹窗和提示条中的默认标题。您可以使用 '{{token}}' 插入规则提取的变量值。变量内容会自动进行 HTML 转义；标题本身以可信方式渲染，允许使用简单的 HTML（如 '<br>'）。支持填写翻译键值。"
     ruleset_toast_theme: "悬浮提示主题"
     ruleset_toast_theme_auto: "自动（根据干预方式）"
     ruleset_toast_theme_success: "成功（绿色）"
