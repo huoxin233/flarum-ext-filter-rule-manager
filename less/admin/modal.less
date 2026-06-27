@@ -1,12 +1,12 @@
 // Ruleset editor modal
 
-.RulesetEditorModal {
+.FilterRuleManager-RulesetEditorModal {
   .Modal-body {
     padding: 20px 24px;
   }
 }
 
-.RulesetEditor-section {
+.FilterRuleManager-RulesetEditor-section {
   background: var(--body-bg, @body-bg);
   border: none;
   border-radius: var(--border-radius);
@@ -26,7 +26,7 @@
       justify-content: space-between;
       gap: 0;
 
-      .RulesetEditor-section-header-title {
+      .FilterRuleManager-RulesetEditor-section-header-title {
         display: flex;
         align-items: center;
         gap: 12px;
@@ -90,14 +90,14 @@
   font-size: 14px;
   border-left: 3px solid transparent;
 
-  &.FilterRuleManager-item--info    { background: fade(@info-color, 10%);    color: darken(@info-color, 15%);    border-left-color: @info-color; }
-  &.FilterRuleManager-item--warning { background: fade(@warning-color, 10%); color: darken(@warning-color, 15%); border-left-color: @warning-color; }
-  &.FilterRuleManager-item--block   { background: fade(@error-color, 10%);   color: darken(@error-color, 15%);   border-left-color: @error-color; }
+  &.FilterRuleManager-item--info    { background: fade(@frm-info-color, 10%);    color: darken(@frm-info-color, 15%);    border-left-color: @frm-info-color; }
+  &.FilterRuleManager-item--warning { background: fade(@frm-warning-color, 10%); color: darken(@frm-warning-color, 15%); border-left-color: @frm-warning-color; }
+  &.FilterRuleManager-item--block   { background: fade(@frm-error-color, 10%);   color: darken(@frm-error-color, 15%);   border-left-color: @frm-error-color; }
 
   .FilterRuleManager-item-icon { font-size: 16px; }
 }
 
-.RulesetEditor-actions {
+.FilterRuleManager-RulesetEditor-actions {
   display: flex;
   flex-direction: row;
   gap: 10px;
@@ -107,39 +107,39 @@
   margin-top: 8px;
 }
 
-.RulesetEditor-divider {
+.FilterRuleManager-RulesetEditor-divider {
   border: none;
   border-top: 1px solid var(--control-bg-shaded, @control-bg);
   margin: 20px 0;
 }
 
-.RulesetEditor-warningAlert {
+.FilterRuleManager-RulesetEditor-warningAlert {
   margin-top: 10px;
   margin-bottom: 20px;
 }
 
-.RulesetEditor-discardConfirmation {
+.FilterRuleManager-RulesetEditor-discardConfirmation {
   text-align: center;
   padding: 30px 10px;
 
-  .RulesetEditor-discardIcon {
+  .FilterRuleManager-RulesetEditor-discardIcon {
     font-size: 3rem;
     color: var(--error-color, @error-color);
     margin-bottom: 20px;
   }
 
-  .RulesetEditor-discardTitle {
+  .FilterRuleManager-RulesetEditor-discardTitle {
     margin-bottom: 10px;
     font-weight: bold;
     color: var(--heading-color, @heading-color);
   }
 
-  .RulesetEditor-discardMessage {
+  .FilterRuleManager-RulesetEditor-discardMessage {
     margin-bottom: 25px;
     font-size: 1.1em;
   }
 
-  .RulesetEditor-discardActions {
+  .FilterRuleManager-RulesetEditor-discardActions {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -149,7 +149,7 @@
       width: auto;
     }
 
-    .RulesetEditor-discardCancel {
+    .FilterRuleManager-RulesetEditor-discardCancel {
       margin-left: 0;
     }
   }

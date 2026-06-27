@@ -41,12 +41,12 @@ export default class GroupListConfig extends Component<GroupListConfigAttrs> {
     return (
       <div className="FilterRuleManager-ConfigForm">
         <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_groups_label')}</label>
-        <div className="RulesetEditor-groupSelection">
+        <div className="FilterRuleManager-RulesetEditor-groupSelection">
           {app.store.all('groups').map((group: any) => {
             const id = parseInt(String(group.id()), 10);
             const isActive = (this.groupIds() || []).includes(id);
             return (
-              <label className={`RulesetEditor-groupOption ${isActive ? 'active' : ''}`} key={id}>
+              <label className={`FilterRuleManager-RulesetEditor-groupOption ${isActive ? 'active' : ''}`} key={id}>
                 <input
                   type="checkbox"
                   checked={isActive}
@@ -62,9 +62,9 @@ export default class GroupListConfig extends Component<GroupListConfigAttrs> {
                     this.attrs.onchange({ ...(this.attrs.config || {}), groupIds: current });
                   }}
                 />
-                <div className="RulesetEditor-groupOption-content">
+                <div className="FilterRuleManager-RulesetEditor-groupOption-content">
                   <GroupBadge group={group} label="" />
-                  <span className="RulesetEditor-groupOption-name">{String(group.namePlural() || group.name())}</span>
+                  <span className="FilterRuleManager-RulesetEditor-groupOption-name">{String(group.namePlural() || group.name())}</span>
                 </div>
               </label>
             );

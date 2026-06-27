@@ -1,14 +1,13 @@
-.card-style() {
+.frm-card-style() {
   background: var(--body-bg, @body-bg);
   border: 1px solid var(--control-bg, @control-bg);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.FilterRulePage {
-  .InterventionBadge,
-  .ScopeBadge,
-  .StatusBadge {
+.FilterRuleManager-Page {
+  .FilterRuleManager-InterventionBadge,
+  .FilterRuleManager-ScopeBadge {
     display: inline-block;
     vertical-align: middle;
     padding: 3px 10px;
@@ -25,32 +24,27 @@
     i { font-size: 10px; margin-right: 4px; }
   }
 
-  .InterventionBadge {
-    &--info    { background: fade(@info-color, 15%);    color: darken(@info-color, 10%); }
-    &--warning { background: fade(@warning-color, 15%); color: darken(@warning-color, 10%); }
-    &--block   { background: fade(@error-color, 15%);   color: darken(@error-color, 10%); }
+  .FilterRuleManager-InterventionBadge {
+    &--info    { background: fade(@frm-info-color, 15%);    color: darken(@frm-info-color, 10%); }
+    &--warning { background: fade(@frm-warning-color, 15%); color: darken(@frm-warning-color, 10%); }
+    &--block   { background: fade(@frm-error-color, 15%);   color: darken(@frm-error-color, 10%); }
     &--silent  { background: fade(@muted-color, 15%);   color: darken(@muted-color, 10%); }
   }
 
-  .ScopeBadge {
+  .FilterRuleManager-ScopeBadge {
     background: rgba(0, 0, 0, 0.05);
     color: var(--muted-color, @muted-color);
 
-    &--global       { background: fade(@info-color, 12%);    color: darken(@info-color, 12%); }
+    &--global       { background: fade(@frm-info-color, 12%);    color: darken(@frm-info-color, 12%); }
     &--normal_post  { background: var(--body-bg-shaded); color: var(--muted-color-light); }
-    &--private_post { background: fade(@warning-color, 15%); color: darken(@warning-color, 12%); }
-    &--tag          { background: fade(@success-color, 15%); color: darken(@success-color, 12%); }
-    &--backend      { background: fade(@info-color, 12%);    color: darken(@info-color, 12%); }
-    &--frontend     { background: fade(@success-color, 15%); color: darken(@success-color, 12%); }
+    &--private_post { background: fade(@frm-warning-color, 15%); color: darken(@frm-warning-color, 12%); }
+    &--tag          { background: fade(@frm-success-color, 15%); color: darken(@frm-success-color, 12%); }
+    &--backend      { background: fade(@frm-info-color, 12%);    color: darken(@frm-info-color, 12%); }
+    &--frontend     { background: fade(@frm-success-color, 15%); color: darken(@frm-success-color, 12%); }
     &--both         { background: fade(@secondary-color, 15%); color: darken(@secondary-color, 12%); }
   }
 
-  .StatusBadge {
-    &--active   { background: fade(@success-color, 15%); color: darken(@success-color, 10%); }
-    &--inactive { background: rgba(0, 0, 0, 0.05);       color: var(--muted-color, @muted-color); }
-  }
-
-  .CountBadge {
+  .FilterRuleManager-CountBadge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -64,12 +58,9 @@
     font-weight: 700;
   }
 }
-.RulesetEditor-priorityInput {
-  max-width: 140px;
-}
 
 // Segmented control for inheritance (3-state)
-.RulesetEditor-segmentedControl {
+.FilterRuleManager-RulesetEditor-segmentedControl {
   display: flex;
   width: 100%;
   background: var(--control-bg, @control-bg);
@@ -77,7 +68,7 @@
   padding: 3px;
   gap: 3px;
 
-  .segmented-option {
+  .FilterRuleManager-segmented-option {
     flex: 1;
     border: none;
     background: transparent;
@@ -109,7 +100,7 @@
     }
 
     &.active-enabled {
-      color: @success-color;
+      color: @frm-success-color;
     }
 
     &.active-disabled {
@@ -124,14 +115,14 @@
 }
 
 // Segmented control for intervention type
-.RulesetEditor-interventionSelector {
+.FilterRuleManager-RulesetEditor-interventionSelector {
   display: flex;
   width: 100%;
   gap: 6px;
   flex-wrap: wrap;
 }
 
-.RulesetEditor-interventionOption {
+.FilterRuleManager-RulesetEditor-interventionOption {
   flex: 1;
   min-width: 100px;
   display: inline-flex;
@@ -154,14 +145,14 @@
 
   i { font-size: 14px; }
 
-  &--info.active    { border-color: @info-color;    background: fade(@info-color, 10%);    color: darken(@info-color, 10%); }
-  &--warning.active { border-color: @warning-color; background: fade(@warning-color, 10%); color: darken(@warning-color, 10%); }
-  &--block.active   { border-color: @error-color;   background: fade(@error-color, 10%);   color: darken(@error-color, 10%); }
+  &--info.active    { border-color: @frm-info-color;    background: fade(@frm-info-color, 10%);    color: darken(@frm-info-color, 10%); }
+  &--warning.active { border-color: @frm-warning-color; background: fade(@frm-warning-color, 10%); color: darken(@frm-warning-color, 10%); }
+  &--block.active   { border-color: @frm-error-color;   background: fade(@frm-error-color, 10%);   color: darken(@frm-error-color, 10%); }
   &--silent.active  { border-color: var(--muted-color, @muted-color); background: fade(@muted-color, 10%); color: darken(@muted-color, 10%); }
 }
 // Token hint chips
 
-.TokenHints {
+.FilterRuleManager-TokenHints {
   width: 100%;
   margin-top: 8px;
   padding: 8px 10px;
@@ -204,7 +195,7 @@
 
     &:hover {
       border-color: var(--primary-color, @primary-color);
-      background: fade(@info-color, 8%);
+      background: fade(@frm-info-color, 8%);
     }
 
     code {
@@ -212,7 +203,7 @@
       padding: 1px 4px;
       border-radius: 3px;
       font-size: 11px;
-      color: darken(@info-color, 10%);
+      color: darken(@frm-info-color, 10%);
       flex-shrink: 0;
     }
 
@@ -230,16 +221,16 @@
 
 // Inline token chip
 
-.TokenInlineChip {
+.FilterRuleManager-TokenInlineChip {
   display: inline-block;
   margin: 0 4px 4px 0;
   padding: 1px 6px;
   background: rgba(0, 0, 0, 0.05);
   border-radius: 3px;
   font-size: 11px;
-  color: darken(@info-color, 10%);
+  color: darken(@frm-info-color, 10%);
 }
-.RulesetEditor-customStyles {
+.FilterRuleManager-RulesetEditor-customStyles {
   display: flex;
   gap: 16px;
   flex-direction: column;
@@ -254,7 +245,7 @@
     margin-bottom: 0;
   }
 
-  .RulesetEditor-customStyles-row {
+  .FilterRuleManager-RulesetEditor-customStyles-row {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
@@ -265,7 +256,7 @@
     }
   }
 
-  .ColorPickerInput {
+  .FilterRuleManager-ColorPickerInput {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -301,7 +292,7 @@
       }
     }
     
-    .ColorPickerInput-input {
+    .FilterRuleManager-ColorPickerInput-input {
       position: relative;
       flex: 1;
 
@@ -310,7 +301,7 @@
         width: 100%;
       }
 
-      .ColorPicker-actions {
+      .FilterRuleManager-ColorPicker-actions {
         position: absolute;
         right: 10px;
         top: 50%;
@@ -318,7 +309,7 @@
         display: flex;
         gap: 8px;
 
-        .ColorPicker-action {
+        .FilterRuleManager-ColorPicker-action {
           cursor: pointer;
           opacity: 0.4;
           transition: opacity 0.2s;
@@ -331,13 +322,13 @@
     }
   }
 
-  .IconPickerInput {
+  .FilterRuleManager-IconPickerInput {
     display: flex;
     align-items: center;
     gap: 8px;
     position: relative;
 
-    .IconPicker-preview {
+    .FilterRuleManager-IconPicker-preview {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -350,7 +341,7 @@
       background: var(--control-bg);
     }
 
-    .IconPickerInput-input {
+    .FilterRuleManager-IconPickerInput-input {
       position: relative;
       flex: 1;
 
@@ -359,7 +350,7 @@
         width: 100%;
       }
 
-      .IconPicker-actions {
+      .FilterRuleManager-IconPicker-actions {
         position: absolute;
         right: 10px;
         top: 50%;
@@ -367,7 +358,7 @@
         display: flex;
         gap: 8px;
 
-        .IconPicker-action {
+        .FilterRuleManager-IconPicker-action {
           cursor: pointer;
           opacity: 0.4;
           transition: opacity 0.2s;
@@ -380,7 +371,7 @@
     }
 
 
-    .IconPicker-dropdown {
+    .FilterRuleManager-IconPicker-dropdown {
       position: absolute;
       top: 100%;
       left: 0;
@@ -392,13 +383,13 @@
       width: 280px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 
-      .IconPicker-icons {
+      .FilterRuleManager-IconPicker-icons {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
       }
 
-      .IconPicker-btn {
+      .FilterRuleManager-IconPicker-btn {
         padding: 6px 10px;
         background: var(--body-bg);
         border: 1px solid var(--control-bg-shaded);
@@ -415,7 +406,7 @@
   }
 }
 
-.InlineTagSelector {
+.FilterRuleManager-InlineTagSelector {
   max-height: 300px;
   overflow-y: auto;
   margin-top: 10px;
@@ -509,13 +500,13 @@
 }
 
 // Bypass group selection
-.RulesetEditor-groupSelection {
+.FilterRuleManager-RulesetEditor-groupSelection {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 10px;
   margin-top: 10px;
 
-  .RulesetEditor-groupOption {
+  .FilterRuleManager-RulesetEditor-groupOption {
     display: flex;
     align-items: center;
     padding: 8px 12px;
@@ -541,7 +532,7 @@
       flex-shrink: 0;
     }
 
-    .RulesetEditor-groupOption-content {
+    .FilterRuleManager-RulesetEditor-groupOption-content {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -553,7 +544,7 @@
       }
     }
 
-    .RulesetEditor-groupOption-name {
+    .FilterRuleManager-RulesetEditor-groupOption-name {
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;

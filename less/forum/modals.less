@@ -1,16 +1,16 @@
 // Warning confirmation modal
 
-.FilterRuleWarningModal-list {
+.FilterRuleManager-FilterRuleWarningModal-list {
   margin: 12px 0 16px;
   padding-left: 20px;
-  color: @filter-rule-warning-color;
+  color: @frm-warning-color;
 
   li { margin-bottom: 6px; }
 }
 
 // Alert modal
 
-.FilterRuleModal {
+.FilterRuleManager-FilterRuleModal {
   &-message {
     display: flex;
     align-items: flex-start;
@@ -20,9 +20,9 @@
     margin-bottom: 16px;
     line-height: 1.5;
 
-    &--info    { background: @filter-rule-info-bg;    color: @filter-rule-info-color; }
-    &--warning { background: @filter-rule-warning-bg; color: @filter-rule-warning-color; }
-    &--block   { background: @filter-rule-error-bg;   color: @filter-rule-error-color; }
+    &--info    { background: @frm-info-bg;    color: @frm-info-color; }
+    &--warning { background: @frm-warning-bg; color: @frm-warning-color; }
+    &--block   { background: @frm-error-bg;   color: @frm-error-color; }
   }
 
   &-icon {

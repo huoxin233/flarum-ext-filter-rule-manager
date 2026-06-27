@@ -92,16 +92,16 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   content(): any {
     if (this.loading) {
       return (
-        <div className="FilterRulePage">
+        <div className="FilterRuleManager-Page">
           <LoadingIndicator />
         </div>
       );
     }
 
     return (
-      <div className="FilterRulePage">
-        <div className="FilterRulePage-header">
-          <div className="FilterRulePage-tabs">
+      <div className="FilterRuleManager-Page">
+        <div className="FilterRuleManager-Page-header">
+          <div className="FilterRuleManager-Page-tabs">
             <Button
               className={`Button ${this.activeTab === 'rulesets' ? 'active' : ''}`}
               onclick={() => {
@@ -134,7 +134,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
               {app.translator.trans('huoxin-filter-rule-manager.admin.tabs.settings')}
             </Button>
           </div>
-          <div className="FilterRulePage-actions">
+          <div className="FilterRuleManager-Page-actions">
             {this.activeTab === 'rulesets' && (
               <Button className="Button Button--primary" icon="fas fa-plus" onclick={() => this.showEditor(null)}>
                 {app.translator.trans('huoxin-filter-rule-manager.admin.add_ruleset')}
@@ -143,7 +143,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           </div>
         </div>
 
-        <div className="FilterRulePage-content">
+        <div className="FilterRuleManager-Page-content">
           {this.activeTab === 'rulesets' && this.rulesetsTab()}
           {this.activeTab === 'registry' && this.registryTab()}
           {this.activeTab === 'settings' && this.settingsTab()}
@@ -159,8 +159,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     const autoFlag = autoFlagVal === true || autoFlagVal === '1';
 
     return (
-      <div className="RulesetEditor-section">
-        <div className="RulesetEditor-section-header">
+      <div className="FilterRuleManager-RulesetEditor-section">
+        <div className="FilterRuleManager-RulesetEditor-section-header">
           <i className="fas fa-cog"></i>
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.settings_header')}</h4>
         </div>
@@ -208,7 +208,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           </div>
         ) : null}
 
-        <hr className="RulesetEditor-divider" />
+        <hr className="FilterRuleManager-RulesetEditor-divider" />
 
         <div className="Form-group">
           <Switch
@@ -250,7 +250,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           })}
         </div>
 
-        <hr className="RulesetEditor-divider" />
+        <hr className="FilterRuleManager-RulesetEditor-divider" />
 
         <div className="Form-group">
           <Switch
@@ -285,20 +285,22 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     };
 
     return (
-      <div className="RulesetsTab">
-        <div className="FilterRulePage-subtabs">
+      <div className="FilterRuleManager-RulesetsTab">
+        <div className="FilterRuleManager-Page-subtabs">
           {SCOPES.map((scope) => (
             <button
               type="button"
               key={scope}
-              className={`SubTab ${this.scopeFilter === scope ? 'active' : ''}`}
+              className={`FilterRuleManager-SubTab ${this.scopeFilter === scope ? 'active' : ''}`}
               onclick={() => {
                 this.scopeFilter = scope;
                 m.redraw();
               }}
             >
-              <span className="SubTab-label">{app.translator.trans(`huoxin-filter-rule-manager.admin.scope_filters.${scope}`)}</span>
-              <span className="SubTab-count">{counts[scope]}</span>
+              <span className="FilterRuleManager-SubTab-label">
+                {app.translator.trans(`huoxin-filter-rule-manager.admin.scope_filters.${scope}`)}
+              </span>
+              <span className="FilterRuleManager-SubTab-count">{counts[scope]}</span>
             </button>
           ))}
         </div>
@@ -316,11 +318,11 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   renderList(list: Model[]): Mithril.Children {
     if (list.length === 0) {
       return (
-        <div className="EmptyState">
-          <div className="EmptyState-icon">
+        <div className="FilterRuleManager-EmptyState">
+          <div className="FilterRuleManager-EmptyState-icon">
             <i className="fas fa-shield-alt"></i>
           </div>
-          <p className="EmptyState-text">
+          <p className="FilterRuleManager-EmptyState-text">
             {this.scopeFilter === 'all'
               ? app.translator.trans('huoxin-filter-rule-manager.admin.no_rulesets')
               : app.translator.trans('huoxin-filter-rule-manager.admin.no_rulesets_in_scope')}
@@ -335,9 +337,9 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     }
 
     return (
-      <div className="RulesetsList">
-        <div className="CardList">
-          <div className="CardList-header">
+      <div className="FilterRuleManager-RulesetsList">
+        <div className="FilterRuleManager-CardList">
+          <div className="FilterRuleManager-CardList-header">
             <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.order')}</span>
             <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.name')}</span>
             <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.intervention')}</span>
@@ -364,8 +366,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     const rulesCount = this.countRules(ruleset.compiledAst());
 
     return (
-      <div className={`CardList-item ${!isActive ? 'CardList-item--inactive' : ''}`} key={ruleset.id() as string}>
-        <div className="CardList-item-cell CardList-item-cell--order">
+      <div className={`FilterRuleManager-CardList-item ${!isActive ? 'FilterRuleManager-CardList-item--inactive' : ''}`} key={ruleset.id() as string}>
+        <div className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--order">
           <Button
             className="Button Button--icon Button--small"
             icon="fas fa-arrow-up"
@@ -383,45 +385,47 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         </div>
 
         <div
-          className="CardList-item-cell CardList-item-cell--primary"
+          className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--primary"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.name')}
         >
           {ruleset.name()}
         </div>
-
-        <div className="CardList-item-cell" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.intervention')}>
-          <span className={`InterventionBadge InterventionBadge--${intervention}`}>
+        <div
+          className="FilterRuleManager-CardList-item-cell"
+          data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.intervention')}
+        >
+          <span className={`FilterRuleManager-InterventionBadge FilterRuleManager-InterventionBadge--${intervention}`}>
             {icon(this.interventionIcon(intervention))}
             {app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}`)}
           </span>
         </div>
-
-        <div className="CardList-item-cell" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.scope')}>
-          <span className={`ScopeBadge ScopeBadge--${scope}`}>{app.translator.trans(`huoxin-filter-rule-manager.admin.scopes.${scope}`)}</span>
+        <div className="FilterRuleManager-CardList-item-cell" data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.scope')}>
+          <span className={`FilterRuleManager-ScopeBadge FilterRuleManager-ScopeBadge--${scope}`}>
+            {app.translator.trans(`huoxin-filter-rule-manager.admin.scopes.${scope}`)}
+          </span>
         </div>
 
         <div
-          className="CardList-item-cell CardList-item-cell--muted"
+          className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--muted"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.display')}
         >
           {app.translator.trans(`huoxin-filter-rule-manager.admin.displays.${display}`)}
         </div>
 
         <div
-          className="CardList-item-cell CardList-item-cell--muted CardList-item-cell--rules"
+          className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--muted FilterRuleManager-CardList-item-cell--rules"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.rules')}
         >
-          <span className="CountBadge">{rulesCount}</span>
+          <span className="FilterRuleManager-CountBadge">{rulesCount}</span>
         </div>
 
         <div
-          className="CardList-item-cell CardList-item-cell--switch"
+          className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--switch"
           data-label={app.translator.trans('huoxin-filter-rule-manager.admin.headers.active')}
         >
           <Switch state={isActive} disabled={isTogglingThis} onchange={(val: boolean) => this.toggleActive(ruleset, val)} />
         </div>
-
-        <div className="CardList-item-actions">
+        <div className="FilterRuleManager-CardList-item-actions">
           <Button
             className="Button"
             icon="fas fa-edit"
@@ -460,19 +464,21 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   registryTab(): Mithril.Children {
     const REGISTRY_SCOPES = ['providers', 'templates', 'modes'];
     return (
-      <div className="RegistryTab">
-        <div className="FilterRulePage-subtabs">
+      <div className="FilterRuleManager-RegistryTab">
+        <div className="FilterRuleManager-Page-subtabs">
           {REGISTRY_SCOPES.map((scope) => (
             <button
               type="button"
               key={scope}
-              className={`SubTab ${this.registryFilter === scope ? 'active' : ''}`}
+              className={`FilterRuleManager-SubTab ${this.registryFilter === scope ? 'active' : ''}`}
               onclick={() => {
                 this.registryFilter = scope;
                 m.redraw();
               }}
             >
-              <span className="SubTab-label">{app.translator.trans(`huoxin-filter-rule-manager.admin.registry_tabs.${scope}`)}</span>
+              <span className="FilterRuleManager-SubTab-label">
+                {app.translator.trans(`huoxin-filter-rule-manager.admin.registry_tabs.${scope}`)}
+              </span>
             </button>
           ))}
         </div>
@@ -487,11 +493,11 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   renderProviders(): Mithril.Children {
     if (this.providers.length === 0) {
       return (
-        <div className="EmptyState">
-          <div className="EmptyState-icon">
+        <div className="FilterRuleManager-EmptyState">
+          <div className="FilterRuleManager-EmptyState-icon">
             <i className="fas fa-plug"></i>
           </div>
-          <p className="EmptyState-text">{app.translator.trans('huoxin-filter-rule-manager.admin.no_providers')}</p>
+          <p className="FilterRuleManager-EmptyState-text">{app.translator.trans('huoxin-filter-rule-manager.admin.no_providers')}</p>
         </div>
       );
     }
@@ -502,10 +508,10 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     }
 
     return (
-      <div className="ProvidersList">
+      <div className="FilterRuleManager-ProvidersList">
         {Object.entries(byProvider).map(([name, items]) => (
-          <div className="ProvidersList-group" key={name}>
-            <h3 className="ProvidersList-groupTitle">
+          <div className="FilterRuleManager-ProvidersList-group" key={name}>
+            <h3 className="FilterRuleManager-ProvidersList-groupTitle">
               {(() => {
                 const key = `huoxin-filter-rule-manager.admin.providers.${name}`;
                 const translated = app.translator.trans(key);
@@ -513,36 +519,42 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
                 return translatedStr === key ? name.toUpperCase() : translated;
               })()}
             </h3>
-            <div className="CardList">
-              <div className="CardList-header">
+            <div className="FilterRuleManager-CardList">
+              <div className="FilterRuleManager-CardList-header">
                 <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.type')}</span>
                 <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.label')}</span>
                 <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.runs')}</span>
                 <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.tokens')}</span>
               </div>
               {items.map((p) => (
-                <div className="CardList-item" key={`${p.provider}:${p.type}`}>
+                <div className="FilterRuleManager-CardList-item" key={`${p.provider}:${p.type}`}>
                   <div
-                    className="CardList-item-cell CardList-item-cell--primary"
+                    className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--primary"
                     data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.type'))}
                   >
                     <code>{p.type}</code>
                   </div>
-                  <div className="CardList-item-cell" data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.label'))}>
+                  <div
+                    className="FilterRuleManager-CardList-item-cell"
+                    data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.label'))}
+                  >
                     {p.label || p.type}
                   </div>
-                  <div className="CardList-item-cell" data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.runs'))}>
-                    <span className={`ScopeBadge ScopeBadge--${p.scope}`}>
+                  <div
+                    className="FilterRuleManager-CardList-item-cell"
+                    data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.runs'))}
+                  >
+                    <span className={`FilterRuleManager-ScopeBadge FilterRuleManager-ScopeBadge--${p.scope}`}>
                       {app.translator.trans(`huoxin-filter-rule-manager.admin.scopes.${p.scope}`)}
                     </span>
                   </div>
                   <div
-                    className="CardList-item-cell CardList-item-cell--muted"
+                    className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--muted"
                     data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.tokens'))}
                   >
                     {p.tokens && (p.tokens as unknown[]).length > 0 ? (
                       (p.tokens as any[]).map((t: Record<string, unknown>) => (
-                        <code className="TokenInlineChip" key={t.name as string}>{`{{${t.name}}}`}</code>
+                        <code className="FilterRuleManager-TokenInlineChip" key={t.name as string}>{`{{${t.name}}}`}</code>
                       ))
                     ) : (
                       <em>—</em>
@@ -561,26 +573,28 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     const templates = app.filterRuleManager ? app.filterRuleManager.templates : {};
 
     return (
-      <div className="ProvidersList">
-        <div className="ProvidersList-group">
-          <h3 className="ProvidersList-groupTitle">{app.translator.trans('huoxin-filter-rule-manager.admin.registry_tabs.templates')}</h3>
-          <div className="CardList CardList--two-col">
-            <div className="CardList-header">
+      <div className="FilterRuleManager-ProvidersList">
+        <div className="FilterRuleManager-ProvidersList-group">
+          <h3 className="FilterRuleManager-ProvidersList-groupTitle">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.registry_tabs.templates')}
+          </h3>
+          <div className="FilterRuleManager-CardList FilterRuleManager-CardList--two-col">
+            <div className="FilterRuleManager-CardList-header">
               <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.template')}</span>
               <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.has_settings')}</span>
             </div>
             {Object.keys(templates).map((name) => {
               const settingsComp = app.filterRuleManager.getTemplateSettingsComponent(name);
               return (
-                <div className="CardList-item" key={name}>
+                <div className="FilterRuleManager-CardList-item" key={name}>
                   <div
-                    className="CardList-item-cell CardList-item-cell--primary"
+                    className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--primary"
                     data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.template'))}
                   >
                     <code>{name}</code>
                   </div>
                   <div
-                    className="CardList-item-cell"
+                    className="FilterRuleManager-CardList-item-cell"
                     data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.has_settings'))}
                   >
                     {settingsComp ? <i className="fas fa-check text-success"></i> : <i className="fas fa-times text-muted"></i>}
@@ -598,23 +612,28 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     const modes = app.filterRuleManager ? app.filterRuleManager.getDisplayModes() : {};
 
     return (
-      <div className="ProvidersList">
-        <div className="ProvidersList-group">
-          <h3 className="ProvidersList-groupTitle">{app.translator.trans('huoxin-filter-rule-manager.admin.registry_tabs.modes')}</h3>
-          <div className="CardList CardList--two-col">
-            <div className="CardList-header">
+      <div className="FilterRuleManager-ProvidersList">
+        <div className="FilterRuleManager-ProvidersList-group">
+          <h3 className="FilterRuleManager-ProvidersList-groupTitle">
+            {app.translator.trans('huoxin-filter-rule-manager.admin.registry_tabs.modes')}
+          </h3>
+          <div className="FilterRuleManager-CardList FilterRuleManager-CardList--two-col">
+            <div className="FilterRuleManager-CardList-header">
               <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.identifier')}</span>
               <span>{app.translator.trans('huoxin-filter-rule-manager.admin.headers.label')}</span>
             </div>
             {Object.keys(modes).map((mode) => (
-              <div className="CardList-item" key={mode}>
+              <div className="FilterRuleManager-CardList-item" key={mode}>
                 <div
-                  className="CardList-item-cell CardList-item-cell--primary"
+                  className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--primary"
                   data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.identifier'))}
                 >
                   <code>{mode}</code>
                 </div>
-                <div className="CardList-item-cell" data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.label'))}>
+                <div
+                  className="FilterRuleManager-CardList-item-cell"
+                  data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.label'))}
+                >
                   {app.translator.trans(modes[mode])}
                 </div>
               </div>

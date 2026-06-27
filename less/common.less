@@ -4,12 +4,12 @@
  * Shared LESS definitions imported by both Admin and Forum environments.
  */
 
-@filter-rule-info-bg:    #e8f4f8;
-@filter-rule-info-color: #2b7c93;
-@filter-rule-warning-bg: #fff4e5;
-@filter-rule-warning-color: #8a6d3b;
-@filter-rule-error-bg:   #fde8e8;
-@filter-rule-error-color: #a94442;
+@frm-info-bg:    #e8f4f8;
+@frm-info-color: #2b7c93;
+@frm-warning-bg: #fff4e5;
+@frm-warning-color: #8a6d3b;
+@frm-error-bg:   #fde8e8;
+@frm-error-color: #a94442;
 
 .FilterRuleManager-item {
   display: flex;
@@ -21,18 +21,18 @@
   line-height: 1.4;
 
   &--info {
-    background: @filter-rule-info-bg;
-    color: @filter-rule-info-color;
+    background: @frm-info-bg;
+    color: @frm-info-color;
   }
 
   &--warning {
-    background: @filter-rule-warning-bg;
-    color: @filter-rule-warning-color;
+    background: @frm-warning-bg;
+    color: @frm-warning-color;
   }
 
   &--block {
-    background: @filter-rule-error-bg;
-    color: @filter-rule-error-color;
+    background: @frm-error-bg;
+    color: @frm-error-color;
   }
 
   &-icon {

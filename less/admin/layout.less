@@ -1,6 +1,6 @@
 // Page shell + header (tabs + actions)
 
-.FilterRulePage {
+.FilterRuleManager-Page {
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
@@ -82,7 +82,7 @@
   }
 
   &-content {
-    .card-style();
+    .frm-card-style();
     padding: 24px;
     min-height: 400px;
 
@@ -94,7 +94,7 @@
 
 // Empty state
 
-.FilterRulePage .EmptyState {
+.FilterRuleManager-Page .FilterRuleManager-EmptyState {
   text-align: center;
   padding: 60px 20px;
   color: var(--muted-color, @muted-color);
@@ -113,7 +113,7 @@
 
 // CardList grid (rulesets list, providers list)
 
-.FilterRulePage .CardList {
+.FilterRuleManager-Page .FilterRuleManager-CardList {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -138,7 +138,7 @@
   }
 
   &-item {
-    .card-style();
+    .frm-card-style();
     padding: 12px 16px;
     display: grid;
     grid-template-columns: var(--grid-cols);
@@ -206,7 +206,7 @@
         flex-shrink: 0;
       }
 
-      &.CardList-item-cell--order::before {
+      &.FilterRuleManager-CardList-item-cell--order::before {
         display: none;
       }
     }
@@ -313,7 +313,7 @@
 }
 
 // Grid sizings per list
-.RulesetsList .CardList {
+.FilterRuleManager-RulesetsList .FilterRuleManager-CardList {
   --grid-cols: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 150px;
 
   &-header {
@@ -329,7 +329,7 @@
   }
 }
 
-.RegistryTab .CardList {
+.FilterRuleManager-RegistryTab .FilterRuleManager-CardList {
   --grid-cols: 1fr 1fr 1fr 2fr;
 
   &-header span {
@@ -341,7 +341,7 @@
   }
 }
 
-.ProvidersList-group {
+.FilterRuleManager-ProvidersList-group {
   margin-bottom: 28px;
   &:last-child { margin-bottom: 0; }
 
@@ -358,7 +358,7 @@
 }
 // Scope sub-tabs
 
-.FilterRulePage-subtabs {
+.FilterRuleManager-Page-subtabs {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -366,7 +366,7 @@
   padding-bottom: 12px;
   border-bottom: 1px solid var(--control-bg, @control-bg);
 
-  .SubTab {
+  .FilterRuleManager-SubTab {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -391,7 +391,7 @@
     }
   }
 
-  .SubTab-count {
+  .FilterRuleManager-SubTab-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -406,7 +406,7 @@
     line-height: 1;
   }
 
-  .SubTab.active .SubTab-count {
+  .FilterRuleManager-SubTab.active .FilterRuleManager-SubTab-count {
     background: fade(@primary-color, 25%);
     color: var(--primary-color, @primary-color);
   }
@@ -414,7 +414,7 @@
 
 // Hide Flarum Switch label for inline active toggle
 
-.FilterRulePage .CardList-item-cell--switch {
+.FilterRuleManager-Page .FilterRuleManager-CardList-item-cell--switch {
   .Switch {
     margin: 0;
   }

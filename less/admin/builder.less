@@ -29,29 +29,29 @@
   }
 }
 
-.Expression-LogicalNode {
-  .LogicalNode-andContainer {
+.FilterRuleManager-Expression-LogicalNode {
+  .FilterRuleManager-LogicalNode-andContainer {
     margin-left: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 40px;
   }
-  .LogicalNode-connector {
+  .FilterRuleManager-LogicalNode-connector {
     width: 1px;
     height: 15px;
     background: var(--control-bg-shaded);
   }
-  .LogicalNode-andButton {
+  .FilterRuleManager-LogicalNode-andButton {
     background: var(--control-bg-light);
     border: 1px solid var(--control-bg-shaded);
     padding: 2px 8px;
     font-size: 12px;
   }
-  .LogicalNode-orContainer {
+  .FilterRuleManager-LogicalNode-orContainer {
     margin: 20px 0;
   }
-  .LogicalNode-orButton {
+  .FilterRuleManager-LogicalNode-orButton {
     background: var(--control-bg-light);
     border: 1px solid var(--control-bg-shaded);
     padding: 4px 12px;
@@ -59,14 +59,14 @@
   }
 }
 
-.Expression-RuleNode {
+.FilterRuleManager-Expression-RuleNode {
   background: var(--body-bg, @body-bg);
   padding: 15px;
   border-radius: 4px;
   border: 1px solid var(--control-bg-shaded);
   width: 100%;
 
-  .RuleNode-header {
+  .FilterRuleManager-RuleNode-header {
     display: grid;
     grid-template-columns: 1fr 1.5fr auto auto;
     gap: 15px;
@@ -84,29 +84,29 @@
       }
     }
   }
-  .RuleNode-negateToggle {
+  .FilterRuleManager-RuleNode-negateToggle {
     padding-left: 10px;
     border-left: 1px solid var(--control-bg-shaded);
     white-space: nowrap;
     display: flex;
     align-items: center;
   }
-  .RuleNode-actions {
+  .FilterRuleManager-RuleNode-actions {
     display: flex;
     justify-content: flex-end;
   }
 
   @media (max-width: 767px) {
-    .RuleNode-header {
+    .FilterRuleManager-RuleNode-header {
       grid-template-columns: 1fr;
       gap: 10px;
     }
-    .RuleNode-negateToggle {
+    .FilterRuleManager-RuleNode-negateToggle {
       padding-left: 0;
       border-left: none;
       flex: 1;
     }
-    .RuleNode-actions {
+    .FilterRuleManager-RuleNode-actions {
       width: 100%;
       .Button {
         width: 100%;
@@ -115,20 +115,20 @@
   }
 }
 
-.NodeView-ruleContainer {
+.FilterRuleManager-NodeView-ruleContainer {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
 }
 
-.Expression-NotNode {
+.FilterRuleManager-Expression-NotNode {
   display: flex;
   align-items: stretch;
   gap: 10px;
   width: 100%;
 
-  .NotNode-label {
+  .FilterRuleManager-NotNode-label {
     display: flex;
     align-items: center;
     background: var(--control-bg-shaded);
@@ -139,7 +139,7 @@
   }
 }
 
-.RuleBuilder {
+.FilterRuleManager-RuleBuilder {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -148,7 +148,7 @@
   border-radius: 8px;
   border: 1px solid var(--control-bg-shaded);
 
-  .RuleBuilder-tabs {
+  .FilterRuleManager-RuleBuilder-tabs {
     display: flex;
     gap: 4px;
     background: var(--control-bg, @control-bg);
@@ -162,7 +162,7 @@
     }
   }
 
-  .RuleBuilder-tabButton {
+  .FilterRuleManager-RuleBuilder-tabButton {
     flex: 1;
     justify-content: center;
     background: transparent;
@@ -190,23 +190,23 @@
     }
   }
 
-  .RuleBuilder-errorAlert {
+  .FilterRuleManager-RuleBuilder-errorAlert {
     margin-bottom: 15px;
   }
-  .RuleBuilder-appendButtons {
+  .FilterRuleManager-RuleBuilder-appendButtons {
     display: flex;
     gap: 10px;
     margin-top: 15px;
   }
-  .RuleBuilder-appendButton {
+  .FilterRuleManager-RuleBuilder-appendButton {
     background: var(--control-bg-light);
     border: 1px solid var(--control-bg-shaded);
     padding: 4px 12px;
   }
-  .RuleBuilder-textarea {
+  .FilterRuleManager-RuleBuilder-textarea {
     font-family: monospace;
   }
-  .RuleBuilder-editorHelp {
+  .FilterRuleManager-RuleBuilder-editorHelp {
     margin-top: 10px;
   }
 }
