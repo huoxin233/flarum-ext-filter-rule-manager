@@ -11,6 +11,7 @@ Filter Rule Manager goes beyond simple word replacements. It allows forum admini
 Filter Rule Manager is built to give Flarum administrators fine-grained control over their community's content. It covers the following features out-of-the-box:
 
 - **Visual Rule Builder**: Construct complex logic using an intuitive drag-and-drop interface. Group conditions using `AND` / `OR` / `NOT` logic to create highly specific content filters.
+- **Builtin Rule Types**: Natively supports checking for specific keywords (`contains_word`), regular expressions (`regex`), checking the author's user group (`group`), and validating post length (`word_count` with mixed CJK/Latin support and optional exclusions for URLs/mentions).
 - **Priority-based Execution**: Order your rulesets. Higher priority rules execute first, efficiently preventing unnecessary processing on lower rulesets.
 - **Intervention Types**: Choose exactly how the system reacts to a violation:
   - **Info**: Displays a real-time hint while the user is typing, but does not block them from submitting the post.
@@ -21,14 +22,14 @@ Filter Rule Manager is built to give Flarum administrators fine-grained control 
 - **Dynamic Scopes**: Apply filtering rules globally, or restrict them to specific **Tags** or specific **Discussions**.
 - **Evasion Detection**: Define strict timeout windows and strike thresholds. If a user repeatedly hits block rules (e.g., 3 times within 15 minutes), the system automatically escalates penalties, flagging their next _clean_ post for moderator review.
 - **Bypass Groups**: Exempt specific User Groups (e.g., Moderators, Admins) from individual rulesets.
-- **Customizable Messaging**: Define dynamic flag reasons and block messages using variable interpolation (e.g., `Matched word: {{matched_word}}` or `Triggered ruleset: {{ruleset}}`). Messages support **HTML**.
+- **Customizable Messaging**: Define dynamic flag reasons, custom titles, and block messages using variable interpolation (e.g., `Matched word: {{matched_word}}` or `Triggered ruleset: {{ruleset}}`). Messages support **HTML** and native localization via **translation keys**.
 - **Extensible API**: Other extensions can securely inject their own custom Rule Providers into the AST engine.
 
 ## ⚠️ Security & Privacy Note
 
 **Frontend Evaluation Disclosure:** Filter Rule Manager evaluates `Info` and `Warning` rulesets instantly on the client-side to provide real-time feedback to users as they type. To achieve this, the system injects the full logic (including compiled word lists, regex patterns, and match conditions) of all active **Info** and **Warning** rulesets into the page payload for authenticated users.
 
-To prevent casual snooping, **this payload is obfuscated** (using a Base64 XOR cipher) before it is sent to the browser. A normal user inspecting the page source or DevTools will only see a scrambled string. However, because the decryption key is necessarily shipped to the browser, a highly determined programmer could theoretically reverse-engineer the JavaScript and decrypt the payload.
+To prevent casual snooping, **this payload is obfuscated** (using a Base64 XOR cipher with a configurable key) before it is sent to the browser. A normal user inspecting the page source or DevTools will only see a scrambled string. However, because the decryption key is necessarily shipped to the browser, a highly determined programmer could theoretically reverse-engineer the JavaScript and decrypt the payload.
 
 **Best Practice:** Use `Info` and `Warning` interventions only for guidelines, formatting hints, or soft moderation. For strict filters (e.g., severe profanity, spam links, zero-tolerance policies) that you wish to keep mathematically impossible to bypass, use the **Block** or **Silent** intervention types. Block and Silent rulesets are evaluated strictly server-side and are **never** exposed to the browser.
 
