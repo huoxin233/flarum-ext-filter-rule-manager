@@ -40,37 +40,39 @@ export default class GroupListConfig extends Component<GroupListConfigAttrs> {
   view(): Mithril.Children {
     return (
       <div className="FilterRuleManager-ConfigForm">
-        <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_groups_label')}</label>
-        <div className="FilterRuleManager-RulesetEditor-groupSelection">
-          {app.store.all('groups').map((group: any) => {
-            const id = parseInt(String(group.id()), 10);
-            const isActive = (this.groupIds() || []).includes(id);
-            return (
-              <label className={`FilterRuleManager-RulesetEditor-groupOption ${isActive ? 'active' : ''}`} key={id}>
-                <input
-                  type="checkbox"
-                  checked={isActive}
-                  onchange={(e: Event) => {
-                    const checked = (e.target as HTMLInputElement).checked;
-                    let current = this.groupIds() || [];
-                    if (checked) {
-                      current.push(id);
-                    } else {
-                      current = current.filter((g: number) => g !== id);
-                    }
-                    this.groupIds(current);
-                    this.attrs.onchange({ ...(this.attrs.config || {}), groupIds: current });
-                  }}
-                />
-                <div className="FilterRuleManager-RulesetEditor-groupOption-content">
-                  <GroupBadge group={group} label="" />
-                  <span className="FilterRuleManager-RulesetEditor-groupOption-name">{String(group.namePlural() || group.name())}</span>
-                </div>
-              </label>
-            );
-          })}
+        <div className="Form-group">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_groups_label')}</label>
+          <div className="FilterRuleManager-RulesetEditor-groupSelection">
+            {app.store.all('groups').map((group: any) => {
+              const id = parseInt(String(group.id()), 10);
+              const isActive = (this.groupIds() || []).includes(id);
+              return (
+                <label className={`FilterRuleManager-RulesetEditor-groupOption ${isActive ? 'active' : ''}`} key={id}>
+                  <input
+                    type="checkbox"
+                    checked={isActive}
+                    onchange={(e: Event) => {
+                      const checked = (e.target as HTMLInputElement).checked;
+                      let current = this.groupIds() || [];
+                      if (checked) {
+                        current.push(id);
+                      } else {
+                        current = current.filter((g: number) => g !== id);
+                      }
+                      this.groupIds(current);
+                      this.attrs.onchange({ ...(this.attrs.config || {}), groupIds: current });
+                    }}
+                  />
+                  <div className="FilterRuleManager-RulesetEditor-groupOption-content">
+                    <GroupBadge group={group} label="" />
+                    <span className="FilterRuleManager-RulesetEditor-groupOption-name">{String(group.namePlural() || group.name())}</span>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_groups_help')}</div>
         </div>
-        <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_groups_help')}</div>
       </div>
     );
   }

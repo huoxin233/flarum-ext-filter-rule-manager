@@ -50,15 +50,17 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
   view(): Mithril.Children {
     return (
       <div className="FilterRuleManager-ConfigForm">
-        <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_label')}</label>
-        <textarea
-          className="FormControl FilterRuleManager-LinesInput"
-          rows={5}
-          value={this.text()}
-          oninput={(e: Event) => this.handleInput((e.target as HTMLTextAreaElement).value)}
-          placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_words_placeholder'))}
-        ></textarea>
-        <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}</div>
+        <div className="Form-group">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_label')}</label>
+          <textarea
+            className="FormControl FilterRuleManager-LinesInput"
+            rows={5}
+            value={this.text()}
+            oninput={(e: Event) => this.handleInput((e.target as HTMLTextAreaElement).value)}
+            placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_words_placeholder'))}
+          ></textarea>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}</div>
+        </div>
         <hr className="FilterRuleManager-divider" />
         <div className="Form-group">
           <Switch

@@ -434,7 +434,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
             ) : null}
           </div>
         ) : (
-          <div className="FilterRuleManager-RuleBuilder-editor">
+          <div className="Form-group FilterRuleManager-RuleBuilder-editor">
             <textarea
               className="FormControl FilterRuleManager-RuleBuilder-textarea"
               value={this.expression}
