@@ -59,6 +59,7 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
           placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_words_placeholder'))}
         ></textarea>
         <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}</div>
+        <hr className="FilterRuleManager-divider" />
         <div className="Form-group">
           <Switch
             state={this.scanAll()}

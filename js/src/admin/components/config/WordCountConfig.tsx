@@ -61,6 +61,8 @@ export default class WordCountConfig extends Component<IWordCountConfigAttrs> {
 
         <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_word_count_help')}</div>
 
+        <hr className="FilterRuleManager-divider" />
+
         <div className="Form-group">
           <Switch state={this.excludeMentions} onchange={(val: boolean) => this.updateConfig('exclude_mentions', val)}>
             {app.translator.trans('huoxin-filter-rule-manager.admin.config_exclude_mentions')}
