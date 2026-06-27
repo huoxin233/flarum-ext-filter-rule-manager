@@ -52,6 +52,7 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
       <div className="FilterRuleManager-ConfigForm">
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_label')}</label>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}</div>
           <textarea
             className="FormControl FilterRuleManager-LinesInput"
             rows={5}
@@ -59,7 +60,6 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
             oninput={(e: Event) => this.handleInput((e.target as HTMLTextAreaElement).value)}
             placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.config_words_placeholder'))}
           ></textarea>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_words_help')}</div>
         </div>
         <hr className="FilterRuleManager-divider" />
         <div className="Form-group">
@@ -71,8 +71,8 @@ export default class WordsListConfig extends Component<WordsListConfigAttrs> {
             }}
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all')}
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all_help')}</div>
           </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_scan_all_help')}</div>
         </div>
       </div>
     );

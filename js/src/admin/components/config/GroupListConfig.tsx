@@ -42,6 +42,7 @@ export default class GroupListConfig extends Component<GroupListConfigAttrs> {
       <div className="FilterRuleManager-ConfigForm">
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.config_groups_label')}</label>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_groups_help')}</div>
           <div className="FilterRuleManager-RulesetEditor-groupSelection">
             {app.store.all('groups').map((group: any) => {
               const id = parseInt(String(group.id()), 10);
@@ -71,7 +72,6 @@ export default class GroupListConfig extends Component<GroupListConfigAttrs> {
               );
             })}
           </div>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_groups_help')}</div>
         </div>
       </div>
     );
