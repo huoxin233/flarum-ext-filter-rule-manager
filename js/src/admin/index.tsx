@@ -46,6 +46,7 @@ export { Ruleset };
 app.initializers.add('huoxin/filter-rule-manager', () => {
   app.filterRuleManager = filterEngine;
 
+  filterEngine.registerDisplayMode('none', 'huoxin-filter-rule-manager.admin.displays.none');
   filterEngine.registerDisplayMode('banner', 'huoxin-filter-rule-manager.admin.displays.banner');
   filterEngine.registerDisplayMode('header_banner', 'huoxin-filter-rule-manager.admin.displays.header_banner');
   filterEngine.registerDisplayMode('sidebar', 'huoxin-filter-rule-manager.admin.displays.sidebar');

@@ -176,6 +176,8 @@ huoxin-filter-rule-manager:
       builtin: "内置"
 
     displays:
+      none: "无 (隐藏)"
+      none_help: "前端不显示任何提示UI。"
       banner: "顶部横幅"
       banner_help: "在整个发帖框上方渲染全宽横幅（位于 .App-composer > .container 内部，#composer 之前）。在视觉上与发帖框对齐。"
       header_banner: "标题栏横幅"

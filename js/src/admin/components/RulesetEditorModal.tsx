@@ -111,7 +111,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     this.name = Stream(this.ruleset ? this.ruleset.name() : '');
     this.expression = Stream(this.ruleset ? this.ruleset.expression() : '');
     this.interventionType = Stream(this.ruleset ? this.ruleset.interventionType() : 'info');
-    this.displayMode = Stream(this.ruleset ? this.ruleset.displayMode() : 'banner');
+    this.displayMode = Stream(this.ruleset ? this.ruleset.displayMode() : 'none');
     this.message = Stream(this.ruleset ? this.ruleset.message() : '');
     this.flagMessage = Stream(this.ruleset ? this.ruleset.flagMessage() : '');
     this.evaluateAllRules = Stream(this.ruleset ? this.ruleset.evaluateAllRules() : false);
@@ -436,7 +436,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                         },
                         {}
                       )
-                    : { banner: String(app.translator.trans('huoxin-filter-rule-manager.admin.displays.banner')) }
+                    : { none: String(app.translator.trans('huoxin-filter-rule-manager.admin.displays.none')) }
                 }
                 value={displayMode}
                 onchange={(v: string) => this.displayMode(v)}
