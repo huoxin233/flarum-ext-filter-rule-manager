@@ -435,6 +435,9 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
           </div>
         ) : (
           <div className="Form-group FilterRuleManager-RuleBuilder-editor">
+            <div className="helpText FilterRuleManager-RuleBuilder-editorHelp">
+              {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_help')}
+            </div>
             <textarea
               className="FormControl FilterRuleManager-RuleBuilder-textarea"
               value={this.expression}
@@ -445,9 +448,6 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
               placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_placeholder'))}
               rows={6}
             />
-            <div className="helpText FilterRuleManager-RuleBuilder-editorHelp">
-              {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_help')}
-            </div>
           </div>
         )}
       </div>

@@ -265,15 +265,15 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
         <div className="Form-group">
           <Switch state={this.blockCascade()} onchange={(v: boolean) => this.blockCascade(v)}>
             {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade')}
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade_help')}</div>
           </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_block_cascade_help')}</div>
         </div>
 
         <div className="Form-group">
           <Switch state={this.evaluateAllRules()} onchange={(v: boolean) => this.evaluateAllRules(v)}>
             {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules')}
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules_help')}</div>
           </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evaluate_all_rules_help')}</div>
         </div>
       </div>
     );
@@ -473,6 +473,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message')}</label>
+              <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.message_help')}</div>
               <textarea
                 className="FormControl"
                 oncreate={(vnode) => {
@@ -487,7 +488,6 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
                 rows={2}
                 required
               ></textarea>
-              <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.message_help')}</div>
               {this.tokenChipsBlock(tokens, 'message')}
             </div>
 
@@ -545,39 +545,37 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
         {this.evasionActive() === true ? (
           <div className="Form-group">
-            <div className="FilterRuleManager-RulesetEditor-inline-inputs">
-              <div className="FilterRuleManager-RulesetEditor-inline-input">
-                <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout')}</label>
-                <input
-                  className="FormControl"
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={this.evasionTimeout() === null ? '' : this.evasionTimeout()!}
-                  oninput={(e: Event) => {
-                    const val = (e.target as HTMLInputElement).value;
-                    this.evasionTimeout(val === '' ? null : Math.max(0, parseInt(val, 10)) || 0);
-                  }}
-                  placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default'))}
-                />
-                <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout_help')}</div>
-              </div>
-              <div className="FilterRuleManager-RulesetEditor-inline-input">
-                <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold')}</label>
-                <input
-                  className="FormControl"
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={this.evasionThreshold() === null ? '' : this.evasionThreshold()!}
-                  oninput={(e: Event) => {
-                    const val = (e.target as HTMLInputElement).value;
-                    this.evasionThreshold(val === '' ? null : Math.max(1, parseInt(val, 10)) || 1);
-                  }}
-                  placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default'))}
-                />
-                <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold_help')}</div>
-              </div>
+            <div className="Form-group">
+              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout')}</label>
+              <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout_help')}</div>
+              <input
+                className="FormControl"
+                type="number"
+                min="0"
+                step="1"
+                value={this.evasionTimeout() === null ? '' : this.evasionTimeout()!}
+                oninput={(e: Event) => {
+                  const val = (e.target as HTMLInputElement).value;
+                  this.evasionTimeout(val === '' ? null : Math.max(0, parseInt(val, 10)) || 0);
+                }}
+                placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default'))}
+              />
+            </div>
+            <div className="Form-group">
+              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold')}</label>
+              <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold_help')}</div>
+              <input
+                className="FormControl"
+                type="number"
+                min="1"
+                step="1"
+                value={this.evasionThreshold() === null ? '' : this.evasionThreshold()!}
+                oninput={(e: Event) => {
+                  const val = (e.target as HTMLInputElement).value;
+                  this.evasionThreshold(val === '' ? null : Math.max(1, parseInt(val, 10)) || 1);
+                }}
+                placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default'))}
+              />
             </div>
           </div>
         ) : null}
@@ -587,6 +585,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
         {this.autoFlag() !== false || this.requireApproval() !== false || this.evasionActive() !== false ? (
           <div className="Form-group">
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message')}</label>
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_help')}</div>
             <textarea
               className="FormControl"
               oncreate={(vnode) => {
@@ -600,7 +599,6 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
               placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_placeholder'))}
               rows={2}
             ></textarea>
-            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_flag_message_help')}</div>
             {this.tokenChipsBlock(this.availableTokens(), 'flagMessage')}
           </div>
         ) : null}

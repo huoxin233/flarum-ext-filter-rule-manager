@@ -113,6 +113,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
       <div className="FilterRuleManager-RulesetEditor-customStyles">
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title') || 'Alert Title (Optional)'}</label>
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_help')}</div>
           <input
             className="FormControl"
             value={displaySetting('title') || ''}
@@ -128,7 +129,6 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
             oninput={(e: Event) => displaySetting('title', (e.target as HTMLInputElement).value)}
             placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_placeholder') || 'e.g., Warning!')}
           />
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title_help')}</div>
           {tokenChipsBlock &&
             tokenChipsBlock(tokens, (name: string) => {
               const insertion = `{{${name}}}`;

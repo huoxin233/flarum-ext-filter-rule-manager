@@ -175,8 +175,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             onchange={(val: boolean) => this.setting('huoxin-filter.global_evaluate_title')(val ? '1' : '0')}
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title')}
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title_help')}</div>
           </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title_help')}</div>
         </div>
         <div className="Form-group">
           <Switch
@@ -184,8 +184,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             onchange={(val: boolean) => this.setting('huoxin-filter.global_auto_flag')(val ? '1' : '0')}
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag')}
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag_help')}</div>
           </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag_help')}</div>
         </div>
         <div className="Form-group">
           <Switch
@@ -196,8 +196,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             onchange={(val: boolean) => this.setting('huoxin-filter.global_require_approval')(val ? '1' : '0')}
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval')}
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval_help')}</div>
           </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval_help')}</div>
         </div>
 
         {requireApproval && !autoFlag ? (
@@ -220,8 +220,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             onchange={(val: boolean) => this.setting('huoxin-filter.global_evasion_active')(val ? '1' : '0')}
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active')}
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active_help')}</div>
           </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active_help')}</div>
         </div>
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_timeout')}</label>
@@ -259,8 +259,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             onchange={(val: boolean) => this.setting('huoxin-filter.obfuscate_active')(val ? '1' : '0')}
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active')}
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active_help')}</div>
           </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active_help')}</div>
         </div>
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_key')}</label>
