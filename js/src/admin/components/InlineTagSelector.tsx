@@ -48,11 +48,13 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
     const childTags = tags.filter((t) => t.isChild());
 
     return (
-      <div className="InlineTagSelector">
+      <div className="FilterRuleManager-InlineTagSelector">
         {primaryTags.length > 0 && (
-          <div className="InlineTagSelector-group">
-            <label className="InlineTagSelector-groupLabel">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_primary_tags')}</label>
-            <div className="InlineTagSelector-list">
+          <div className="FilterRuleManager-InlineTagSelector-group">
+            <label className="FilterRuleManager-InlineTagSelector-groupLabel">
+              {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_primary_tags')}
+            </label>
+            <div className="FilterRuleManager-InlineTagSelector-list">
               {primaryTags.map((tag) =>
                 this.renderTag(
                   tag,
@@ -63,9 +65,11 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
           </div>
         )}
         {secondaryTags.length > 0 && (
-          <div className="InlineTagSelector-group">
-            <label className="InlineTagSelector-groupLabel">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_secondary_tags')}</label>
-            <div className="InlineTagSelector-list">{secondaryTags.map((tag) => this.renderTag(tag, []))}</div>
+          <div className="FilterRuleManager-InlineTagSelector-group">
+            <label className="FilterRuleManager-InlineTagSelector-groupLabel">
+              {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_secondary_tags')}
+            </label>
+            <div className="FilterRuleManager-InlineTagSelector-list">{secondaryTags.map((tag) => this.renderTag(tag, []))}</div>
           </div>
         )}
       </div>
@@ -77,15 +81,17 @@ export default class InlineTagSelector extends Component<InlineTagSelectorAttrs>
     const selected = (this.selectedIds() || []).includes(id);
 
     return (
-      <div className="InlineTagSelector-itemContainer" key={id}>
-        <label className={classList('InlineTagSelector-item', { active: selected })}>
+      <div className="FilterRuleManager-InlineTagSelector-itemContainer" key={id}>
+        <label className={classList('FilterRuleManager-InlineTagSelector-item', { active: selected })}>
           <input type="checkbox" checked={selected} onchange={(e: Event) => this.toggleTag(id, (e.target as HTMLInputElement).checked)} />
-          <span className="InlineTagSelector-icon" style={{ backgroundColor: tag.color() }}>
+          <span className="FilterRuleManager-InlineTagSelector-icon" style={{ backgroundColor: tag.color() }}>
             {tag.icon() && <Icon name={tag.icon() as string} />}
           </span>
-          <span className="InlineTagSelector-name">{tag.name()}</span>
+          <span className="FilterRuleManager-InlineTagSelector-name">{tag.name()}</span>
         </label>
-        {children && children.length > 0 && <div className="InlineTagSelector-children">{children.map((child) => this.renderTag(child, []))}</div>}
+        {children && children.length > 0 && (
+          <div className="FilterRuleManager-InlineTagSelector-children">{children.map((child) => this.renderTag(child, []))}</div>
+        )}
       </div>
     );
   }

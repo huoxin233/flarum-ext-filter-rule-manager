@@ -53,7 +53,7 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
     const isOr = node.operator === 'OR';
 
     return (
-      <div className="Expression-LogicalNode">
+      <div className="FilterRuleManager-Expression-LogicalNode">
         <NodeView
           node={node.left}
           onchange={(v: ASTNode | null) => {
@@ -64,24 +64,24 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
         />
 
         {isAnd ? (
-          <div className="LogicalNode-andContainer">
-            <div className="LogicalNode-connector"></div>
+          <div className="FilterRuleManager-LogicalNode-andContainer">
+            <div className="FilterRuleManager-LogicalNode-connector"></div>
             <Button
-              className="Button Button--basic LogicalNode-andButton"
+              className="Button Button--basic FilterRuleManager-LogicalNode-andButton"
               onclick={() => {
                 onchange({ ...node, operator: 'OR' });
               }}
             >
               {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.and')}
             </Button>
-            <div className="LogicalNode-connector"></div>
+            <div className="FilterRuleManager-LogicalNode-connector"></div>
           </div>
         ) : null}
 
         {isOr ? (
-          <div className="LogicalNode-orContainer">
+          <div className="FilterRuleManager-LogicalNode-orContainer">
             <Button
-              className="Button Button--basic LogicalNode-orButton"
+              className="Button Button--basic FilterRuleManager-LogicalNode-orButton"
               onclick={() => {
                 onchange({ ...node, operator: 'AND' });
               }}
@@ -132,8 +132,8 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
     }, {});
 
     return (
-      <div className="Expression-RuleNode">
-        <div className="RuleNode-header">
+      <div className="FilterRuleManager-Expression-RuleNode">
+        <div className="FilterRuleManager-RuleNode-header">
           <Select
             options={providerOptions}
             value={node.provider}
@@ -150,13 +150,13 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
             disabled={!node.provider}
           />
 
-          <div className="RuleNode-negateToggle">
+          <div className="FilterRuleManager-RuleNode-negateToggle">
             <Switch state={this.attrs.isNegated} onchange={this.attrs.onNegateChange}>
               {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.negate')}
             </Switch>
           </div>
 
-          <div className="RuleNode-actions">
+          <div className="FilterRuleManager-RuleNode-actions">
             <Button
               className="Button Button--icon Button--danger"
               icon="fas fa-times"
@@ -166,7 +166,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
           </div>
         </div>
 
-        <div className="Expression-RuleNode-config">{this.renderConfig()}</div>
+        <div className="FilterRuleManager-Expression-RuleNode-config">{this.renderConfig()}</div>
       </div>
     );
   }
@@ -249,7 +249,7 @@ class NodeView extends Component<NodeViewAttrs> {
 
     if (node.type === 'rule') {
       return (
-        <div className="NodeView-ruleContainer">
+        <div className="FilterRuleManager-NodeView-ruleContainer">
           <RuleNodeView
             node={node}
             isNegated={false}
@@ -268,7 +268,7 @@ class NodeView extends Component<NodeViewAttrs> {
     if (node.type === 'not') {
       if (node.node && node.node.type === 'rule') {
         return (
-          <div className="NodeView-ruleContainer">
+          <div className="FilterRuleManager-NodeView-ruleContainer">
             <RuleNodeView
               node={node.node}
               isNegated={true}
@@ -288,8 +288,8 @@ class NodeView extends Component<NodeViewAttrs> {
       }
 
       return (
-        <div className="Expression-NotNode">
-          <div className="NotNode-label">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.not')}</div>
+        <div className="FilterRuleManager-Expression-NotNode">
+          <div className="FilterRuleManager-NotNode-label">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.not')}</div>
           <NodeView
             node={node.node}
             onchange={(v: ASTNode | null) => {
@@ -358,10 +358,10 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
     const providers = this.attrs.providers || [];
 
     return (
-      <div className="RuleBuilder">
-        <div className="RuleBuilder-tabs">
+      <div className="FilterRuleManager-RuleBuilder">
+        <div className="FilterRuleManager-RuleBuilder-tabs">
           <Button
-            className={`Button RuleBuilder-tabButton ${this.mode === 'visual' ? 'active' : ''}`}
+            className={`Button FilterRuleManager-RuleBuilder-tabButton ${this.mode === 'visual' ? 'active' : ''}`}
             onclick={() => {
               this.syncToVisual();
               if (!this.parseError) this.mode = 'visual';
@@ -370,7 +370,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
             <Icon name="fas fa-project-diagram" /> {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.visual_builder')}
           </Button>
           <Button
-            className={`Button RuleBuilder-tabButton ${this.mode === 'editor' ? 'active' : ''}`}
+            className={`Button FilterRuleManager-RuleBuilder-tabButton ${this.mode === 'editor' ? 'active' : ''}`}
             onclick={() => {
               if (this.mode === 'visual') this.syncToEditor();
               this.mode = 'editor';
@@ -380,14 +380,14 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
           </Button>
         </div>
         {this.parseError && (
-          <div className="Alert Alert--error RuleBuilder-errorAlert">
+          <div className="Alert Alert--error FilterRuleManager-RuleBuilder-errorAlert">
             <strong>{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.parse_error')}</strong> {this.parseError}
             <br />
             {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.parse_error_help')}
           </div>
         )}
         {this.mode === 'visual' ? (
-          <div className="RuleBuilder-visual">
+          <div className="FilterRuleManager-RuleBuilder-visual">
             <NodeView
               node={this.ast}
               onchange={(newAst: ASTNode | null) => {
@@ -397,9 +397,9 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
               providers={providers}
             />
             {this.ast ? (
-              <div className="RuleBuilder-appendButtons">
+              <div className="FilterRuleManager-RuleBuilder-appendButtons">
                 <Button
-                  className="Button Button--basic RuleBuilder-appendButton"
+                  className="Button Button--basic FilterRuleManager-RuleBuilder-appendButton"
                   onclick={() => {
                     const newLogical = {
                       _key: nodeIdCounter++,
@@ -415,7 +415,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
                   {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.and')}
                 </Button>
                 <Button
-                  className="Button Button--basic RuleBuilder-appendButton"
+                  className="Button Button--basic FilterRuleManager-RuleBuilder-appendButton"
                   onclick={() => {
                     const newLogical = {
                       _key: nodeIdCounter++,
@@ -434,9 +434,9 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
             ) : null}
           </div>
         ) : (
-          <div className="RuleBuilder-editor">
+          <div className="FilterRuleManager-RuleBuilder-editor">
             <textarea
-              className="FormControl RuleBuilder-textarea"
+              className="FormControl FilterRuleManager-RuleBuilder-textarea"
               value={this.expression}
               oninput={(e: Event) => {
                 this.expression = (e.target as HTMLTextAreaElement).value;
@@ -445,7 +445,9 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
               placeholder={String(app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_placeholder'))}
               rows={6}
             />
-            <div className="helpText RuleBuilder-editorHelp">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_help')}</div>
+            <div className="helpText FilterRuleManager-RuleBuilder-editorHelp">
+              {app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.editor_help')}
+            </div>
           </div>
         )}
       </div>

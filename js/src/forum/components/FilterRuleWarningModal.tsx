@@ -33,7 +33,7 @@ export default class FilterRuleWarningModal extends Modal<FilterRuleWarningModal
     return (
       <div className="Modal-body">
         <p>{app.translator.trans('huoxin-filter-rule-manager.forum.warning_modal_text')}</p>
-        <ul className="FilterRuleWarningModal-list">
+        <ul className="FilterRuleManager-FilterRuleWarningModal-list">
           {alerts.map((alert, i) => (
             <li key={i}>{m.trust(alert.message)}</li>
           ))}

@@ -150,7 +150,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
   }
 
   className() {
-    return 'RulesetEditorModal Modal--large';
+    return 'FilterRuleManager-RulesetEditorModal Modal--large';
   }
 
   title() {
@@ -164,13 +164,15 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
       return (
         <div className="Modal-body">
           <Form>
-            <div className="RulesetEditor-discardConfirmation">
-              <i className="fas fa-exclamation-triangle RulesetEditor-discardIcon"></i>
-              <h3 className="RulesetEditor-discardTitle">{app.translator.trans('huoxin-filter-rule-manager.admin.unsaved_changes_title')}</h3>
-              <p className="helpText RulesetEditor-discardMessage">
+            <div className="FilterRuleManager-RulesetEditor-discardConfirmation">
+              <i className="fas fa-exclamation-triangle FilterRuleManager-RulesetEditor-discardIcon"></i>
+              <h3 className="FilterRuleManager-RulesetEditor-discardTitle">
+                {app.translator.trans('huoxin-filter-rule-manager.admin.unsaved_changes_title')}
+              </h3>
+              <p className="helpText FilterRuleManager-RulesetEditor-discardMessage">
                 {app.translator.trans('huoxin-filter-rule-manager.admin.unsaved_changes_message')}
               </p>
-              <div className="Form-group RulesetEditor-discardActions">
+              <div className="Form-group FilterRuleManager-RulesetEditor-discardActions">
                 <Button
                   className="Button Button--danger"
                   onclick={() => {
@@ -181,7 +183,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
                   {app.translator.trans('huoxin-filter-rule-manager.admin.discard_changes')}
                 </Button>
                 <Button
-                  className="Button RulesetEditor-discardCancel"
+                  className="Button FilterRuleManager-RulesetEditor-discardCancel"
                   onclick={() => {
                     this.showingDiscardConfirmation = false;
                     m.redraw();
@@ -216,14 +218,18 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     return (
       <div className="Form-group">
         <label>{app.translator.trans(labelKey)}</label>
-        <div className="RulesetEditor-segmentedControl">
-          <button type="button" className={`segmented-option ${val === null ? 'active' : ''}`} onclick={() => stream(null)}>
+        <div className="FilterRuleManager-RulesetEditor-segmentedControl">
+          <button type="button" className={`FilterRuleManager-segmented-option ${val === null ? 'active' : ''}`} onclick={() => stream(null)}>
             <Icon name="fas fa-globe" /> {app.translator.trans('huoxin-filter-rule-manager.admin.inherit_global_default')}
           </button>
-          <button type="button" className={`segmented-option ${val === true ? 'active-enabled' : ''}`} onclick={() => stream(true)}>
+          <button type="button" className={`FilterRuleManager-segmented-option ${val === true ? 'active-enabled' : ''}`} onclick={() => stream(true)}>
             <Icon name="fas fa-check" /> {app.translator.trans('huoxin-filter-rule-manager.admin.force_enabled')}
           </button>
-          <button type="button" className={`segmented-option ${val === false ? 'active-disabled' : ''}`} onclick={() => stream(false)}>
+          <button
+            type="button"
+            className={`FilterRuleManager-segmented-option ${val === false ? 'active-disabled' : ''}`}
+            onclick={() => stream(false)}
+          >
             <Icon name="fas fa-times" /> {app.translator.trans('huoxin-filter-rule-manager.admin.force_disabled')}
           </button>
         </div>
@@ -234,9 +240,9 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
   generalSection(): Mithril.Children {
     return (
-      <div className="RulesetEditor-section">
-        <div className="RulesetEditor-section-header RulesetEditor-section-header--with-toggle">
-          <div className="RulesetEditor-section-header-title">
+      <div className="FilterRuleManager-RulesetEditor-section">
+        <div className="FilterRuleManager-RulesetEditor-section-header FilterRuleManager-RulesetEditor-section-header--with-toggle">
+          <div className="FilterRuleManager-RulesetEditor-section-header-title">
             <i className="fas fa-info-circle"></i>
             <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_general')}</h4>
           </div>
@@ -275,8 +281,8 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
   scopeSection(): Mithril.Children {
     return (
-      <div className="RulesetEditor-section">
-        <div className="RulesetEditor-section-header">
+      <div className="FilterRuleManager-RulesetEditor-section">
+        <div className="FilterRuleManager-RulesetEditor-section-header">
           <i className="fas fa-crosshairs"></i>
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_scope')}</h4>
         </div>
@@ -304,9 +310,9 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
                 const selectedTags = this.availableTags.filter((t) => (this.scopeTagIds() || []).includes(parseInt(String(t.id()), 10)));
 
                 return (
-                  <div className="RulesetEditor-tagsSelection">
+                  <div className="FilterRuleManager-RulesetEditor-tagsSelection">
                     {selectedTags.length > 0 && getTagsLabel && (
-                      <div className="RulesetEditor-tagsSelection-labels" style={{ marginBottom: '10px' }}>
+                      <div className="FilterRuleManager-RulesetEditor-tagsSelection-labels" style={{ marginBottom: '10px' }}>
                         {getTagsLabel(selectedTags)}
                       </div>
                     )}
@@ -323,12 +329,12 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_bypass_groups')}</label>
-          <div className="RulesetEditor-groupSelection">
+          <div className="FilterRuleManager-RulesetEditor-groupSelection">
             {app.store.all('groups').map((group: any) => {
               const id = parseInt(String(group.id()), 10);
               const isActive = (this.bypassGroupIds() || []).includes(id);
               return (
-                <label className={`RulesetEditor-groupOption ${isActive ? 'active' : ''}`} key={id}>
+                <label className={`FilterRuleManager-RulesetEditor-groupOption ${isActive ? 'active' : ''}`} key={id}>
                   <input
                     type="checkbox"
                     checked={isActive}
@@ -343,9 +349,9 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
                       this.bypassGroupIds(current);
                     }}
                   />
-                  <div className="RulesetEditor-groupOption-content">
+                  <div className="FilterRuleManager-RulesetEditor-groupOption-content">
                     <GroupBadge group={group} label="" />
-                    <span className="RulesetEditor-groupOption-name">{String(group.namePlural() || group.name())}</span>
+                    <span className="FilterRuleManager-RulesetEditor-groupOption-name">{String(group.namePlural() || group.name())}</span>
                   </div>
                 </label>
               );
@@ -376,19 +382,21 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     const SettingsComponent = app.filterRuleManager.getTemplateSettingsComponent(templateName);
 
     return (
-      <div className="RulesetEditor-section">
-        <div className="RulesetEditor-section-header">
+      <div className="FilterRuleManager-RulesetEditor-section">
+        <div className="FilterRuleManager-RulesetEditor-section-header">
           <i className="fas fa-eye"></i>
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_display')}</h4>
         </div>
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_intervention_type')}</label>
-          <div className="RulesetEditor-interventionSelector">
+          <div className="FilterRuleManager-RulesetEditor-interventionSelector">
             {['info', 'warning', 'block', 'silent'].map((value) => (
               <button
                 type="button"
                 key={value}
-                className={`RulesetEditor-interventionOption RulesetEditor-interventionOption--${value} ${intervention === value ? 'active' : ''}`}
+                className={`FilterRuleManager-RulesetEditor-interventionOption FilterRuleManager-RulesetEditor-interventionOption--${value} ${
+                  intervention === value ? 'active' : ''
+                }`}
                 onclick={() => {
                   this.interventionType(value);
                   if (value === 'silent' && !this.message()) {
@@ -403,14 +411,14 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
           </div>
           <div className="helpText">{app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}_help`)}</div>
           {(intervention === 'info' || intervention === 'warning') && (
-            <div className="Alert Alert--warning RulesetEditor-warningAlert">
+            <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
               <p>
                 <i className="fas fa-exclamation-circle"></i> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_exposed_warning_text')}
               </p>
             </div>
           )}
         </div>
-        <hr className="RulesetEditor-divider" />
+        <hr className="FilterRuleManager-RulesetEditor-divider" />
         {intervention !== 'silent' && (
           <div>
             <div className="Form-group">
@@ -461,7 +469,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
               />
             )}
 
-            <hr className="RulesetEditor-divider" />
+            <hr className="FilterRuleManager-RulesetEditor-divider" />
 
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_message')}</label>
@@ -483,7 +491,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
               {this.tokenChipsBlock(tokens, 'message')}
             </div>
 
-            <hr className="RulesetEditor-divider" />
+            <hr className="FilterRuleManager-RulesetEditor-divider" />
 
             <div className="Form-group">
               <label>{app.translator.trans('huoxin-filter-rule-manager.admin.preview')}</label>
@@ -500,8 +508,8 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
   moderationSection(): Mithril.Children {
     return (
-      <div className="RulesetEditor-section">
-        <div className="RulesetEditor-section-header">
+      <div className="FilterRuleManager-RulesetEditor-section">
+        <div className="FilterRuleManager-RulesetEditor-section-header">
           <i className="fas fa-shield-alt"></i>
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_moderation')}</h4>
         </div>
@@ -519,7 +527,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
         )}
 
         {this.requireApproval() === true && this.autoFlag() === false ? (
-          <div className="Alert Alert--warning RulesetEditor-warningAlert">
+          <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
             <p>
               <i className="fas fa-exclamation-circle"></i>{' '}
               {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
@@ -527,7 +535,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
           </div>
         ) : null}
 
-        <hr className="RulesetEditor-divider" />
+        <hr className="FilterRuleManager-RulesetEditor-divider" />
 
         {this.nullableBooleanSelect(
           'huoxin-filter-rule-manager.admin.ruleset_evasion_active',
@@ -537,8 +545,8 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
         {this.evasionActive() === true ? (
           <div className="Form-group">
-            <div className="RulesetEditor-inline-inputs">
-              <div className="RulesetEditor-inline-input">
+            <div className="FilterRuleManager-RulesetEditor-inline-inputs">
+              <div className="FilterRuleManager-RulesetEditor-inline-input">
                 <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout')}</label>
                 <input
                   className="FormControl"
@@ -554,7 +562,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
                 />
                 <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_timeout_help')}</div>
               </div>
-              <div className="RulesetEditor-inline-input">
+              <div className="FilterRuleManager-RulesetEditor-inline-input">
                 <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_evasion_threshold')}</label>
                 <input
                   className="FormControl"
@@ -574,7 +582,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
           </div>
         ) : null}
 
-        <hr className="RulesetEditor-divider" />
+        <hr className="FilterRuleManager-RulesetEditor-divider" />
 
         {this.autoFlag() !== false || this.requireApproval() !== false || this.evasionActive() !== false ? (
           <div className="Form-group">
@@ -602,8 +610,8 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
   rulesSection(): Mithril.Children {
     return (
-      <div className="RulesetEditor-section">
-        <div className="RulesetEditor-section-header">
+      <div className="FilterRuleManager-RulesetEditor-section">
+        <div className="FilterRuleManager-RulesetEditor-section-header">
           <i className="fas fa-sliders-h"></i>
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_rules')}</h4>
         </div>
@@ -669,23 +677,27 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
   tokenChipsBlock(tokens: Record<string, unknown>[], targetField: string | ((name: string) => void)): Mithril.Children {
     if (!tokens || tokens.length === 0) {
-      return <div className="TokenHints TokenHints--empty">{app.translator.trans('huoxin-filter-rule-manager.admin.tokens_none')}</div>;
+      return (
+        <div className="FilterRuleManager-TokenHints FilterRuleManager-TokenHints--empty">
+          {app.translator.trans('huoxin-filter-rule-manager.admin.tokens_none')}
+        </div>
+      );
     }
 
     return (
-      <div className="TokenHints">
-        <div className="TokenHints-label">{app.translator.trans('huoxin-filter-rule-manager.admin.tokens_available')}</div>
-        <div className="TokenHints-list">
+      <div className="FilterRuleManager-TokenHints">
+        <div className="FilterRuleManager-TokenHints-label">{app.translator.trans('huoxin-filter-rule-manager.admin.tokens_available')}</div>
+        <div className="FilterRuleManager-TokenHints-list">
           {tokens.map((t) => (
             <button
               type="button"
-              className="TokenHints-chip"
+              className="FilterRuleManager-TokenHints-chip"
               key={t.name as string}
               title={String(t.description || t.name)}
               onclick={() => this.insertToken(t.name as string, targetField)}
             >
               <code>{`{{${t.name}}}`}</code>
-              {t.description && <span className="TokenHints-chip-desc">{t.description}</span>}
+              {t.description && <span className="FilterRuleManager-TokenHints-chip-desc">{t.description}</span>}
             </button>
           ))}
         </div>
@@ -783,7 +795,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
   actionsBlock(): Mithril.Children {
     return (
-      <div className="Form-group RulesetEditor-actions">
+      <div className="Form-group FilterRuleManager-RulesetEditor-actions">
         <Button className="Button Button--primary" loading={this.loading} disabled={!this.canSave()} onclick={() => this.save()}>
           {app.translator.trans('huoxin-filter-rule-manager.admin.save')}
         </Button>

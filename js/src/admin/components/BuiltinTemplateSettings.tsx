@@ -51,14 +51,14 @@ class ColorPickerInput extends Component<ColorPickerInputAttrs> {
     return (
       <div className="Form-group">
         <label>{label}</label>
-        <div className="ColorPickerInput">
+        <div className="FilterRuleManager-ColorPickerInput">
           <input
             type="color"
             className={value === 'transparent' ? 'is-transparent' : ''}
             value={value && value !== 'transparent' ? value : defaultColor}
             oninput={(e: Event) => onchange((e.target as HTMLInputElement).value)}
           />
-          <div className="ColorPickerInput-input">
+          <div className="FilterRuleManager-ColorPickerInput-input">
             <input
               type="text"
               className="FormControl"
@@ -66,11 +66,11 @@ class ColorPickerInput extends Component<ColorPickerInputAttrs> {
               value={value || ''}
               oninput={(e: Event) => onchange((e.target as HTMLInputElement).value)}
             />
-            <div className="ColorPicker-actions">
-              <div className="ColorPicker-action" onclick={() => onchange('transparent')} title="Set transparent">
+            <div className="FilterRuleManager-ColorPicker-actions">
+              <div className="FilterRuleManager-ColorPicker-action" onclick={() => onchange('transparent')} title="Set transparent">
                 <Icon name="fas fa-eye-slash" />
               </div>
-              <div className="ColorPicker-action" onclick={() => onchange('')} title="Clear to default">
+              <div className="FilterRuleManager-ColorPicker-action" onclick={() => onchange('')} title="Clear to default">
                 <Icon name="fas fa-eraser" />
               </div>
             </div>
@@ -110,7 +110,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
     const defaultStyles = this.getDefaultStylesForIntervention(interventionType);
 
     return (
-      <div className="RulesetEditor-customStyles">
+      <div className="FilterRuleManager-RulesetEditor-customStyles">
         <div className="Form-group">
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_title') || 'Alert Title (Optional)'}</label>
           <input
@@ -153,33 +153,33 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
               } catch (e) {}
             })}
         </div>
-        <div className="RulesetEditor-customStyles-row">
+        <div className="FilterRuleManager-RulesetEditor-customStyles-row">
           <div className="Form-group">
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_icon')}</label>
-            <div className="IconPickerInput">
-              <div className="IconPicker-preview" onclick={() => (this.showIconPicker = !this.showIconPicker)}>
+            <div className="FilterRuleManager-IconPickerInput">
+              <div className="FilterRuleManager-IconPicker-preview" onclick={() => (this.showIconPicker = !this.showIconPicker)}>
                 <Icon name={displaySetting('icon') || defaultStyles.icon} />
               </div>
-              <div className="IconPickerInput-input">
+              <div className="FilterRuleManager-IconPickerInput-input">
                 <input
                   className="FormControl"
                   placeholder={defaultStyles.icon}
                   value={displaySetting('icon')}
                   oninput={(e: Event) => displaySetting('icon', (e.target as HTMLInputElement).value)}
                 />
-                <div className="IconPicker-actions">
-                  <div className="IconPicker-action" onclick={() => displaySetting('icon', '')} title="Clear to default">
+                <div className="FilterRuleManager-IconPicker-actions">
+                  <div className="FilterRuleManager-IconPicker-action" onclick={() => displaySetting('icon', '')} title="Clear to default">
                     <Icon name="fas fa-eraser" />
                   </div>
                 </div>
               </div>
 
               {this.showIconPicker && (
-                <div className="IconPicker-dropdown">
-                  <div className="IconPicker-icons">
+                <div className="FilterRuleManager-IconPicker-dropdown">
+                  <div className="FilterRuleManager-IconPicker-icons">
                     <button
                       type="button"
-                      className="Button IconPicker-btn IconPicker-btn--none"
+                      className="Button FilterRuleManager-IconPicker-btn FilterRuleManager-IconPicker-btn--none"
                       onclick={() => {
                         displaySetting('icon', 'none');
                         this.showIconPicker = false;
@@ -191,7 +191,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
                     {COMMON_ICONS.map((iconClass) => (
                       <button
                         type="button"
-                        className="Button Button--icon IconPicker-btn"
+                        className="Button Button--icon FilterRuleManager-IconPicker-btn"
                         onclick={() => {
                           displaySetting('icon', iconClass);
                           this.showIconPicker = false;

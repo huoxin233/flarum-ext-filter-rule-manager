@@ -60,11 +60,11 @@ export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
 
     return (
       <div className="Modal-body">
-        <div className={`FilterRuleModal-message FilterRuleModal-message--${type}`} style={style}>
-          {settings.icon !== 'none' && <i className={`FilterRuleModal-icon ${iconClass}`} style={iconStyle}></i>}
-          <span className="FilterRuleModal-text">{m.trust(this.attrs.message)}</span>
+        <div className={`FilterRuleManager-FilterRuleModal-message FilterRuleManager-FilterRuleModal-message--${type}`} style={style}>
+          {settings.icon !== 'none' && <i className={`FilterRuleManager-FilterRuleModal-icon ${iconClass}`} style={iconStyle}></i>}
+          <span className="FilterRuleManager-FilterRuleModal-text">{m.trust(this.attrs.message)}</span>
         </div>
-        <div className="Form-group FilterRuleModal-actions">
+        <div className="Form-group FilterRuleManager-FilterRuleModal-actions">
           <Button className="Button Button--primary" onclick={() => this.hide()}>
             {app.translator.trans('huoxin-filter-rule-manager.forum.modal_ok')}
           </Button>
