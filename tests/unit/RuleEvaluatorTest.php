@@ -13,7 +13,7 @@ namespace Huoxin\FilterRuleManager\Tests\unit;
 
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Illuminate\Container\Container;
-use PHPUnit\Framework\Attributes\Test;
+
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -79,7 +79,7 @@ class RuleEvaluatorTest extends TestCase
         };
     }
 
-    #[Test]
+    /** @test */
     public function interpolate_escapes_html_in_tokens()
     {
         $result = $this->evaluator->interpolate('Found: {{matched_word}}', [
@@ -89,7 +89,7 @@ class RuleEvaluatorTest extends TestCase
         $this->assertEquals('Found: &lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;', $result);
     }
 
-    #[Test]
+    /** @test */
     public function interpolate_resolves_translation_keys()
     {
         // 'test.namespace.key' should be translated to 'Translated: {{matched_word}}'
@@ -100,7 +100,7 @@ class RuleEvaluatorTest extends TestCase
         $this->assertEquals('Translated: apple', $result);
     }
 
-    #[Test]
+    /** @test */
     public function interpolate_flattens_arrays_from_third_party_providers()
     {
         $result = $this->evaluator->interpolate('Blocked: {{matched_word}}', [
@@ -110,7 +110,7 @@ class RuleEvaluatorTest extends TestCase
         $this->assertEquals('Blocked: apple, banana, orange', $result);
     }
 
-    #[Test]
+    /** @test */
     public function merge_results_deduplicates_comma_separated_strings()
     {
         $left = ['matched_word' => 'apple, banana'];

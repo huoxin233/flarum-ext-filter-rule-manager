@@ -15,7 +15,7 @@ use Carbon\Carbon;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
 use Flarum\User\User;
-use PHPUnit\Framework\Attributes\Test;
+
 
 class FrontendPayloadTest extends TestCase
 {
@@ -54,7 +54,7 @@ class FrontendPayloadTest extends TestCase
         ]);
     }
 
-    #[Test]
+    /** @test */
     public function it_obfuscates_payload_by_default()
     {
         // Settings are empty by default, so obfuscation is ON (true fallback).
@@ -81,7 +81,7 @@ class FrontendPayloadTest extends TestCase
         $this->assertStringNotContainsString('badword', $decoded);
     }
 
-    #[Test]
+    /** @test */
     public function it_sends_plain_json_when_obfuscation_disabled()
     {
         $this->setting('huoxin-filter.obfuscate_active', '0');
@@ -104,7 +104,7 @@ class FrontendPayloadTest extends TestCase
         $this->assertStringContainsString('badword', $payloadValue);
     }
 
-    #[Test]
+    /** @test */
     public function it_hides_payload_from_guests()
     {
         $response = $this->send($this->request('GET', '/')); // Unauthenticated

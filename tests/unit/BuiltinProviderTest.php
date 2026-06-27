@@ -137,7 +137,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('foo, bar', $result['matched_string']);
     }
 
-    #[Test]
+    /** @test */
     public function it_evaluates_word_count_correctly()
     {
         $config = ['min' => 2, 'max' => 5];
@@ -156,7 +156,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('6', $resultMax['word_count']);
     }
 
-    #[Test]
+    /** @test */
     public function it_evaluates_cjk_character_count_correctly()
     {
         $config = ['max' => 4];
@@ -170,7 +170,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('5', $resultMax['word_count']);
     }
 
-    #[Test]
+    /** @test */
     public function it_strips_mentions_by_default()
     {
         $config = ['min' => 2];
@@ -185,7 +185,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertNull($this->evaluate('word_count', 'Hello @"User Name"#123', $config2));
     }
 
-    #[Test]
+    /** @test */
     public function it_strips_urls_by_default()
     {
         $config = ['min' => 2];
@@ -206,7 +206,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertNull($this->evaluate('word_count', 'Check http://example.com', $config3));
     }
 
-    #[Test]
+    /** @test */
     public function it_evaluates_group_correctly()
     {
         $config = ['groupIds' => [3, 4]];

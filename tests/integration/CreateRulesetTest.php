@@ -12,7 +12,7 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Huoxin\FilterRuleManager\Model\Ruleset;
-use PHPUnit\Framework\Attributes\Test;
+
 
 class CreateRulesetTest extends FilterTestCase
 {
@@ -21,7 +21,7 @@ class CreateRulesetTest extends FilterTestCase
         parent::setUp();
     }
 
-    #[Test]
+    /** @test */
     public function can_create_valid_ruleset_and_compiles_ast()
     {
         $response = $this->send(
@@ -65,7 +65,7 @@ class CreateRulesetTest extends FilterTestCase
         $this->assertEquals(10, $ruleset->priority);
     }
 
-    #[Test]
+    /** @test */
     public function invalid_expression_syntax_returns_422()
     {
         $response = $this->send(
@@ -99,7 +99,7 @@ class CreateRulesetTest extends FilterTestCase
         $this->assertStringContainsString('expression', $error['source']['pointer']);
     }
 
-    #[Test]
+    /** @test */
     public function normal_users_cannot_create_rulesets()
     {
         $response = $this->send(

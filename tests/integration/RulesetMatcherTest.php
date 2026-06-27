@@ -15,7 +15,7 @@ use Carbon\Carbon;
 use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
 use Flarum\User\User;
-use PHPUnit\Framework\Attributes\Test;
+
 
 class RulesetMatcherTest extends FilterTestCase
 {
@@ -105,7 +105,7 @@ class RulesetMatcherTest extends FilterTestCase
         ]);
     }
 
-    #[Test]
+    /** @test */
     public function bypass_groups_ignores_ruleset()
     {
         // Normal user (User 3) gets blocked by the word 'forbidden'
@@ -119,7 +119,7 @@ class RulesetMatcherTest extends FilterTestCase
         $this->assertEquals(201, $response2->getStatusCode());
     }
 
-    #[Test]
+    /** @test */
     public function block_cascade_stops_subsequent_rulesets()
     {
         // 'cascade_test' hits Ruleset 2 (Silent, Auto-Flag, Block Cascade) and Ruleset 3 (Block).
@@ -137,7 +137,7 @@ class RulesetMatcherTest extends FilterTestCase
         $this->assertNotNull($flag, 'Ruleset 2 (Priority 1) should have silently flagged the post.');
     }
 
-    #[Test]
+    /** @test */
     public function evaluate_title_prepends_to_content_for_first_post()
     {
         // Create a new discussion where the content is clean, but the TITLE has 'scam'

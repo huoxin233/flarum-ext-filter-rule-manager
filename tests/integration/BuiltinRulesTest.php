@@ -12,7 +12,7 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
-use PHPUnit\Framework\Attributes\Test;
+
 
 class BuiltinRulesTest extends FilterTestCase
 {
@@ -63,7 +63,7 @@ class BuiltinRulesTest extends FilterTestCase
         ]);
     }
 
-    #[Test]
+    /** @test */
     public function word_count_blocks_posts_correctly()
     {
         // 5 words -> Should pass
@@ -79,7 +79,7 @@ class BuiltinRulesTest extends FilterTestCase
         $this->assertEquals('Post exceeds max word count of 5', $body['errors'][0]['detail']);
     }
 
-    #[Test]
+    /** @test */
     public function group_blocks_posts_correctly()
     {
         // Normal user (ID: 2) -> Not in group 4, should pass
