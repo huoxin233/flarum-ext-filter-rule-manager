@@ -58,6 +58,7 @@ Create a class implementing `Huoxin\FilterRuleManager\Provider\RuleProviderInter
 
 namespace YourNamespace\ToxicityFilter\Provider;
 
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 
 class ToxicityProvider implements RuleProviderInterface
@@ -84,11 +85,11 @@ class ToxicityProvider implements RuleProviderInterface
      * The core evaluation logic.
      *
      * @param string $type    The rule type (e.g., 'is_toxic').
-     * @param string $content The raw content of the Flarum Post.
      * @param array  $config  The configuration object saved by the admin in the Visual Editor.
+     * @param EvaluationContext $context The context object containing content, actor, and post.
      * @return array|null     Return an array of string tokens if triggered, or null if clean.
      */
-    public function evaluate(string $type, string $content, array $config): ?array
+    public function evaluate(string $type, array $config, EvaluationContext $context): ?array
     {
         if ($type === 'is_toxic') {
             // Retrieve the threshold configured by the admin (defaults to 0.8)
@@ -97,7 +98,7 @@ class ToxicityProvider implements RuleProviderInterface
             // NOTE: Be mindful of performance! This runs synchronously during Post Saving.
             // If the API call fails, catch the exception and return null so users aren't blocked.
             try {
-                $score = $this->callExternalToxicityApi($content);
+                $score = $this->callExternalToxicityApi($context->content);
             } catch (\Exception $e) {
                 return null;
             }
@@ -118,6 +119,21 @@ class ToxicityProvider implements RuleProviderInterface
     {
         // ... external API logic ...
         return 0.9;
+    }
+
+    /**
+     * Tokens this provider exposes for use in the ruleset messages.
+     * This defines the backend contract for dynamic variable interpolation.
+     */
+    public function getProvidedTokens(string $type): array
+    {
+        if ($type === 'is_toxic') {
+            return [
+                ['name' => 'matched_word', 'description' => 'Outputs the actual toxicity score returned by the API.'],
+            ];
+        }
+
+        return [];
     }
 }
 ```
