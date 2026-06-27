@@ -92,7 +92,8 @@ export default class FilterRulePopupDispatcher {
       }
 
       if (displaySettings.title) {
-        alertAttrs.title = application.translator.trans(displaySettings.title as string);
+        const trans = application.translator.trans(displaySettings.title as string);
+        alertAttrs.title = m.trust(Array.isArray(trans) ? trans.join('') : String(trans));
       }
 
       const alertKey = application.alerts.show(alertAttrs as any, m.trust(message));

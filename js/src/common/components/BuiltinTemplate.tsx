@@ -53,7 +53,15 @@ export default class BuiltinTemplate extends Component<BuiltinTemplateAttrs> {
           </span>
         )}
         <div className="FilterRuleManager-item-content">
-          {settings.title && <strong className="FilterRuleManager-item-title">{settings.title as string}</strong>}
+          {settings.title && (
+            <strong className="FilterRuleManager-item-title">
+              {m.trust(
+                Array.isArray(app.translator.trans(settings.title as string))
+                  ? (app.translator.trans(settings.title as string) as any[]).join('')
+                  : String(app.translator.trans(settings.title as string))
+              )}
+            </strong>
+          )}
           <span className="FilterRuleManager-item-message">{m.trust(alert.message)}</span>
         </div>
       </div>
