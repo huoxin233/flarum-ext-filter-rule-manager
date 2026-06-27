@@ -14,7 +14,6 @@ namespace Huoxin\FilterRuleManager\Tests\integration;
 use Carbon\Carbon;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
-use Flarum\User\User;
 
 
 class FrontendPayloadTest extends TestCase
@@ -28,7 +27,7 @@ class FrontendPayloadTest extends TestCase
         $this->extension('huoxin-filter-rule-manager');
 
         $this->prepareDatabase([
-            User::class => [
+            'users' => [
                 ['id' => 1, 'username' => 'admin', 'email' => 'admin@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 2, 'username' => 'normalUser', 'email' => 'normal@machine.local', 'is_email_confirmed' => 1],
             ],

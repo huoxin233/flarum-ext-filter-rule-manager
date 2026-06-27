@@ -12,9 +12,6 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
-use Flarum\Discussion\Discussion;
-use Flarum\Post\Post;
-use Flarum\User\User;
 
 
 class RulesetMatcherTest extends FilterTestCase
@@ -24,17 +21,17 @@ class RulesetMatcherTest extends FilterTestCase
         parent::setUp();
 
         $this->prepareDatabase([
-            User::class => [
+            'users' => [
                 ['id' => 3, 'username' => 'normaluser', 'email' => 'normal@example.com', 'is_email_confirmed' => 1],
                 ['id' => 4, 'username' => 'moderator', 'email' => 'mod@example.com', 'is_email_confirmed' => 1],
             ],
             'group_user' => [
                 ['user_id' => 4, 'group_id' => 4], // Moderator group
             ],
-            Discussion::class => [
+            'discussions' => [
                 ['id' => 1, 'title' => 'Clean Discussion', 'created_at' => Carbon::now()->toDateTimeString(), 'user_id' => 3, 'first_post_id' => 1, 'comment_count' => 1],
             ],
-            Post::class => [
+            'posts' => [
                 ['id' => 1, 'discussion_id' => 1, 'user_id' => 3, 'type' => 'comment', 'content' => '<t><p>First post</p></t>', 'is_approved' => 1, 'number' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
             ],
             'filter_rulesets' => [
