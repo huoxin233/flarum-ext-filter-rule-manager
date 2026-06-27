@@ -59,18 +59,18 @@ class FrontendPayloadTest extends TestCase
         // Settings are empty by default, so obfuscation is ON (true fallback).
         $response = $this->send($this->request('GET', '/', ['authenticatedAs' => 1]));
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $body = (string) $response->getBody(); $this->assertEquals(200, $response->getStatusCode(), "Response body: " . substr($body, 0, 2000));
         $html = $response->getBody()->getContents();
 
         // Extract the payload
         preg_match('/"filterRuleRulesets":\s*(".*?"|\[.*?\])/', $html, $matches);
 
-        $this->assertNotEmpty($matches, 'filterRuleRulesets should be present in the payload');
+        $this->assertNotEmpty($matches, 'filterRuleRulesets should be present in the payload. HTML: '.substr($html, 0, 500));
 
         $payloadValue = $matches[1];
 
         // Ensure it is a string (quotes) and NOT an array (brackets)
-        $this->assertStringStartsWith('"', $payloadValue, 'Payload should be a string (obfuscated)');
+        $this->assertStringStartsWith('"', $payloadValue, 'Payload should be a string (obfuscated). Value: '.$payloadValue);
 
         // Strip quotes and decode
         $base64 = trim($payloadValue, '"');
@@ -87,7 +87,7 @@ class FrontendPayloadTest extends TestCase
 
         $response = $this->send($this->request('GET', '/', ['authenticatedAs' => 1]));
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $body = (string) $response->getBody(); $this->assertEquals(200, $response->getStatusCode(), "Response body: " . substr($body, 0, 2000));
         $html = $response->getBody()->getContents();
 
         preg_match('/"filterRuleRulesets":\s*(".*?"|\[.*?\])/', $html, $matches);
@@ -97,7 +97,7 @@ class FrontendPayloadTest extends TestCase
         $payloadValue = $matches[1];
 
         // Ensure it is an array bracket
-        $this->assertStringStartsWith('[', $payloadValue, 'Payload should be a plain JSON array');
+        $this->assertStringStartsWith('[', $payloadValue, 'Payload should be a plain JSON array. Value: '.$payloadValue);
 
         // It should contain the cleartext word since it is not obfuscated
         $this->assertStringContainsString('badword', $payloadValue);
@@ -108,7 +108,7 @@ class FrontendPayloadTest extends TestCase
     {
         $response = $this->send($this->request('GET', '/')); // Unauthenticated
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $body = (string) $response->getBody(); $this->assertEquals(200, $response->getStatusCode(), "Response body: " . substr($body, 0, 2000));
         $html = $response->getBody()->getContents();
 
         preg_match('/"filterRuleRulesets":\s*(".*?"|\[.*?\])/', $html, $matches);

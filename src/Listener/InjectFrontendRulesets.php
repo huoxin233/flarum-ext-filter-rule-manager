@@ -38,6 +38,20 @@ class InjectFrontendRulesets
     public function __invoke(Document $document, ServerRequestInterface $request): void
     {
         $actor = RequestUtil::getActor($request);
+
+        // DEBUG: Dump actor state before guest check
+        $debugCookies = json_encode($request->getCookieParams());
+        $debugSession = $request->getAttribute('session');
+        $debugSessionToken = $debugSession ? $debugSession->get('access_token') : 'NO_SESSION';
+        throw new \RuntimeException(
+            "DEBUG-INJECT-PAYLOAD:\n" .
+            "Actor class: " . get_class($actor) . "\n" .
+            "Actor ID: " . ($actor->id ?? 'null') . "\n" .
+            "Is Guest: " . ($actor->isGuest() ? 'YES' : 'NO') . "\n" .
+            "Session access_token: " . ($debugSessionToken ?? 'null') . "\n" .
+            "Request cookies: " . $debugCookies
+        );
+
         // Temporarily removed until Flarum natively supports a "Nobody" permission
         if ($actor->isGuest() /* || $actor->can('huoxin-filter-rule-manager.bypassAllRules') */) {
             $document->payload['filterRuleRulesets'] = [];
@@ -78,6 +92,8 @@ class InjectFrontendRulesets
 
         $rulesetsArray = $rulesets->values()->toArray();
         $isObfuscated = (bool) $this->settings->get('huoxin-filter.obfuscate_active', true);
+
+
 
         if ($isObfuscated) {
             $json = json_encode($rulesetsArray);
