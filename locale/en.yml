@@ -176,6 +176,8 @@ huoxin-filter-rule-manager:
       builtin: "Built-in"
 
     displays:
+      none: "None (Hidden)"
+      none_help: "No UI will be shown on the frontend."
       banner: "Banner"
       banner_help: "Full-width strip rendered above the entire composer (inside .App-composer > .container, before #composer). Aligns visually with the editor."
       header_banner: "Header banner"
