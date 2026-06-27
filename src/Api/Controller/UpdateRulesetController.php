@@ -20,7 +20,7 @@ use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
-use Tobscure\JsonApi\Exception\InvalidParameterException;
+use Flarum\Foundation\ValidationException;
 
 class UpdateRulesetController extends AbstractShowController
 {
@@ -41,7 +41,7 @@ class UpdateRulesetController extends AbstractShowController
         if (isset($attributes['name'])) {
             $name = trim((string) $attributes['name']);
             if ($name === '') {
-                throw new InvalidParameterException('Ruleset name cannot be empty.');
+                throw new ValidationException(['name' => 'Ruleset name cannot be empty.']);
             }
             $ruleset->name = $name;
         }
@@ -62,7 +62,7 @@ class UpdateRulesetController extends AbstractShowController
                     $ast = $parser->parse();
                     $ruleset->compiled_ast = $ast->toArray();
                 } catch (\Exception $e) {
-                    throw new InvalidParameterException('Invalid expression syntax: '.$e->getMessage());
+                    throw new ValidationException(['expression' => 'Invalid expression syntax: '.$e->getMessage()]);
                 }
             } else {
                 $ruleset->compiled_ast = null;

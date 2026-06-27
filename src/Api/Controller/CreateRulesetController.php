@@ -19,7 +19,7 @@ use Huoxin\FilterRuleManager\Expression\Parser;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
-use Tobscure\JsonApi\Exception\InvalidParameterException;
+use Flarum\Foundation\ValidationException;
 
 class CreateRulesetController extends AbstractCreateController
 {
@@ -36,7 +36,7 @@ class CreateRulesetController extends AbstractCreateController
 
         $name = trim((string) ($attributes['name'] ?? ''));
         if ($name === '') {
-            throw new InvalidParameterException('Ruleset name is required.');
+            throw new ValidationException(['name' => 'Ruleset name is required.']);
         }
 
         $ruleset = new Ruleset();
@@ -54,7 +54,7 @@ class CreateRulesetController extends AbstractCreateController
                 $ast = $parser->parse();
                 $ruleset->compiled_ast = $ast->toArray();
             } catch (\Exception $e) {
-                throw new InvalidParameterException('Invalid expression syntax: '.$e->getMessage());
+                throw new ValidationException(['expression' => 'Invalid expression syntax: '.$e->getMessage()]);
             }
         } else {
             $ruleset->compiled_ast = null;
