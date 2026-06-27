@@ -43,7 +43,7 @@ class FrontendPayloadTest extends TestCase
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
                     'message' => 'Warning Message',
-                    'is_active' => 1,
+                    'is_active' => true,
                     'auto_flag' => 0,
                     'require_approval' => 0,
                     'created_at' => Carbon::now()->toDateTimeString(),
@@ -57,7 +57,7 @@ class FrontendPayloadTest extends TestCase
     public function it_obfuscates_payload_by_default()
     {
         // Settings are empty by default, so obfuscation is ON (true fallback).
-        $response = $this->send($this->request('GET', '/', ['authenticatedAs' => 2]));
+        $response = $this->send($this->request('GET', '/', ['authenticatedAs' => 1]));
 
         $this->assertEquals(200, $response->getStatusCode());
         $html = $response->getBody()->getContents();
@@ -85,7 +85,7 @@ class FrontendPayloadTest extends TestCase
     {
         $this->setting('huoxin-filter.obfuscate_active', '0');
 
-        $response = $this->send($this->request('GET', '/', ['authenticatedAs' => 2]));
+        $response = $this->send($this->request('GET', '/', ['authenticatedAs' => 1]));
 
         $this->assertEquals(200, $response->getStatusCode());
         $html = $response->getBody()->getContents();
