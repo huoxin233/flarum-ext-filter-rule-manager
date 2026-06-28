@@ -46,7 +46,8 @@ class RuleEvaluatorTest extends TestCase
 
         $container->instance('translator', $this->translator);
 
-        $this->evaluator = new class($container, new NullLogger(), $this->translator) extends RuleEvaluator {
+        $this->evaluator = new class ($container, new NullLogger(), $this->translator) extends RuleEvaluator
+        {
             public function __construct($container, $logger, $translator)
             {
                 parent::__construct($container, $logger, $translator);
@@ -72,7 +73,6 @@ class RuleEvaluatorTest extends TestCase
                 // We use reflection since it's private
                 $reflection = new \ReflectionClass(RuleEvaluator::class);
                 $method = $reflection->getMethod('mergeResults');
-                $method->setAccessible(true);
 
                 return $method->invoke($this, $results);
             }
