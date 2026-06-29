@@ -14,7 +14,7 @@ namespace Huoxin\FilterRuleManager\Listener;
 use Flarum\Frontend\Document;
 use Flarum\Http\RequestUtil;
 use Flarum\Settings\SettingsRepositoryInterface;
-use Huoxin\FilterRuleManager\Model\Ruleset;
+use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -27,11 +27,16 @@ use Psr\Http\Message\ServerRequestInterface;
  * The payload is gated on the actor being authenticated. Anonymous visitors
  * cannot compose posts, and exposing moderation rules (especially regex
  * patterns) to everyone would be unnecessary information disclosure.
+ * 
+ * To ensure maximum performance, the raw payload is stored in Flarum's global
+ * Application Cache. User-specific filtering (e.g., bypass groups) is applied 
+ * lazily at runtime, and internal group IDs are securely stripped before injection.
  */
 class InjectFrontendRulesets
 {
     public function __construct(
-        protected SettingsRepositoryInterface $settings
+        protected SettingsRepositoryInterface $settings,
+        protected RulesetRepository $repository
     ) {
     }
 
@@ -45,38 +50,32 @@ class InjectFrontendRulesets
             return;
         }
 
-        $userGroups = $actor->groups->pluck('id')->toArray();
+        $rulesetsArray = $this->repository->getActiveFrontendRulesetsArray();
 
-        $rulesets = Ruleset::active()
-            ->frontend()
-            ->ordered()
-            ->get()
-            ->filter(function (Ruleset $r) use ($userGroups) {
-                if (is_array($r->bypass_group_ids) && count($r->bypass_group_ids) > 0) {
-                    if (count(array_intersect($userGroups, $r->bypass_group_ids)) > 0) {
-                        return false;
-                    }
+        if (empty($rulesetsArray)) {
+            $document->payload['filterRuleRulesets'] = [];
+            return;
+        }
+
+        $filteredRulesets = [];
+        $userGroups = null;
+
+        foreach ($rulesetsArray as $r) {
+            if (! empty($r['bypass_group_ids'])) {
+                if ($userGroups === null) {
+                    $userGroups = $actor->groups->pluck('id')->toArray();
                 }
 
-                return true;
-            })
-            ->map(fn (Ruleset $r) => [
-                'id' => $r->id,
-                'name' => $r->name,
-                'priority' => $r->priority,
-                'compiled_ast' => $r->compiled_ast,
-                'interventionType' => $r->intervention_type,
-                'evaluateAllRules' => $r->evaluate_all_rules,
-                'displayMode' => $r->display_mode,
-                'message' => $r->message,
-                'evaluateTitle' => $r->evaluate_title === null ? null : (bool) $r->evaluate_title,
-                'blockCascade' => $r->block_cascade,
-                'scopeType' => $r->scope_type,
-                'scopeTagIds' => $r->scope_tag_ids ?? [],
-                'displaySettings' => $r->display_settings,
-            ]);
+                if (array_intersect($userGroups, $r['bypass_group_ids'])) {
+                    continue;
+                }
+            }
 
-        $rulesetsArray = $rulesets->values()->toArray();
+            unset($r['bypass_group_ids']);
+            $filteredRulesets[] = $r;
+        }
+
+        $rulesetsArray = $filteredRulesets;
         $isObfuscated = (bool) $this->settings->get('huoxin-filter.obfuscate_active', true);
 
         if ($isObfuscated) {
@@ -85,14 +84,14 @@ class InjectFrontendRulesets
             if (empty($key)) {
                 $key = 'HuoxinFilterRuleManager';
             }
-            $out = '';
+
             $keyLen = strlen($key);
 
             for ($i = 0, $len = strlen($json); $i < $len; $i++) {
-                $out .= chr(ord($json[$i]) ^ ord($key[$i % $keyLen]));
+                $json[$i] = chr(ord($json[$i]) ^ ord($key[$i % $keyLen]));
             }
 
-            $document->payload['filterRuleRulesets'] = base64_encode($out);
+            $document->payload['filterRuleRulesets'] = base64_encode($json);
         } else {
             $document->payload['filterRuleRulesets'] = $rulesetsArray;
         }
