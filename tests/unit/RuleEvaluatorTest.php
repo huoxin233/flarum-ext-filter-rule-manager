@@ -13,7 +13,6 @@ namespace Huoxin\FilterRuleManager\Tests\unit;
 
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Illuminate\Container\Container;
-
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Contracts\Translation\TranslatorInterface;

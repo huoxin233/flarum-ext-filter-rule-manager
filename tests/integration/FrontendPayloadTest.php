@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use Flarum\Testing\integration\RetrievesAuthorizedUsers;
 use Flarum\Testing\integration\TestCase;
 
-
 class FrontendPayloadTest extends TestCase
 {
     use RetrievesAuthorizedUsers;

@@ -12,6 +12,7 @@
 namespace Huoxin\FilterRuleManager\Api\Controller;
 
 use Flarum\Api\Controller\AbstractShowController;
+use Flarum\Foundation\ValidationException;
 use Flarum\Http\RequestUtil;
 use Huoxin\FilterRuleManager\Api\Serializer\RulesetSerializer;
 use Huoxin\FilterRuleManager\Expression\Lexer;
@@ -20,7 +21,6 @@ use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
-use Flarum\Foundation\ValidationException;
 
 class UpdateRulesetController extends AbstractShowController
 {

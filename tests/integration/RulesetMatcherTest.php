@@ -13,7 +13,6 @@ namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
 
-
 class RulesetMatcherTest extends FilterTestCase
 {
     protected function setUp(): void
