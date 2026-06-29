@@ -29,6 +29,7 @@ jobs:
     uses: huoxin233/flarum-workflows/.github/workflows/REUSABLE-draft-release.yml@main
     with:
       previous_tag: ${{ github.event.inputs.previous_tag }}
+      next_tag: ${{ github.event.inputs.next_tag }}
       include_full_commits: ${{ github.event.inputs.include_full_commits == 'true' || false }}
       exclude_co_authors: ${{ github.event.inputs.exclude_co_authors != 'false' || true }}
     secrets: inherit
