@@ -172,7 +172,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             setting: 'huoxin-filter.global_evaluate_title',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title_help')),
-            default: true,
           })}
         </div>
         <div className="Form-group">
@@ -181,7 +180,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             setting: 'huoxin-filter.global_auto_flag',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag_help')),
-            default: true,
           })}
         </div>
         <div className="Form-group">
@@ -190,7 +188,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             setting: 'huoxin-filter.global_require_approval',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval_help')),
-            default: true,
           })}
         </div>
 
@@ -211,7 +208,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             setting: 'huoxin-filter.global_evasion_active',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active_help')),
-            default: false,
           })}
         </div>
         <div className="Form-group">
@@ -220,7 +216,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             type: 'number',
             setting: 'huoxin-filter.global_evasion_timeout',
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_timeout_help')),
-            default: 5,
           })}
         </div>
         <div className="Form-group">
@@ -229,7 +224,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             type: 'number',
             setting: 'huoxin-filter.global_evasion_threshold',
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_threshold_help')),
-            default: 2,
           })}
         </div>
         <div className="Form-group">
@@ -238,7 +232,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             type: 'number',
             setting: 'huoxin-filter.global_evasion_log_keep_days',
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_log_keep_days_help')),
-            default: 0,
           })}
         </div>
 
@@ -250,7 +243,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             setting: 'huoxin-filter.obfuscate_active',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active_help')),
-            default: true,
           })}
         </div>
         <div className="Form-group">
@@ -259,7 +251,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             type: 'string',
             setting: 'huoxin-filter.obfuscate_key',
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_key_help')),
-            default: 'HuoxinFilterRuleManager',
           })}
         </div>
         <div className="Form-group">{this.submitButton()}</div>
