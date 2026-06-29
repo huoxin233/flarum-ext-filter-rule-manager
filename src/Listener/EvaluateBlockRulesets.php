@@ -79,24 +79,27 @@ class EvaluateBlockRulesets
         if (! empty($triggered)) {
             $actor = $event->actor;
             if ($actor && ! $actor->isGuest()) {
-                $lastBlock = FilterBlockLog::where('user_id', $actor->id)
-                    ->orderBy('created_at', 'desc')
-                    ->first();
+                $now = Carbon::now();
 
-                if ($lastBlock && Carbon::parse($lastBlock->created_at)->diffInSeconds(Carbon::now()) < 10) {
+                $lastBlockTime = FilterBlockLog::where('user_id', $actor->id)
+                    ->orderBy('created_at', 'desc')
+                    ->value('created_at');
+
+                if ($lastBlockTime && Carbon::parse($lastBlockTime)->diffInSeconds($now, true) < 10) {
                     throw new FloodingException();
                 }
 
-                foreach ($triggered as $t) {
-                    FilterBlockLog::create([
-                        'user_id' => $actor->id,
-                        'ruleset_id' => $t['ruleset_id'],
-                        'content' => $t['content'],
-                        'message' => $t['message'],
-                        'tokens' => $t['tokens'],
-                        'created_at' => Carbon::now(),
-                    ]);
-                }
+                $nowStr = $now->toDateTimeString();
+                $rows = array_map(fn($t) => [
+                    'user_id' => $actor->id,
+                    'ruleset_id' => $t['ruleset_id'],
+                    'content' => $t['content'],
+                    'message' => $t['message'],
+                    'tokens' => json_encode($t['tokens']),
+                    'created_at' => $nowStr,
+                ], $triggered);
+
+                FilterBlockLog::insert($rows);
             }
 
             throw new RuleBlockException($triggered);
