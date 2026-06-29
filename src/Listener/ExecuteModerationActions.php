@@ -65,11 +65,11 @@ class ExecuteModerationActions
             return;
         }
 
-        $globalAutoFlag = (bool) $this->settings->get('huoxin-filter.global_auto_flag', true);
-        $globalRequireApproval = (bool) $this->settings->get('huoxin-filter.global_require_approval', true);
-        $globalEvasionActive = (bool) $this->settings->get('huoxin-filter.global_evasion_active', false);
-        $globalEvasionTimeout = (int) $this->settings->get('huoxin-filter.global_evasion_timeout', 5);
-        $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter.global_evasion_threshold', 2);
+        $globalAutoFlag = (bool) $this->settings->get('huoxin-filter-rule-manager.global_auto_flag', true);
+        $globalRequireApproval = (bool) $this->settings->get('huoxin-filter-rule-manager.global_require_approval', true);
+        $globalEvasionActive = (bool) $this->settings->get('huoxin-filter-rule-manager.global_evasion_active', false);
+        $globalEvasionTimeout = (int) $this->settings->get('huoxin-filter-rule-manager.global_evasion_timeout', 5);
+        $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter-rule-manager.global_evasion_threshold', 2);
 
         // Load all active rulesets once from in-memory cache, filter per concern.
         $allActive = $this->rulesets->getActiveRulesets();

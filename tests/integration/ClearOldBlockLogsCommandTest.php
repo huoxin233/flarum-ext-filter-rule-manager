@@ -52,7 +52,7 @@ class ClearOldBlockLogsCommandTest extends FilterTestCase
     {
         /** @var SettingsRepositoryInterface $settings */
         $settings = $this->app()->getContainer()->make(SettingsRepositoryInterface::class);
-        $settings->set('huoxin-filter.global_evasion_log_keep_days', 30);
+        $settings->set('huoxin-filter-rule-manager.global_evasion_log_keep_days', 30);
 
         // Run the command manually
         $command = $this->app()->getContainer()->make(ClearOldBlockLogsCommand::class);

@@ -82,7 +82,7 @@ class FrontendPayloadTest extends TestCase
     /** @test */
     public function it_sends_plain_json_when_obfuscation_disabled()
     {
-        $this->setting('huoxin-filter.obfuscate_active', '0');
+        $this->setting('huoxin-filter-rule-manager.obfuscate_active', '0');
 
         $response = $this->send($this->request('GET', '/', ['authenticatedAs' => 2]));
 
@@ -123,7 +123,7 @@ class FrontendPayloadTest extends TestCase
     /** @test */
     public function it_filters_out_bypassed_rulesets_and_strips_group_ids()
     {
-        $this->setting('huoxin-filter.obfuscate_active', '0');
+        $this->setting('huoxin-filter-rule-manager.obfuscate_active', '0');
 
         // Add a second ruleset that is explicitly bypassed by group 3 (Member)
         $this->database()->table('filter_rulesets')->insert([
