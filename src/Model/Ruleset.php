@@ -60,11 +60,6 @@ class Ruleset extends AbstractModel
         'display_settings' => 'array',
     ];
 
-    public static function getActiveRulesets()
-    {
-        return static::active()->ordered()->get();
-    }
-
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
