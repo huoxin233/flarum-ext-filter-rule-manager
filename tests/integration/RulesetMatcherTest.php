@@ -12,6 +12,7 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class RulesetMatcherTest extends FilterTestCase
 {
@@ -126,7 +127,7 @@ class RulesetMatcherTest extends FilterTestCase
         // Assert the post was successfully created (not blocked by Ruleset 3)
         $this->assertEquals(201, $response->getStatusCode());
 
-        $postId = \Illuminate\Support\Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
 
         // Verify that the silent flag from Ruleset 2 was created
         $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();

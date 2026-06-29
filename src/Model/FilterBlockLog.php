@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Model;
 
+use Carbon\Carbon;
 use Flarum\Database\AbstractModel;
 use Flarum\User\User;
 
@@ -18,7 +19,7 @@ use Flarum\User\User;
  * @property int    $id
  * @property int|null $user_id
  * @property int    $ruleset_id
- * @property \Carbon\Carbon $created_at
+ * @property Carbon $created_at
  * @property bool   $is_cleared
  * @property string|null $content
  * @property string|null $message

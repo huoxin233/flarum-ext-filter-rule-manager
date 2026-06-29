@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Api\Controller;
 
+use Exception;
 use Flarum\Api\Controller\AbstractShowController;
 use Flarum\Foundation\ValidationException;
 use Flarum\Http\RequestUtil;
@@ -69,7 +70,7 @@ class UpdateRulesetController extends AbstractShowController
                     $ruleset->compiled_ast = $ast->toArray();
                 } catch (ValidationException $e) {
                     throw $e;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     throw new ValidationException(['expression' => 'Invalid expression syntax: '.$e->getMessage()]);
                 }
             } else {

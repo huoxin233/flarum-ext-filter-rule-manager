@@ -18,6 +18,7 @@ use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Illuminate\Contracts\Container\Container;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Throwable;
 
 class RuleEvaluator
 {
@@ -132,7 +133,7 @@ class RuleEvaluator
             $result = $provider->evaluate($node['ruleType'], $config, $context);
 
             return $result;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->error('[filter-rule-manager] provider evaluate() threw', [
                 'provider' => $node['provider'],
                 'type' => $node['ruleType'],
