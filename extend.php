@@ -21,6 +21,7 @@ use Huoxin\FilterRuleManager\Listener\EvaluateBlockRulesets;
 use Huoxin\FilterRuleManager\Listener\ExecuteModerationActions;
 use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
 use Huoxin\FilterRuleManager\Provider\FilterRuleManagerServiceProvider;
+use Huoxin\FilterRuleManager\Api\Resource\RulesetResource;
 use Illuminate\Console\Scheduling\Event as ScheduleEvent;
 
 return [
@@ -66,8 +67,8 @@ return [
         ->default('huoxin-filter-rule-manager.global_evasion_log_keep_days', 30)
         ->default('huoxin-filter-rule-manager.obfuscate_active', true)
         ->default('huoxin-filter-rule-manager.obfuscate_key', 'HuoxinFilterRuleManager')
-        ->serializeToForum('filterRuleObfuscateActive', 'huoxin-filter-rule-manager.obfuscate_active', 'boolval', true)
-        ->serializeToForum('filterRuleObfuscateKey', 'huoxin-filter-rule-manager.obfuscate_key', 'strval', 'HuoxinFilterRuleManager'),
+        ->serializeToForum('filterRuleObfuscateActive', 'huoxin-filter-rule-manager.obfuscate_active', 'boolval')
+        ->serializeToForum('filterRuleObfuscateKey', 'huoxin-filter-rule-manager.obfuscate_key', 'strval'),
 
     // ── Prune old block logs command ──────────────────────────────────────
     (new Extend\Console())
@@ -75,5 +76,7 @@ return [
         ->schedule(ClearOldBlockLogsCommand::class, function (ScheduleEvent $event) {
             $event->daily();
         }),
-    new Extend\ApiResource(Api\Resource\RulesetResource::class),
+
+    // ── API Resources ─────────────────────────────────────────────────────────
+    new Extend\ApiResource(RulesetResource::class),
 ];
