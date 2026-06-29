@@ -14,12 +14,14 @@ namespace Huoxin\FilterRuleManager\Provider;
 use Flarum\Foundation\AbstractServiceProvider;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
+use Huoxin\FilterRuleManager\Service\RulesetMatcher;
 
 class FilterRuleManagerServiceProvider extends AbstractServiceProvider
 {
     public function register(): void
     {
         $this->container->scoped(RulesetRepository::class);
+        $this->container->scoped(RulesetMatcher::class);
 
         $this->container->singleton(FilterRuleProvider::REGISTRY_KEY, function ($container) {
             $providers = [
