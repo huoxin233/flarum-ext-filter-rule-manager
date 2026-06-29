@@ -116,7 +116,7 @@ class RulesetMatcher
                 || $discussion->first_post_id === null;
         }
 
-        $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter.global_evaluate_title', true);
+        $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter-rule-manager.global_evaluate_title', true);
 
         if ($evaluateTitle && $title !== '' && $isFirstPost) {
             return $title."\n\n".$content;

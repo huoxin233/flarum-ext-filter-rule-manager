@@ -57,17 +57,17 @@ return [
 
     // ── Default Settings ──────────────────────────────────────────────────
     (new Extend\Settings())
-        ->default('huoxin-filter.global_evaluate_title', true)
-        ->default('huoxin-filter.global_auto_flag', true)
-        ->default('huoxin-filter.global_require_approval', true)
-        ->default('huoxin-filter.global_evasion_active', false)
-        ->default('huoxin-filter.global_evasion_timeout', 5)
-        ->default('huoxin-filter.global_evasion_threshold', 2)
-        ->default('huoxin-filter.global_evasion_log_keep_days', 30)
-        ->default('huoxin-filter.obfuscate_active', true)
-        ->default('huoxin-filter.obfuscate_key', 'HuoxinFilterRuleManager')
-        ->serializeToForum('filterRuleObfuscateActive', 'huoxin-filter.obfuscate_active', 'boolval', true)
-        ->serializeToForum('filterRuleObfuscateKey', 'huoxin-filter.obfuscate_key', 'strval', 'HuoxinFilterRuleManager'),
+        ->default('huoxin-filter-rule-manager.global_evaluate_title', true)
+        ->default('huoxin-filter-rule-manager.global_auto_flag', true)
+        ->default('huoxin-filter-rule-manager.global_require_approval', true)
+        ->default('huoxin-filter-rule-manager.global_evasion_active', false)
+        ->default('huoxin-filter-rule-manager.global_evasion_timeout', 5)
+        ->default('huoxin-filter-rule-manager.global_evasion_threshold', 2)
+        ->default('huoxin-filter-rule-manager.global_evasion_log_keep_days', 30)
+        ->default('huoxin-filter-rule-manager.obfuscate_active', true)
+        ->default('huoxin-filter-rule-manager.obfuscate_key', 'HuoxinFilterRuleManager')
+        ->serializeToForum('filterRuleObfuscateActive', 'huoxin-filter-rule-manager.obfuscate_active', 'boolval', true)
+        ->serializeToForum('filterRuleObfuscateKey', 'huoxin-filter-rule-manager.obfuscate_key', 'strval', 'HuoxinFilterRuleManager'),
 
     // ── Prune old block logs command ──────────────────────────────────────
     (new Extend\Console())

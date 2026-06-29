@@ -154,8 +154,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   }
 
   settingsTab(): Mithril.Children {
-    const requireApprovalVal = this.setting('huoxin-filter.global_require_approval', '1')();
-    const autoFlagVal = this.setting('huoxin-filter.global_auto_flag', '1')();
+    const requireApprovalVal = this.setting('huoxin-filter-rule-manager.global_require_approval', '1')();
+    const autoFlagVal = this.setting('huoxin-filter-rule-manager.global_auto_flag', '1')();
     const requireApproval = requireApprovalVal === true || requireApprovalVal === '1';
     const autoFlag = autoFlagVal === true || autoFlagVal === '1';
 
@@ -169,7 +169,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <div className="Form-group">
           {this.buildSettingComponent({
             type: 'boolean',
-            setting: 'huoxin-filter.global_evaluate_title',
+            setting: 'huoxin-filter-rule-manager.global_evaluate_title',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title_help')),
           })}
@@ -177,7 +177,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <div className="Form-group">
           {this.buildSettingComponent({
             type: 'boolean',
-            setting: 'huoxin-filter.global_auto_flag',
+            setting: 'huoxin-filter-rule-manager.global_auto_flag',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag_help')),
           })}
@@ -185,7 +185,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <div className="Form-group">
           {this.buildSettingComponent({
             type: 'boolean',
-            setting: 'huoxin-filter.global_require_approval',
+            setting: 'huoxin-filter-rule-manager.global_require_approval',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_require_approval_help')),
           })}
@@ -205,7 +205,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <div className="Form-group">
           {this.buildSettingComponent({
             type: 'boolean',
-            setting: 'huoxin-filter.global_evasion_active',
+            setting: 'huoxin-filter-rule-manager.global_evasion_active',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active_help')),
           })}
@@ -214,7 +214,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_timeout')}</label>
           {this.buildSettingComponent({
             type: 'number',
-            setting: 'huoxin-filter.global_evasion_timeout',
+            setting: 'huoxin-filter-rule-manager.global_evasion_timeout',
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_timeout_help')),
           })}
         </div>
@@ -222,7 +222,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_threshold')}</label>
           {this.buildSettingComponent({
             type: 'number',
-            setting: 'huoxin-filter.global_evasion_threshold',
+            setting: 'huoxin-filter-rule-manager.global_evasion_threshold',
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_threshold_help')),
           })}
         </div>
@@ -230,7 +230,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_log_keep_days')}</label>
           {this.buildSettingComponent({
             type: 'number',
-            setting: 'huoxin-filter.global_evasion_log_keep_days',
+            setting: 'huoxin-filter-rule-manager.global_evasion_log_keep_days',
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_log_keep_days_help')),
           })}
         </div>
@@ -240,7 +240,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <div className="Form-group">
           {this.buildSettingComponent({
             type: 'boolean',
-            setting: 'huoxin-filter.obfuscate_active',
+            setting: 'huoxin-filter-rule-manager.obfuscate_active',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_active_help')),
           })}
@@ -249,7 +249,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_key')}</label>
           {this.buildSettingComponent({
             type: 'string',
-            setting: 'huoxin-filter.obfuscate_key',
+            setting: 'huoxin-filter-rule-manager.obfuscate_key',
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.obfuscate_key_help')),
           })}
         </div>

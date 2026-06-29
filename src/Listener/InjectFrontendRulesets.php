@@ -76,11 +76,11 @@ class InjectFrontendRulesets
         }
 
         $rulesetsArray = $filteredRulesets;
-        $isObfuscated = (bool) $this->settings->get('huoxin-filter.obfuscate_active', true);
+        $isObfuscated = (bool) $this->settings->get('huoxin-filter-rule-manager.obfuscate_active', true);
 
         if ($isObfuscated) {
             $json = json_encode($rulesetsArray);
-            $key = $this->settings->get('huoxin-filter.obfuscate_key', 'HuoxinFilterRuleManager');
+            $key = $this->settings->get('huoxin-filter-rule-manager.obfuscate_key', 'HuoxinFilterRuleManager');
             if (empty($key)) {
                 $key = 'HuoxinFilterRuleManager';
             }
