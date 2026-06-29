@@ -27,9 +27,9 @@ use Psr\Http\Message\ServerRequestInterface;
  * The payload is gated on the actor being authenticated. Anonymous visitors
  * cannot compose posts, and exposing moderation rules (especially regex
  * patterns) to everyone would be unnecessary information disclosure.
- * 
+ *
  * To ensure maximum performance, the raw payload is stored in Flarum's global
- * Application Cache. User-specific filtering (e.g., bypass groups) is applied 
+ * Application Cache. User-specific filtering (e.g., bypass groups) is applied
  * lazily at runtime, and internal group IDs are securely stripped before injection.
  */
 class InjectFrontendRulesets
@@ -54,6 +54,7 @@ class InjectFrontendRulesets
 
         if (empty($rulesetsArray)) {
             $document->payload['filterRuleRulesets'] = [];
+
             return;
         }
 
