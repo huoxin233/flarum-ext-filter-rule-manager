@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Builder;
 return [
     'up' => function (Builder $schema) {
         $db = $schema->getConnection();
-        
+
         $settings = [
             'huoxin-filter.global_evaluate_title' => 'huoxin-filter-rule-manager.global_evaluate_title',
             'huoxin-filter.global_auto_flag' => 'huoxin-filter-rule-manager.global_auto_flag',
@@ -24,10 +24,10 @@ return [
                 ->update(['key' => $new]);
         }
     },
-    
+
     'down' => function (Builder $schema) {
         $db = $schema->getConnection();
-        
+
         $settings = [
             'huoxin-filter.global_evaluate_title' => 'huoxin-filter-rule-manager.global_evaluate_title',
             'huoxin-filter.global_auto_flag' => 'huoxin-filter-rule-manager.global_auto_flag',
