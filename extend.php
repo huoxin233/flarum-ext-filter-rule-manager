@@ -14,6 +14,7 @@ namespace Huoxin\FilterRuleManager;
 use Flarum\Extend;
 use Flarum\Post\Event\Saving;
 use Huoxin\FilterRuleManager\Api\Controller;
+use Huoxin\FilterRuleManager\Api\Resource\RulesetResource;
 use Huoxin\FilterRuleManager\Console\ClearOldBlockLogsCommand;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Exception\RuleBlockExceptionHandler;
@@ -21,7 +22,6 @@ use Huoxin\FilterRuleManager\Listener\EvaluateBlockRulesets;
 use Huoxin\FilterRuleManager\Listener\ExecuteModerationActions;
 use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
 use Huoxin\FilterRuleManager\Provider\FilterRuleManagerServiceProvider;
-use Huoxin\FilterRuleManager\Api\Resource\RulesetResource;
 use Illuminate\Console\Scheduling\Event as ScheduleEvent;
 
 return [
