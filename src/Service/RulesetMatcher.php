@@ -72,6 +72,7 @@ class RulesetMatcher
             if (count(array_intersect($userGroups, $ruleset->bypass_group_ids)) > 0) {
                 $postCache[$cacheKey] = null;
                 $this->evaluationCache[$post] = $postCache;
+
                 return null;
             }
         }
@@ -81,6 +82,7 @@ class RulesetMatcher
         if (! $this->evaluator->scopeMatches($ruleset, $discussion)) {
             $postCache[$cacheKey] = null;
             $this->evaluationCache[$post] = $postCache;
+
             return null;
         }
 
