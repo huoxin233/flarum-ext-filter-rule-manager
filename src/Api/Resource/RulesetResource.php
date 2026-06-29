@@ -18,14 +18,24 @@ use Flarum\Foundation\ValidationException;
 use Huoxin\FilterRuleManager\Expression\Lexer;
 use Huoxin\FilterRuleManager\Expression\Parser;
 use Huoxin\FilterRuleManager\Model\Ruleset;
+use Huoxin\FilterRuleManager\Expression\LogicalNode;
+use Huoxin\FilterRuleManager\Expression\NodeInterface;
+use Huoxin\FilterRuleManager\Expression\NotNode;
+use Huoxin\FilterRuleManager\Expression\RuleNode;
+use Huoxin\FilterRuleManager\Provider\ValidatesConfigInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Tobyz\JsonApiServer\Context;
+
+use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 
 /**
  * @extends Resource\AbstractDatabaseResource<Ruleset>
  */
 class RulesetResource extends Resource\AbstractDatabaseResource
 {
+    public function __construct(protected RuleEvaluator $evaluator)
+    {
+    }
     public function type(): string
     {
         return 'filter-rule-rulesets';
@@ -94,7 +104,10 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                             $tokens = $lexer->tokenize();
                             $parser = new Parser($tokens);
                             $ast = $parser->parse();
+                            $this->validateAstNode($ast, $this->evaluator->getProviders());
                             $model->compiled_ast = $ast->toArray();
+                        } catch (ValidationException $e) {
+                            throw $e;
                         } catch (\Exception $e) {
                             throw new ValidationException(['expression' => 'Invalid expression syntax: '.$e->getMessage()]);
                         }
@@ -210,5 +223,26 @@ class RulesetResource extends Resource\AbstractDatabaseResource
         $ids = array_values(array_filter(array_map('intval', $raw), fn ($id) => $id > 0));
 
         return $ids === [] ? null : $ids;
+    }
+
+    protected function validateAstNode(NodeInterface $node, array $providers): void
+    {
+        if ($node instanceof RuleNode) {
+            $provider = $providers[$node->provider] ?? null;
+            if ($provider instanceof ValidatesConfigInterface) {
+                $isObject = is_array($node->value) && ! array_is_list($node->value);
+                if ($isObject) {
+                    $config = array_merge($node->value, ['operator' => $node->operator]);
+                } else {
+                    $config = ['operator' => $node->operator, 'value' => $node->value];
+                }
+                $provider->validateConfig($node->ruleType, $config);
+            }
+        } elseif ($node instanceof LogicalNode) {
+            $this->validateAstNode($node->left, $providers);
+            $this->validateAstNode($node->right, $providers);
+        } elseif ($node instanceof NotNode) {
+            $this->validateAstNode($node->node, $providers);
+        }
     }
 }

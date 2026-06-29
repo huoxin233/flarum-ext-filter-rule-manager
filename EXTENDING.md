@@ -58,10 +58,12 @@ Create a class implementing `Huoxin\FilterRuleManager\Provider\RuleProviderInter
 
 namespace YourNamespace\ToxicityFilter\Provider;
 
+use Flarum\Foundation\ValidationException;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
+use Huoxin\FilterRuleManager\Provider\ValidatesConfigInterface;
 
-class ToxicityProvider implements RuleProviderInterface
+class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterface
 {
     /**
      * Declares the rule types this provider handles.
@@ -134,6 +136,22 @@ class ToxicityProvider implements RuleProviderInterface
         }
 
         return [];
+    }
+
+    /**
+     * Validate the given config for the specified rule type.
+     * Throw a ValidationException if the admin entered invalid data.
+     */
+    public function validateConfig(string $type, array $config): void
+    {
+        if ($type === 'is_toxic') {
+            $threshold = $config['threshold'] ?? 0.8;
+            if ($threshold < 0 || $threshold > 1) {
+                throw new ValidationException([
+                    'expression' => 'Toxicity threshold must be between 0.0 and 1.0.'
+                ]);
+            }
+        }
     }
 }
 ```
