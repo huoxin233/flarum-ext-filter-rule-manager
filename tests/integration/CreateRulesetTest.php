@@ -13,7 +13,6 @@ namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Huoxin\FilterRuleManager\Model\Ruleset;
 
-
 class CreateRulesetTest extends FilterTestCase
 {
     protected function setUp(): void
