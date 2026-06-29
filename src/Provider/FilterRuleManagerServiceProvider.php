@@ -39,4 +39,15 @@ class FilterRuleManagerServiceProvider extends AbstractServiceProvider
             return $providers;
         });
     }
+
+    public function boot(): void
+    {
+        \Huoxin\FilterRuleManager\Model\Ruleset::saved(function () {
+            $this->container->make(RulesetRepository::class)->flush();
+        });
+
+        \Huoxin\FilterRuleManager\Model\Ruleset::deleted(function () {
+            $this->container->make(RulesetRepository::class)->flush();
+        });
+    }
 }
