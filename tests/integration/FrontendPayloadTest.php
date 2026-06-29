@@ -121,4 +121,45 @@ class FrontendPayloadTest extends TestCase
         // Ensure it is an empty array
         $this->assertEquals('[]', $payloadValue, 'Payload should be empty for guests');
     }
+
+    #[Test]
+    public function it_filters_out_bypassed_rulesets_and_strips_group_ids()
+    {
+        $this->setting('huoxin-filter.obfuscate_active', '0');
+
+        // Add a second ruleset that is explicitly bypassed by group 3 (Member)
+        $this->database()->table('filter_rulesets')->insert([
+            'id' => 2,
+            'name' => 'Bypassed Ruleset',
+            'priority' => 1,
+            'compiled_ast' => json_encode(['type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['secret']]]),
+            'intervention_type' => 'warning',
+            'display_mode' => 'banner',
+            'scope_type' => 'global',
+            'message' => 'Secret Message',
+            'is_active' => 1,
+            'bypass_group_ids' => json_encode([3]), // Normal user (2) has group 3 by default
+            'auto_flag' => 0,
+            'require_approval' => 0,
+            'created_at' => Carbon::now()->toDateTimeString(),
+            'updated_at' => Carbon::now()->toDateTimeString()
+        ]);
+
+        $response = $this->send($this->request('GET', '/', ['authenticatedAs' => 2]));
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $html = $response->getBody()->getContents();
+
+        preg_match('/"filterRuleRulesets":\s*(".*?"|\[.*?\])/', $html, $matches);
+        $payloadValue = $matches[1];
+
+        // The bypassed ruleset should NOT be in the payload
+        $this->assertStringNotContainsString('Bypassed Ruleset', $payloadValue);
+
+        // The standard ruleset SHOULD still be in the payload
+        $this->assertStringContainsString('Test Ruleset', $payloadValue);
+
+        // The string "bypass_group_ids" MUST NOT exist in the payload
+        $this->assertStringNotContainsString('bypass_group_ids', $payloadValue);
+    }
 }
