@@ -18,6 +18,7 @@ use Huoxin\FilterRuleManager\Api\Serializer\RulesetSerializer;
 use Huoxin\FilterRuleManager\Expression\Lexer;
 use Huoxin\FilterRuleManager\Expression\Parser;
 use Huoxin\FilterRuleManager\Model\Ruleset;
+use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Illuminate\Support\Arr;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
@@ -27,6 +28,10 @@ class UpdateRulesetController extends AbstractShowController
     use RulesetValidationTrait;
 
     public $serializer = RulesetSerializer::class;
+
+    public function __construct(protected RuleEvaluator $evaluator)
+    {
+    }
 
     protected function data(ServerRequestInterface $request, Document $document): Ruleset
     {
@@ -60,7 +65,10 @@ class UpdateRulesetController extends AbstractShowController
                     $tokens = $lexer->tokenize();
                     $parser = new Parser($tokens);
                     $ast = $parser->parse();
+                    $this->validateAstNode($ast, $this->evaluator->getProviders());
                     $ruleset->compiled_ast = $ast->toArray();
+                } catch (ValidationException $e) {
+                    throw $e;
                 } catch (\Exception $e) {
                     throw new ValidationException(['expression' => 'Invalid expression syntax: '.$e->getMessage()]);
                 }

@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Provider;
 
+use Flarum\Foundation\ValidationException;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -23,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Each type triggers if ANY of the listed entries matches. The first match
  * becomes the token value used to interpolate the ruleset's message.
  */
-class BuiltinProvider implements RuleProviderInterface
+class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
 {
     public function __construct(protected TranslatorInterface $translator)
     {
@@ -231,5 +232,26 @@ class BuiltinProvider implements RuleProviderInterface
         }
 
         return [];
+    }
+
+    public function validateConfig(string $type, array $config): void
+    {
+        if ($type === 'regex') {
+            $patterns = $this->normalizeList($config, 'patterns', 'pattern');
+            foreach ($patterns as $pattern) {
+                $regex = str_starts_with($pattern, '/')
+                    ? $pattern
+                    : '/'.str_replace('/', '\/', $pattern).'/i';
+
+                error_clear_last();
+                if (@preg_match($regex, '') === false) {
+                    $error = error_get_last();
+                    $msg = $error ? $error['message'] : preg_last_error_msg();
+                    throw new ValidationException([
+                        'expression' => "Invalid regex pattern '{$pattern}'. Error: {$msg}",
+                    ]);
+                }
+            }
+        }
     }
 }
