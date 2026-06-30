@@ -11,6 +11,8 @@
 
 namespace Huoxin\FilterRuleManager\Expression;
 
+use InvalidArgumentException;
+
 class Parser
 {
     private int $position = 0;
@@ -28,7 +30,7 @@ class Parser
         if (! $this->isAtEnd()) {
             $token = $this->peek();
 
-            throw new \InvalidArgumentException("Unexpected token '{$token->value}' at position {$token->position}. Expected end of expression.");
+            throw new InvalidArgumentException("Unexpected token '{$token->value}' at position {$token->position}. Expected end of expression.");
         }
 
         return $node;
@@ -87,7 +89,7 @@ class Parser
 
         $parts = explode('.', $fieldToken->value, 2);
         if (count($parts) !== 2) {
-            throw new \InvalidArgumentException("Field '{$fieldToken->value}' must be in format provider.type");
+            throw new InvalidArgumentException("Field '{$fieldToken->value}' must be in format provider.type");
         }
 
         $provider = $parts[0];
@@ -146,7 +148,7 @@ class Parser
 
         $token = $this->peek();
 
-        throw new \InvalidArgumentException("Expected value (string, number, boolean, array) at position {$token->position}. Found: {$token->type}");
+        throw new InvalidArgumentException("Expected value (string, number, boolean, array) at position {$token->position}. Found: {$token->type}");
     }
 
     private function match(string ...$types): bool
@@ -168,7 +170,7 @@ class Parser
             return $this->advance();
         }
 
-        throw new \InvalidArgumentException($message.' Found: '.$this->peek()->type);
+        throw new InvalidArgumentException($message.' Found: '.$this->peek()->type);
     }
 
     private function check(string $type): bool

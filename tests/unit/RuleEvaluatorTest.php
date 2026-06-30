@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use ReflectionClass;
 
 class RuleEvaluatorTest extends TestCase
 {
@@ -70,7 +71,7 @@ class RuleEvaluatorTest extends TestCase
             public function testMergeResults(array $results): array
             {
                 // We use reflection since it's private
-                $reflection = new \ReflectionClass(RuleEvaluator::class);
+                $reflection = new ReflectionClass(RuleEvaluator::class);
                 $method = $reflection->getMethod('mergeResults');
 
                 return $method->invoke($this, $results);

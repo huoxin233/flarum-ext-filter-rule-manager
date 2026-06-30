@@ -13,6 +13,7 @@ namespace Huoxin\FilterRuleManager\Provider;
 
 use Flarum\Foundation\AbstractServiceProvider;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
+use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
 
@@ -42,11 +43,11 @@ class FilterRuleManagerServiceProvider extends AbstractServiceProvider
 
     public function boot(): void
     {
-        \Huoxin\FilterRuleManager\Model\Ruleset::saved(function () {
+        Ruleset::saved(function () {
             $this->container->make(RulesetRepository::class)->flush();
         });
 
-        \Huoxin\FilterRuleManager\Model\Ruleset::deleted(function () {
+        Ruleset::deleted(function () {
             $this->container->make(RulesetRepository::class)->flush();
         });
     }

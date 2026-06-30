@@ -16,6 +16,8 @@ use Huoxin\FilterRuleManager\Provider\BuiltinProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Flarum\User\User;
+use Illuminate\Database\Eloquent\Collection;
 
 class BuiltinProviderTest extends TestCase
 {
@@ -201,8 +203,8 @@ class BuiltinProviderTest extends TestCase
         $config = ['groupIds' => [3, 4]];
 
         // User belongs to group 4
-        $userWithGroup = new \Flarum\User\User();
-        $groups = new \Illuminate\Database\Eloquent\Collection([
+        $userWithGroup = new User();
+        $groups = new Collection([
             (object) ['id' => 1],
             (object) ['id' => 4],
         ]);
@@ -214,8 +216,8 @@ class BuiltinProviderTest extends TestCase
         $this->assertEquals('4', $result['matched_group']);
 
         // User does not belong to target groups
-        $userWithoutGroup = new \Flarum\User\User();
-        $groupsEmpty = new \Illuminate\Database\Eloquent\Collection([
+        $userWithoutGroup = new User();
+        $groupsEmpty = new Collection([
             (object) ['id' => 1],
         ]);
         $userWithoutGroup->setRelation('groups', $groupsEmpty);

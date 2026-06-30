@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Api\Resource;
 
+use Exception;
 use Flarum\Api\Endpoint;
 use Flarum\Api\Resource;
 use Flarum\Api\Schema;
@@ -108,7 +109,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                             $model->compiled_ast = $ast->toArray();
                         } catch (ValidationException $e) {
                             throw $e;
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             throw new ValidationException(['expression' => 'Invalid expression syntax: '.$e->getMessage()]);
                         }
                     } else {

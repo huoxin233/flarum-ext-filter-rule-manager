@@ -13,6 +13,7 @@ namespace Huoxin\FilterRuleManager\Service;
 
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\User;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use WeakMap;
@@ -20,12 +21,12 @@ use WeakMap;
 class RulesetMatcher
 {
     /**
-     * @var WeakMap<\Flarum\Post\Post, array<string, array|null>>
+     * @var WeakMap<Post, array<string, array|null>>
      */
     protected WeakMap $evaluationCache;
 
     /**
-     * @var WeakMap<\Flarum\User\User, array<int>>
+     * @var WeakMap<User, array<int>>
      */
     protected WeakMap $userGroupsCache;
 
@@ -43,7 +44,7 @@ class RulesetMatcher
      *
      * @return array|null Returns matched tokens if the ruleset triggers, null otherwise.
      */
-    public function match(Ruleset $ruleset, Post $post, ?\Flarum\User\User $actor = null, ?array $providers = null): ?array
+    public function match(Ruleset $ruleset, Post $post, ?User $actor = null, ?array $providers = null): ?array
     {
         if (! isset($this->evaluationCache[$post])) {
             $this->evaluationCache[$post] = [];

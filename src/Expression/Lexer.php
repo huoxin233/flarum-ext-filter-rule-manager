@@ -11,6 +11,8 @@
 
 namespace Huoxin\FilterRuleManager\Expression;
 
+use InvalidArgumentException;
+
 class Lexer
 {
     private int $length;
@@ -114,7 +116,7 @@ class Lexer
                 }
             }
 
-            throw new \InvalidArgumentException("Unexpected character '{$char}' at position {$this->position}");
+            throw new InvalidArgumentException("Unexpected character '{$char}' at position {$this->position}");
         }
 
         $tokens[] = new Token(Token::T_EOF, null, $this->position);
@@ -145,7 +147,7 @@ class Lexer
             $this->position++;
         }
 
-        throw new \InvalidArgumentException("Unterminated string starting at position {$start}");
+        throw new InvalidArgumentException("Unterminated string starting at position {$start}");
     }
 
     private function readNumber(): Token

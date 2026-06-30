@@ -14,11 +14,12 @@ namespace Huoxin\FilterRuleManager\Repository;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Collection;
 
 class RulesetRepository
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Collection|null
+     * @var Collection|null
      */
     protected $activeRulesets;
 

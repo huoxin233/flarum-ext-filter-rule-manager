@@ -18,6 +18,7 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 
 /**
  * Returns registered backend rule providers and their supported types.
@@ -33,7 +34,7 @@ class ListProvidersController implements RequestHandlerInterface
     {
         RequestUtil::getActor($request)->assertAdmin();
 
-        /** @var array<string, \Huoxin\FilterRuleManager\Provider\RuleProviderInterface> $providers */
+        /** @var array<string, RuleProviderInterface> $providers */
         $providers = $this->container->make(FilterRuleProvider::REGISTRY_KEY);
 
         $result = [];
