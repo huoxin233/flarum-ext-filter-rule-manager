@@ -90,7 +90,7 @@ class EvaluateBlockRulesets
                 }
 
                 $nowStr = $now->toDateTimeString();
-                $rows = array_map(fn($t) => [
+                $rows = array_map(fn ($t) => [
                     'user_id' => $actor->id,
                     'ruleset_id' => $t['ruleset_id'],
                     'content' => $t['content'],

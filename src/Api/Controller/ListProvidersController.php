@@ -13,12 +13,12 @@ namespace Huoxin\FilterRuleManager\Api\Controller;
 
 use Flarum\Http\RequestUtil;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
+use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Illuminate\Contracts\Container\Container;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 
 /**
  * Returns registered backend rule providers and their supported types.
