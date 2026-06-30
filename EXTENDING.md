@@ -58,6 +58,7 @@ Create a class implementing `Huoxin\FilterRuleManager\Provider\RuleProviderInter
 
 namespace YourNamespace\ToxicityFilter\Provider;
 
+use Exception;
 use Flarum\Foundation\ValidationException;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
@@ -66,7 +67,10 @@ use Huoxin\FilterRuleManager\Provider\ValidatesConfigInterface;
 class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterface
 {
     /**
-     * Declares the rule types this provider handles.
+     * The rule type strings this provider handles on the backend.
+     * Return an empty array if this provider only has frontend checks.
+     *
+     * @return string[]
      */
     public function getSupportedBackendTypes(): array
     {
@@ -74,22 +78,25 @@ class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterfac
     }
 
     /**
-     * Human-readable labels for the backend types (rarely used natively, but required by interface).
+     * Human-readable labels for each supported type (shown in admin rule builder).
+     *
+     * @return array<string, string>  ['type_string' => 'Human Label']
      */
     public function getBackendTypeLabels(): array
     {
         return [
-            'is_toxic' => 'AI Toxicity Check'
+            'is_toxic' => 'AI Toxicity Check',
         ];
     }
 
     /**
-     * The core evaluation logic.
+     * Evaluate a single rule against the evaluation context.
      *
-     * @param string $type    The rule type (e.g., 'is_toxic').
-     * @param array  $config  The configuration object saved by the admin in the Visual Editor.
-     * @param EvaluationContext $context The context object containing content, actor, and post.
-     * @return array|null     Return an array of string tokens if triggered, or null if clean.
+     * @param string $type    The rule type string (one of getSupportedBackendTypes())
+     * @param array  $config  Rule config JSON decoded to array
+     * @param EvaluationContext $context The context object containing content, actor, and post
+     *
+     * @return array|null  null = not triggered; array (may be empty) = triggered with tokens
      */
     public function evaluate(string $type, array $config, EvaluationContext $context): ?array
     {
@@ -101,7 +108,7 @@ class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterfac
             // If the API call fails, catch the exception and return null so users aren't blocked.
             try {
                 $score = $this->callExternalToxicityApi($context->content);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return null;
             }
 
@@ -124,8 +131,10 @@ class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterfac
     }
 
     /**
-     * Tokens this provider exposes for use in the ruleset messages.
-     * This defines the backend contract for dynamic variable interpolation.
+     * Tokens this provider exposes per rule type, for use in ruleset messages.
+     *
+     * @param string $type The rule type
+     * @return array  A list of associative arrays with 'name' and 'description' keys
      */
     public function getProvidedTokens(string $type): array
     {
@@ -140,15 +149,21 @@ class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterfac
 
     /**
      * Validate the given config for the specified rule type.
-     * Throw a ValidationException if the admin entered invalid data.
+     * Must throw Flarum\Foundation\ValidationException if the config is malformed.
+     *
+     * @param string $type
+     * @param array $config
+     * @return void
+     * @throws ValidationException
      */
     public function validateConfig(string $type, array $config): void
     {
         if ($type === 'is_toxic') {
             $threshold = $config['threshold'] ?? 0.8;
+
             if ($threshold < 0 || $threshold > 1) {
                 throw new ValidationException([
-                    'expression' => 'Toxicity threshold must be between 0.0 and 1.0.'
+                    'expression' => 'Toxicity threshold must be between 0.0 and 1.0.',
                 ]);
             }
         }
