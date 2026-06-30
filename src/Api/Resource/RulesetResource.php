@@ -17,17 +17,16 @@ use Flarum\Api\Resource;
 use Flarum\Api\Schema;
 use Flarum\Foundation\ValidationException;
 use Huoxin\FilterRuleManager\Expression\Lexer;
-use Huoxin\FilterRuleManager\Expression\Parser;
-use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Expression\LogicalNode;
 use Huoxin\FilterRuleManager\Expression\NodeInterface;
 use Huoxin\FilterRuleManager\Expression\NotNode;
+use Huoxin\FilterRuleManager\Expression\Parser;
 use Huoxin\FilterRuleManager\Expression\RuleNode;
+use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Provider\ValidatesConfigInterface;
+use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Illuminate\Database\Eloquent\Builder;
 use Tobyz\JsonApiServer\Context;
-
-use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 
 /**
  * @extends Resource\AbstractDatabaseResource<Ruleset>
@@ -37,6 +36,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
     public function __construct(protected RuleEvaluator $evaluator)
     {
     }
+
     public function type(): string
     {
         return 'filter-rule-rulesets';
