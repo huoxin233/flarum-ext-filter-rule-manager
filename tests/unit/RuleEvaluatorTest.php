@@ -15,8 +15,8 @@ use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Illuminate\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use ReflectionClass;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RuleEvaluatorTest extends TestCase
 {
