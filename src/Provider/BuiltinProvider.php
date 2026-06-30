@@ -247,6 +247,7 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
                 if (@preg_match($regex, '') === false) {
                     $error = error_get_last();
                     $msg = $error ? $error['message'] : preg_last_error_msg();
+
                     throw new ValidationException([
                         'expression' => "Invalid regex pattern '{$pattern}'. Error: {$msg}",
                     ]);

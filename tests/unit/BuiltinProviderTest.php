@@ -11,13 +11,13 @@
 
 namespace Huoxin\FilterRuleManager\Tests\unit;
 
+use Flarum\User\User;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Provider\BuiltinProvider;
+use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Flarum\User\User;
-use Illuminate\Database\Eloquent\Collection;
 
 class BuiltinProviderTest extends TestCase
 {
