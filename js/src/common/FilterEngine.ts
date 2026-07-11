@@ -454,7 +454,8 @@ export class FilterEngine {
         return isPrivate;
       case 'tag':
         if (!ruleset.scopeTagIds || ruleset.scopeTagIds.length === 0) return false;
-        return tagIds.some((id) => ruleset.scopeTagIds!.includes(id));
+        const targetTags = ruleset.scopeTagIds.map(String);
+        return tagIds.map(String).some((id) => targetTags.includes(id));
       default:
         return false;
     }
