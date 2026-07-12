@@ -10,6 +10,8 @@
 import app from 'flarum/admin/app';
 import ExtensionPage, { ExtensionPageAttrs } from 'flarum/admin/components/ExtensionPage';
 import Button from 'flarum/common/components/Button';
+import Dropdown from 'flarum/common/components/Dropdown';
+import Separator from 'flarum/common/components/Separator';
 import Switch from 'flarum/common/components/Switch';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import extractText from 'flarum/common/utils/extractText';
@@ -348,7 +350,10 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     const rulesCount = this.countRules(ruleset.compiledAst());
 
     return (
-      <div className={`FilterRuleManager-CardList-item ${!isActive ? 'FilterRuleManager-CardList-item--inactive' : ''}`} key={ruleset.id() as string}>
+      <div
+        className={`FilterRuleManager-CardList-item ${!isActive ? 'FilterRuleManager-CardList-item--inactive' : ''}`}
+        key={ruleset.id() || `temp-${filteredIndex}`}
+      >
         <div className="FilterRuleManager-CardList-item-cell FilterRuleManager-CardList-item-cell--order">
           <Button
             className="Button Button--icon Button--small"
@@ -416,14 +421,26 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           >
             {app.translator.trans('huoxin-filter-rule-manager.admin.edit')}
           </Button>
-          <Button
-            className="Button Button--danger"
-            icon="fas fa-trash"
-            onclick={() => this.deleteRuleset(ruleset)}
-            aria-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.delete'))}
+          <Dropdown
+            icon="fas fa-ellipsis-v"
+            buttonClassName="Button Button--icon"
+            menuClassName="Dropdown-menu--right FilterRuleManager-Dropdown-menu"
+            accessibleToggleLabel={app.translator.trans('huoxin-filter-rule-manager.admin.more_actions')}
           >
-            {app.translator.trans('huoxin-filter-rule-manager.admin.delete')}
-          </Button>
+            <Button icon="fas fa-angle-double-up" onclick={() => this.moveToEdge(ruleset, 'top')}>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.move_to_top')}
+            </Button>
+            <Button icon="fas fa-angle-double-down" onclick={() => this.moveToEdge(ruleset, 'bottom')}>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.move_to_bottom')}
+            </Button>
+            <Button icon="fas fa-copy" onclick={() => this.duplicateRuleset(ruleset)}>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.duplicate')}
+            </Button>
+            <Separator />
+            <Button className="has-Icon text-danger" icon="fas fa-trash" onclick={() => this.deleteRuleset(ruleset)}>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.delete')}
+            </Button>
+          </Dropdown>
         </div>
       </div>
     );
@@ -632,6 +649,90 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       providers: this.providers,
       onsave: () => this.loadData(),
     });
+  }
+
+  async duplicateRuleset(ruleset: any) {
+    try {
+      const attributes = Object.assign({}, ruleset.data.attributes);
+      delete attributes.id;
+      attributes.name = (ruleset.name() + ' (Copy)').substring(0, 100);
+
+      const duplicate = app.store.createRecord('filter-rule-rulesets');
+      const savedDuplicate = await duplicate.save(attributes);
+
+      // Insert it right after the original in this.rulesets to retain order
+      const all = this.rulesets.slice();
+      const originalIndex = all.findIndex((r) => r.id() === ruleset.id());
+      if (originalIndex !== -1) {
+        all.splice(originalIndex + 1, 0, savedDuplicate);
+      } else {
+        all.push(savedDuplicate);
+      }
+      this.rulesets = all;
+
+      // Persist the new order immediately
+      this.reordering = true;
+      m.redraw();
+
+      try {
+        await app.request({
+          method: 'POST',
+          url: app.forum.attribute('apiUrl') + '/filter-rule-rulesets/reorder',
+          body: { data: { ids: all.map((r) => r.id()) } },
+        });
+        app.alerts.show({ type: 'success' }, app.translator.trans('huoxin-filter-rule-manager.admin.save_success'));
+      } catch (err) {
+        console.error('Failed to reorder after duplicating:', err);
+        app.alerts.show({ type: 'error' }, app.translator.trans('huoxin-filter-rule-manager.admin.save_error'));
+      }
+
+      await this.loadData();
+    } catch (err) {
+      console.error('Failed to duplicate ruleset:', err);
+      app.alerts.show({ type: 'error' }, app.translator.trans('huoxin-filter-rule-manager.admin.save_error'));
+    } finally {
+      this.reordering = false;
+      m.redraw();
+    }
+  }
+
+  async moveToEdge(ruleset: any, edge: 'top' | 'bottom') {
+    if (this.reordering) return;
+
+    const all = this.rulesets.slice();
+    const index = all.findIndex((r) => r.id() === ruleset.id());
+    if (index === -1) return;
+
+    // Check if it's already at the edge
+    if ((edge === 'top' && index === 0) || (edge === 'bottom' && index === all.length - 1)) {
+      return;
+    }
+
+    const [item] = all.splice(index, 1);
+    if (edge === 'top') {
+      all.unshift(item);
+    } else {
+      all.push(item);
+    }
+
+    this.rulesets = all;
+    this.reordering = true;
+    m.redraw();
+
+    try {
+      await app.request({
+        method: 'POST',
+        url: app.forum.attribute('apiUrl') + '/filter-rule-rulesets/reorder',
+        body: { data: { ids: all.map((r) => r.id()) } },
+      });
+    } catch (err) {
+      console.error(`Failed to move ruleset to ${edge}:`, err);
+      app.alerts.show({ type: 'error' }, app.translator.trans('huoxin-filter-rule-manager.admin.reorder_error'));
+      await this.loadData();
+    } finally {
+      this.reordering = false;
+      m.redraw();
+    }
   }
 
   async deleteRuleset(ruleset: any) {
