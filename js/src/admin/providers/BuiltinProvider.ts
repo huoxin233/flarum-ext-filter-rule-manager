@@ -13,6 +13,7 @@ import WordsListConfig from '../components/config/WordsListConfig';
 import PatternsListConfig from '../components/config/PatternsListConfig';
 import GroupListConfig from '../components/config/GroupListConfig';
 import WordCountConfig from '../components/config/WordCountConfig';
+import RuleTriggeredConfig from '../components/config/RuleTriggeredConfig';
 
 /**
  * Admin-side view of the builtin provider. Mirrors the type catalogue exposed
@@ -40,7 +41,7 @@ import WordCountConfig from '../components/config/WordCountConfig';
  */
 export default class BuiltinProvider {
   getSupportedTypes(): string[] {
-    return ['contains_word', 'regex', 'group', 'word_count'];
+    return ['contains_word', 'regex', 'group', 'word_count', 'rule_triggered'];
   }
 
   getTypeLabels(): Record<string, string> {
@@ -49,6 +50,7 @@ export default class BuiltinProvider {
       regex: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_regex')),
       group: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_group')),
       word_count: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_word_count')),
+      rule_triggered: String(app.translator.trans('huoxin-filter-rule-manager.admin.type_rule_triggered') || 'Has triggered rule(s)'),
     };
   }
 
@@ -57,6 +59,7 @@ export default class BuiltinProvider {
     if (type === 'regex') return PatternsListConfig;
     if (type === 'group') return GroupListConfig;
     if (type === 'word_count') return WordCountConfig;
+    if (type === 'rule_triggered') return RuleTriggeredConfig;
     return null;
   }
 

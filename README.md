@@ -11,7 +11,7 @@ Filter Rule Manager goes beyond simple word replacements. It allows forum admini
 Filter Rule Manager is built to give Flarum administrators fine-grained control over their community's content. It covers the following features out-of-the-box:
 
 - **Visual Rule Builder**: Construct complex logic using an intuitive drag-and-drop interface. Group conditions using `AND` / `OR` / `NOT` logic to create highly specific content filters.
-- **Builtin Rule Types**: Natively supports checking for specific keywords (`contains_word`), regular expressions (`regex`), checking the author's user group (`group`), and validating post length (`word_count` with mixed CJK/Latin support and optional exclusions for URLs/mentions).
+- **Builtin Rule Types**: Natively supports checking for specific keywords (`contains_word`), regular expressions (`regex`), checking the author's user group (`group`), validating post length (`word_count` with mixed CJK/Latin support and optional exclusions for URLs/mentions), and checking if other rules have fired (`rule_triggered` for building dependent meta-rules, disclaimers, or condition chains).
 - **Priority-based Execution**: Order your rulesets. Higher priority rules execute first, efficiently preventing unnecessary processing on lower rulesets.
 - **Intervention Types**: Choose exactly how the system reacts to a violation:
   - **Info**: Displays a real-time hint while the user is typing, but does not block them from submitting the post.
