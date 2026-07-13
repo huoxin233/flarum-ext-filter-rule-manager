@@ -222,8 +222,8 @@ huoxin-filter-rule-manager:
 
     config_rule_triggered_match_rule_id: "Specific Rule"
     config_rule_triggered_match_rule_id_help: "Select a specific rule to depend on. If selected, other filters below are ignored."
-    config_rule_triggered_match_name: "Rule Name (Contains)"
-    config_rule_triggered_match_name_help: "Leave empty to match any rule. Enter text to only trigger if the triggered rule's name contains this text."
+    config_rule_triggered_match_name: "Rule Name (Contains or Regex)"
+    config_rule_triggered_match_name_help: "Leave empty to match any rule. Enter text to only trigger if the triggered rule's name contains this text. You can also use regex by wrapping it in slashes, e.g., `/^Rule/i`."
     config_rule_triggered_match_scope: "Rule Scope"
     config_rule_triggered_match_scope_help: "Only trigger if the matched rule applies to this scope."
     config_rule_triggered_match_intervention: "Intervention Type"

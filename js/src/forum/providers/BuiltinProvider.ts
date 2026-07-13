@@ -32,7 +32,8 @@ export default class BuiltinProvider implements FilterRuleProvider {
   evaluate(type: string, content: string, config: Record<string, unknown>): Record<string, string> | null {
     if (type === 'rule_triggered') {
       const matchRuleId = config.match_rule_id !== undefined ? String(config.match_rule_id) : '';
-      const matchName = typeof config.match_name === 'string' ? config.match_name.toLowerCase() : '';
+      const matchNameRaw = typeof config.match_name === 'string' ? config.match_name : '';
+      const matchNameLower = matchNameRaw.toLowerCase();
       const matchScope = config.match_scope as string;
       const matchInterv = config.match_intervention as string;
       const matchDisplay = config.match_display as string;
@@ -42,7 +43,25 @@ export default class BuiltinProvider implements FilterRuleProvider {
       const triggeredAlert = alertsToCheck.find((alert: any) => {
         const ruleset = alert.ruleset;
         if (matchRuleId && String(ruleset.id) !== matchRuleId) return false;
-        if (!matchRuleId && matchName && ruleset.name && !String(ruleset.name).toLowerCase().includes(matchName)) return false;
+
+        if (!matchRuleId && matchNameRaw && ruleset.name) {
+          const nameStr = String(ruleset.name);
+          let matched = false;
+          if (matchNameRaw.startsWith('/') && matchNameRaw.lastIndexOf('/') > 0) {
+            try {
+              const lastSlash = matchNameRaw.lastIndexOf('/');
+              const pattern = matchNameRaw.substring(1, lastSlash);
+              const flags = matchNameRaw.substring(lastSlash + 1);
+              const rx = new RegExp(pattern, flags);
+              matched = rx.test(nameStr);
+            } catch (e) {
+              matched = nameStr.toLowerCase().includes(matchNameLower);
+            }
+          } else {
+            matched = nameStr.toLowerCase().includes(matchNameLower);
+          }
+          if (!matched) return false;
+        }
         if (!matchRuleId && matchScope && ruleset.scopeType !== matchScope) return false;
         if (!matchRuleId && matchInterv && ruleset.interventionType !== matchInterv) return false;
         if (!matchRuleId && matchDisplay && ruleset.displayMode !== matchDisplay) return false;
@@ -55,7 +74,7 @@ export default class BuiltinProvider implements FilterRuleProvider {
       const triggeredBlock = filterEngine.blockResults.find((block) => {
         // Blocks don't store Name or Scope currently natively via Flarum PHP payload.
         if (matchRuleId) return false; // Cannot match specific rule ID for blocks currently
-        if (matchName) return false;
+        if (matchNameRaw) return false;
         if (matchScope) return false;
         if (matchInterv && block.interventionType !== matchInterv) return false;
         if (matchDisplay && block.displayMode !== matchDisplay) return false;
