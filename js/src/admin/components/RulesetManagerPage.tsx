@@ -193,11 +193,9 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         </div>
 
         {requireApproval && !autoFlag ? (
-          <div className="Alert Alert--warning">
-            <p>
-              <i className="fas fa-exclamation-circle"></i>{' '}
-              {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
-            </p>
+          <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
+            <i className="fas fa-exclamation-circle"></i>{' '}
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
           </div>
         ) : null}
 
