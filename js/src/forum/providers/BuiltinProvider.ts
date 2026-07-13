@@ -10,6 +10,7 @@
 import app from 'flarum/forum/app';
 import type { FilterRuleProvider } from '../../common/FilterEngine';
 import type Group from 'flarum/common/models/Group';
+import filterEngine from '../../common/FilterEngine';
 
 /**
  * Forum-side BuiltinProvider — handles real-time evaluation against the
@@ -25,10 +26,47 @@ import type Group from 'flarum/common/models/Group';
  */
 export default class BuiltinProvider implements FilterRuleProvider {
   getSupportedTypes(): string[] {
-    return ['contains_word', 'regex', 'group', 'word_count'];
+    return ['contains_word', 'regex', 'group', 'word_count', 'rule_triggered'];
   }
 
   evaluate(type: string, content: string, config: Record<string, unknown>): Record<string, string> | null {
+    if (type === 'rule_triggered') {
+      const matchRuleId = config.match_rule_id !== undefined ? String(config.match_rule_id) : '';
+      const matchName = typeof config.match_name === 'string' ? config.match_name.toLowerCase() : '';
+      const matchScope = config.match_scope as string;
+      const matchInterv = config.match_intervention as string;
+      const matchDisplay = config.match_display as string;
+
+      // Active Alerts have full ruleset info
+      const alertsToCheck = filterEngine.currentRunAlerts || filterEngine.activeAlerts;
+      const triggeredAlert = alertsToCheck.find((alert: any) => {
+        const ruleset = alert.ruleset;
+        if (matchRuleId && String(ruleset.id) !== matchRuleId) return false;
+        if (!matchRuleId && matchName && ruleset.name && !String(ruleset.name).toLowerCase().includes(matchName)) return false;
+        if (!matchRuleId && matchScope && ruleset.scopeType !== matchScope) return false;
+        if (!matchRuleId && matchInterv && ruleset.interventionType !== matchInterv) return false;
+        if (!matchRuleId && matchDisplay && ruleset.displayMode !== matchDisplay) return false;
+        return true;
+      });
+
+      if (triggeredAlert) return {};
+
+      // Block Results lack full ruleset, but we can check intervention and display mode
+      const triggeredBlock = filterEngine.blockResults.find((block) => {
+        // Blocks don't store Name or Scope currently natively via Flarum PHP payload.
+        if (matchRuleId) return false; // Cannot match specific rule ID for blocks currently
+        if (matchName) return false;
+        if (matchScope) return false;
+        if (matchInterv && block.interventionType !== matchInterv) return false;
+        if (matchDisplay && block.displayMode !== matchDisplay) return false;
+        return true;
+      });
+
+      if (triggeredBlock) return {};
+
+      return null;
+    }
+
     const scanAll = config.scan_all || false;
     if (type === 'contains_word') {
       const words = this.normalizeList(config, 'words');

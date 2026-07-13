@@ -83,6 +83,7 @@ export class FilterEngine {
   > = {};
   public displayModes: Record<string, string> = {};
   public activeAlerts: ActiveAlert[] = [];
+  public currentRunAlerts?: ActiveAlert[];
   public blockResults: BlockResult[] = [];
   public debounceTimer: number | null = null;
   public hasAlerts: boolean = false;
@@ -287,8 +288,8 @@ export class FilterEngine {
     const stateKey = `${title}\n\n${content}`;
     if (stateKey === this._lastStateKey) return;
     this._lastStateKey = stateKey;
-
     const activeAlerts: ActiveAlert[] = [];
+    this.currentRunAlerts = activeAlerts;
 
     for (const ruleset of this.rulesets) {
       if (!this.scopeMatches(ruleset, composer, application)) continue;
@@ -317,6 +318,7 @@ export class FilterEngine {
 
     const changed = this.alertsChanged(this.activeAlerts, activeAlerts);
     this.activeAlerts = activeAlerts;
+    this.currentRunAlerts = undefined;
     this.hasAlerts = this.activeAlerts.length > 0 || this.blockResults.length > 0;
 
     if (changed) {
