@@ -59,6 +59,7 @@ export declare class FilterEngine {
     }>;
     displayModes: Record<string, string>;
     activeAlerts: ActiveAlert[];
+    currentRunAlerts?: ActiveAlert[];
     blockResults: BlockResult[];
     intervalId: number | null;
     hasAlerts: boolean;
@@ -146,5 +147,5 @@ export declare class FilterEngine {
     interpolate(template: string | string[], tokens: Record<string, string> | undefined): string;
     alertsChanged(oldAlerts: ActiveAlert[], newAlerts: ActiveAlert[]): boolean;
 }
-declare const _default: FilterEngine;
-export default _default;
+declare const filterEngine: FilterEngine;
+export default filterEngine;
