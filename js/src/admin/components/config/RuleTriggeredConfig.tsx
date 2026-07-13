@@ -73,10 +73,8 @@ export default class RuleTriggeredConfig extends Component<IRuleTriggeredConfigA
     return (
       <div className="FilterRuleManager-ConfigForm">
         <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
-          <p>
-            <i className="fas fa-exclamation-circle"></i>{' '}
-            {app.translator.trans('huoxin-filter-rule-manager.admin.config_rule_triggered_position_warning')}
-          </p>
+          <i className="fas fa-exclamation-circle"></i>{' '}
+          {app.translator.trans('huoxin-filter-rule-manager.admin.config_rule_triggered_position_warning')}
         </div>
 
         <div className="Form-group">

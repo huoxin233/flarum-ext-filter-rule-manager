@@ -412,9 +412,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
           <div className="helpText">{app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}_help`)}</div>
           {(intervention === 'info' || intervention === 'warning') && (
             <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
-              <p>
-                <i className="fas fa-exclamation-circle"></i> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_exposed_warning_text')}
-              </p>
+              <i className="fas fa-exclamation-circle"></i> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_exposed_warning_text')}
             </div>
           )}
         </div>
@@ -528,10 +526,8 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
         {this.requireApproval() === true && this.autoFlag() === false ? (
           <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
-            <p>
-              <i className="fas fa-exclamation-circle"></i>{' '}
-              {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
-            </p>
+            <i className="fas fa-exclamation-circle"></i>{' '}
+            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
           </div>
         ) : null}
 
