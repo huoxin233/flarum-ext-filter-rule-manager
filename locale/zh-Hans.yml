@@ -222,8 +222,8 @@ huoxin-filter-rule-manager:
 
     config_rule_triggered_match_rule_id: "指定规则"
     config_rule_triggered_match_rule_id_help: "选择依赖的特定规则。如果选择此项，下面的其他筛选条件将被忽略。"
-    config_rule_triggered_match_name: "名称（包含）"
-    config_rule_triggered_match_name_help: "留空表示匹配任意规则。输入文本表示仅当触发规则的名称包含该文本时才触发。"
+    config_rule_triggered_match_name: "名称（包含或正则）"
+    config_rule_triggered_match_name_help: "留空表示匹配任意规则。输入文本表示仅当触发规则的名称包含该文本时才触发。您也可以使用正则表达式（将其包裹在斜杠中），例如 `/^Rule/i`。"
     config_rule_triggered_match_scope: "应用于"
     config_rule_triggered_match_scope_help: "仅当命中的规则应用范围符合此选项时才触发。"
     config_rule_triggered_match_intervention: "干预方式"
