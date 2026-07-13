@@ -11,6 +11,7 @@ import app from 'flarum/admin/app';
 import Component from 'flarum/common/Component';
 import type { ComponentAttrs } from 'flarum/common/Component';
 import Select from 'flarum/common/components/Select';
+import Icon from 'flarum/common/components/Icon';
 import type Mithril from 'mithril';
 
 export interface IRuleTriggeredConfigAttrs extends ComponentAttrs {
@@ -73,8 +74,7 @@ export default class RuleTriggeredConfig extends Component<IRuleTriggeredConfigA
     return (
       <div className="FilterRuleManager-ConfigForm">
         <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
-          <i className="fas fa-exclamation-circle"></i>{' '}
-          {app.translator.trans('huoxin-filter-rule-manager.admin.config_rule_triggered_position_warning')}
+          <Icon name="fas fa-exclamation-circle" /> {app.translator.trans('huoxin-filter-rule-manager.admin.config_rule_triggered_position_warning')}
         </div>
 
         <div className="Form-group">

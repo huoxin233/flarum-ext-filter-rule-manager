@@ -165,7 +165,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
         <div className="Modal-body">
           <Form>
             <div className="FilterRuleManager-RulesetEditor-discardConfirmation">
-              <i className="fas fa-exclamation-triangle FilterRuleManager-RulesetEditor-discardIcon"></i>
+              <Icon name="fas fa-exclamation-triangle" className="FilterRuleManager-RulesetEditor-discardIcon" />
               <h3 className="FilterRuleManager-RulesetEditor-discardTitle">
                 {app.translator.trans('huoxin-filter-rule-manager.admin.unsaved_changes_title')}
               </h3>
@@ -243,7 +243,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
       <div className="FilterRuleManager-RulesetEditor-section">
         <div className="FilterRuleManager-RulesetEditor-section-header FilterRuleManager-RulesetEditor-section-header--with-toggle">
           <div className="FilterRuleManager-RulesetEditor-section-header-title">
-            <i className="fas fa-info-circle"></i>
+            <Icon name="fas fa-info-circle" />
             <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_general')}</h4>
           </div>
           <Switch state={this.isActive()} onchange={(v: boolean) => this.isActive(v)}>
@@ -283,7 +283,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     return (
       <div className="FilterRuleManager-RulesetEditor-section">
         <div className="FilterRuleManager-RulesetEditor-section-header">
-          <i className="fas fa-crosshairs"></i>
+          <Icon name="fas fa-crosshairs" />
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_scope')}</h4>
         </div>
 
@@ -384,7 +384,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     return (
       <div className="FilterRuleManager-RulesetEditor-section">
         <div className="FilterRuleManager-RulesetEditor-section-header">
-          <i className="fas fa-eye"></i>
+          <Icon name="fas fa-eye" />
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_display')}</h4>
         </div>
         <div className="Form-group">
@@ -412,7 +412,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
           <div className="helpText">{app.translator.trans(`huoxin-filter-rule-manager.admin.interventions.${intervention}_help`)}</div>
           {(intervention === 'info' || intervention === 'warning') && (
             <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
-              <i className="fas fa-exclamation-circle"></i> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_exposed_warning_text')}
+              <Icon name="fas fa-exclamation-circle" /> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_exposed_warning_text')}
             </div>
           )}
         </div>
@@ -508,7 +508,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     return (
       <div className="FilterRuleManager-RulesetEditor-section">
         <div className="FilterRuleManager-RulesetEditor-section-header">
-          <i className="fas fa-shield-alt"></i>
+          <Icon name="fas fa-shield-alt" />
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_moderation')}</h4>
         </div>
 
@@ -526,8 +526,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
         {this.requireApproval() === true && this.autoFlag() === false ? (
           <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
-            <i className="fas fa-exclamation-circle"></i>{' '}
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
+            <Icon name="fas fa-exclamation-circle" /> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
           </div>
         ) : null}
 
@@ -606,7 +605,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     return (
       <div className="FilterRuleManager-RulesetEditor-section">
         <div className="FilterRuleManager-RulesetEditor-section-header">
-          <i className="fas fa-sliders-h"></i>
+          <Icon name="fas fa-sliders-h" />
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_rules')}</h4>
         </div>
 
@@ -781,7 +780,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     return (
       <div className="Form-group">
         <div className="Alert Alert--error">
-          <i className="fas fa-exclamation-circle"></i> {err}
+          <Icon name="fas fa-exclamation-circle" /> {err}
         </div>
       </div>
     );

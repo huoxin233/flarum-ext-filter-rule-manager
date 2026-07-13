@@ -10,6 +10,7 @@
 import app from 'flarum/forum/app';
 import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
 import Button from 'flarum/common/components/Button';
+import Icon from 'flarum/common/components/Icon';
 import type Mithril from 'mithril';
 
 export interface FilterRuleModalAttrs extends IInternalModalAttrs {
@@ -64,7 +65,7 @@ export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
     return (
       <div className="Modal-body">
         <div className={`FilterRuleManager-FilterRuleModal-message FilterRuleManager-FilterRuleModal-message--${type}`} style={style}>
-          {settings.icon !== 'none' && <i className={`FilterRuleManager-FilterRuleModal-icon ${iconClass}`} style={iconStyle}></i>}
+          {settings.icon !== 'none' && <Icon name={iconClass as string} className="FilterRuleManager-FilterRuleModal-icon" style={iconStyle} />}
           <span className="FilterRuleManager-FilterRuleModal-text">{m.trust(this.attrs.message)}</span>
         </div>
         <div className="Form-group FilterRuleManager-FilterRuleModal-actions">

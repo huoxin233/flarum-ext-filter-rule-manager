@@ -112,7 +112,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
                 m.redraw();
               }}
             >
-              <i className="fas fa-shield-alt"></i>
+              <Icon name="fas fa-shield-alt" />
               {app.translator.trans('huoxin-filter-rule-manager.admin.tabs.rulesets')}
               <span className="Button-badge">{this.rulesets.length}</span>
             </Button>
@@ -123,7 +123,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
                 m.redraw();
               }}
             >
-              <i className="fas fa-plug"></i>
+              <Icon name="fas fa-plug" />
               {app.translator.trans('huoxin-filter-rule-manager.admin.tabs.registry')}
             </Button>
             <Button
@@ -133,7 +133,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
                 m.redraw();
               }}
             >
-              <i className="fas fa-cog"></i>
+              <Icon name="fas fa-cog" />
               {app.translator.trans('huoxin-filter-rule-manager.admin.tabs.settings')}
             </Button>
           </div>
@@ -164,7 +164,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     return (
       <div className="FilterRuleManager-RulesetEditor-section">
         <div className="FilterRuleManager-RulesetEditor-section-header">
-          <i className="fas fa-cog"></i>
+          <Icon name="fas fa-cog" />
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.settings_header')}</h4>
         </div>
 
@@ -195,8 +195,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
 
         {requireApproval && !autoFlag ? (
           <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
-            <i className="fas fa-exclamation-circle"></i>{' '}
-            {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
+            <Icon name="fas fa-exclamation-circle" /> {app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_approval_without_flag_warning')}
           </div>
         ) : null}
 
@@ -303,7 +302,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       return (
         <div className="FilterRuleManager-EmptyState">
           <div className="FilterRuleManager-EmptyState-icon">
-            <i className="fas fa-shield-alt"></i>
+            <Icon name="fas fa-shield-alt" />
           </div>
           <p className="FilterRuleManager-EmptyState-text">
             {this.scopeFilter === 'all'
@@ -489,7 +488,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       return (
         <div className="FilterRuleManager-EmptyState">
           <div className="FilterRuleManager-EmptyState-icon">
-            <i className="fas fa-plug"></i>
+            <Icon name="fas fa-plug" />
           </div>
           <p className="FilterRuleManager-EmptyState-text">{app.translator.trans('huoxin-filter-rule-manager.admin.no_providers')}</p>
         </div>
@@ -591,7 +590,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
                     className="FilterRuleManager-CardList-item-cell"
                     data-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.headers.has_settings'))}
                   >
-                    {settingsComp ? <i className="fas fa-check text-success"></i> : <i className="fas fa-times text-muted"></i>}
+                    {settingsComp ? <Icon name="fas fa-check text-success" /> : <Icon name="fas fa-times text-muted" />}
                   </div>
                 </div>
               );
