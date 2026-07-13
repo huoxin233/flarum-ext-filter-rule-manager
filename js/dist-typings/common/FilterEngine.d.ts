@@ -59,6 +59,7 @@ export declare class FilterEngine {
     }>;
     displayModes: Record<string, string>;
     activeAlerts: ActiveAlert[];
+    currentRunAlerts?: ActiveAlert[];
     blockResults: BlockResult[];
     debounceTimer: number | null;
     hasAlerts: boolean;
