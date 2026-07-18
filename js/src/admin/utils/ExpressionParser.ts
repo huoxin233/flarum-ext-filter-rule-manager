@@ -370,20 +370,22 @@ export function stringifyExpression(ast: ASTNode | null | undefined): string {
   if (ast.type === 'not') return `not (${stringifyExpression(ast.node)})`;
   if (ast.type === 'rule') {
     let valStr = '';
-    if (typeof ast.value === 'string') valStr = `"${ast.value.replace(/"/g, '\\"')}"`;
+    if (typeof ast.value === 'string') valStr = `"${ast.value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
     else if (Array.isArray(ast.value))
-      valStr = `[${ast.value.map((v: unknown) => (typeof v === 'string' ? `"${v.replace(/"/g, '\\"')}"` : v)).join(', ')}]`;
+      valStr = `[${ast.value.map((v: unknown) => (typeof v === 'string' ? `"${v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : v)).join(', ')}]`;
     else if (typeof ast.value === 'object' && ast.value !== null) {
       valStr =
         `{` +
         Object.entries(ast.value)
           .map(
             ([k, v]) =>
-              `"${k}": ${
+              `"${k.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}": ${
                 typeof v === 'string'
-                  ? `"${(v as string).replace(/"/g, '\\"')}"`
+                  ? `"${(v as string).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
                   : Array.isArray(v)
-                  ? `[${v.map((item: unknown) => (typeof item === 'string' ? `"${item.replace(/"/g, '\\"')}"` : item)).join(', ')}]`
+                  ? `[${v
+                      .map((item: unknown) => (typeof item === 'string' ? `"${item.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : item))
+                      .join(', ')}]`
                   : v
               }`
           )
