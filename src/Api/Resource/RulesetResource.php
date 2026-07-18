@@ -129,7 +129,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                 ->property('display_mode')
                 ->writable()
                 ->set(function (Ruleset $model, $value) {
-                    $model->display_mode = in_array($value, ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], true) ? $value : ($model->display_mode ?? 'banner');
+                    $model->display_mode = in_array($value, ['none', 'banner', 'header_banner', 'toast', 'modal', 'sidebar'], true) ? $value : ($model->display_mode ?? 'banner');
                 }),
             Schema\Str::make('message')
                 ->writable()
