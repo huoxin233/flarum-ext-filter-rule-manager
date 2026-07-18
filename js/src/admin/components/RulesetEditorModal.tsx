@@ -837,7 +837,8 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       this.scopeType() !== r.scopeType() ||
       JSON.stringify(this.scopeTagIds() || []) !== JSON.stringify(r.scopeTagIds() || []) ||
       JSON.stringify(this.bypassGroupIds() || []) !== JSON.stringify(r.bypassGroupIds() || []) ||
-      JSON.stringify(this.displaySettings() || {}) !== JSON.stringify(r.displaySettings() || {})
+      JSON.stringify(this.displaySettings() || {}) !==
+        JSON.stringify(Array.isArray(r.displaySettings()) && r.displaySettings().length === 0 ? {} : r.displaySettings() || {})
     );
   }
 

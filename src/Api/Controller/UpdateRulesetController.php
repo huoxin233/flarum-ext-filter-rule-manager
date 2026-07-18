@@ -82,7 +82,7 @@ class UpdateRulesetController extends AbstractShowController
             $ruleset->intervention_type = $this->validEnum($attributes['interventionType'], ['info', 'warning', 'block', 'silent'], $ruleset->intervention_type);
         }
         if (isset($attributes['displayMode'])) {
-            $ruleset->display_mode = $this->validEnum($attributes['displayMode'], ['banner', 'header_banner', 'toast', 'modal', 'sidebar'], $ruleset->display_mode);
+            $ruleset->display_mode = $this->validEnum($attributes['displayMode'], ['none', 'banner', 'header_banner', 'toast', 'modal', 'sidebar'], $ruleset->display_mode);
         }
         if (isset($attributes['message'])) {
             $ruleset->message = (string) $attributes['message'];

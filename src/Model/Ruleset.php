@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string|null $expression
  * @property array|null $compiled_ast
  * @property string $intervention_type    info|warning|block|silent
- * @property string $display_mode   banner|header_banner|toast|modal|sidebar
+ * @property string $display_mode   none|banner|header_banner|toast|modal|sidebar
  * @property string $message
  * @property string|null $flag_message
  * @property bool   $evaluate_all_rules
