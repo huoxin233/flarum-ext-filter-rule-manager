@@ -46,10 +46,10 @@ class CreateRulesetController extends AbstractCreateController
         }
 
         $ruleset = new Ruleset();
-        
+
         return $ruleset->getConnection()->transaction(function () use ($ruleset, $name, $attributes) {
             $ruleset->name = $name;
-            
+
             $lastRuleset = Ruleset::orderBy('priority', 'desc')->lockForUpdate()->first();
             if ($lastRuleset) {
                 $ruleset->priority = (int) $lastRuleset->priority + 10;
