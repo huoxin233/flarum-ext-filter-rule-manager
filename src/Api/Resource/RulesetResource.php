@@ -57,7 +57,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
             if ($model->priority === null) {
                 // Lock the highest priority row to prevent race conditions during concurrent creations
                 $lastRuleset = Ruleset::orderBy('priority', 'desc')->lockForUpdate()->first();
-                
+
                 if ($lastRuleset) {
                     $model->priority = (int) $lastRuleset->priority + 10;
                 } else {
