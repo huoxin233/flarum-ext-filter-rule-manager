@@ -252,7 +252,7 @@ huoxin-filter-rule-manager:
     config_exclude_urls_help: "If enabled, URLs will be stripped before counting to prevent long links from artificially inflating word counts."
 
     rule_scan_all: "Find all matches"
-    rule_scan_all_help: "If enabled, this rule will gather every matched word or pattern in your list. If disabled, it returns quickly on the first match to save processing time."
+    rule_scan_all_help: "If enabled, this rule will list every matched word or pattern in the warning message. If disabled, it only lists the first match."
     rule_regex_warning: "Regex patterns run server-side on every post save. Avoid catastrophic backtracking (e.g. nested quantifiers like (a+)+) — keep patterns simple and well-anchored."
 
     # ── Validation messages ────────────────────────────────────────────────
