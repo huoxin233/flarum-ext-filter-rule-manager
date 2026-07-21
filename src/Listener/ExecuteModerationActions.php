@@ -104,14 +104,16 @@ class ExecuteModerationActions
         // Load all active rulesets once from in-memory cache, filter per concern.
         $allActive = $this->rulesets->getActiveRulesets();
 
-        $rulesets = $allActive->filter(function (Ruleset $ruleset) use ($globalAutoFlag, $globalRequireApproval) {
-            return ($ruleset->auto_flag ?? $globalAutoFlag) || ($ruleset->require_approval ?? $globalRequireApproval);
+        $rulesets = $allActive->filter(function (Ruleset $ruleset) use ($globalAutoFlag, $globalRequireApproval, $hasFlags, $hasApproval) {
+            $willFlag = $hasFlags && ($ruleset->auto_flag ?? $globalAutoFlag);
+            $willApprove = $hasApproval && ($ruleset->require_approval ?? $globalRequireApproval);
+            return $willFlag || $willApprove || $ruleset->block_cascade;
         });
 
         $providers = $this->evaluator->getProviders();
 
         [$defaultRulesets, $customMessages, $requiresApproval, $requiresFlag] =
-            $this->collectModerationMatches($rulesets, $post, $actor, $providers, $globalAutoFlag, $globalRequireApproval, $onlyField);
+            $this->collectModerationMatches($rulesets, $post, $actor, $providers, $globalAutoFlag, $globalRequireApproval, $hasFlags, $hasApproval, $onlyField);
 
         $blockedRulesetName = $this->resolveEvasion($actor, $allActive, $globalEvasionActive, $globalEvasionTimeout, $globalEvasionThreshold);
         $isEvasion = $blockedRulesetName !== null;
@@ -145,7 +147,7 @@ class ExecuteModerationActions
         }
     }
 
-    private function collectModerationMatches(Collection $rulesets, $post, $actor, array $providers, bool $globalAutoFlag, bool $globalRequireApproval, ?string $onlyField = null): array
+    private function collectModerationMatches(Collection $rulesets, $post, $actor, array $providers, bool $globalAutoFlag, bool $globalRequireApproval, bool $hasFlags, bool $hasApproval, ?string $onlyField = null): array
     {
         $defaultRulesets = [];
         $customMessages = [];
@@ -164,14 +166,16 @@ class ExecuteModerationActions
                         continue; // Violation already existed prior to this edit.
                     }
                 }
-                if (! empty($ruleset->flag_message)) {
-                    $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);
-                } else {
-                    $defaultRulesets[] = $ruleset->name;
-                }
+                $autoFlag = ($ruleset->auto_flag ?? $globalAutoFlag) && $hasFlags;
+                $requireApproval = ($ruleset->require_approval ?? $globalRequireApproval) && $hasApproval;
 
-                $autoFlag = $ruleset->auto_flag ?? $globalAutoFlag;
-                $requireApproval = $ruleset->require_approval ?? $globalRequireApproval;
+                if ($autoFlag || $requireApproval) {
+                    if (! empty($ruleset->flag_message)) {
+                        $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);
+                    } else {
+                        $defaultRulesets[] = $ruleset->name;
+                    }
+                }
 
                 if ($requireApproval) {
                     $requiresApproval = true;
