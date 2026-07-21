@@ -44,14 +44,14 @@ class RulesetMatcher
      *
      * @return array|null Returns matched tokens if the ruleset triggers, null otherwise.
      */
-    public function match(Ruleset $ruleset, Post $post, ?User $actor = null, ?array $providers = null): ?array
+    public function match(Ruleset $ruleset, Post $post, ?User $actor = null, ?array $providers = null, bool $useOriginal = false, ?string $onlyField = null): ?array
     {
         if (! isset($this->evaluationCache[$post])) {
             $this->evaluationCache[$post] = [];
         }
 
         $actorId = $actor ? $actor->id : 0;
-        $cacheKey = $ruleset->id.'_'.$actorId;
+        $cacheKey = $ruleset->id.'_'.$actorId.($useOriginal ? '_old' : '').($onlyField ? '_'.$onlyField : '');
         $postCache = $this->evaluationCache[$post];
 
         if (array_key_exists($cacheKey, $postCache)) {
@@ -87,7 +87,7 @@ class RulesetMatcher
             return null;
         }
 
-        $targetContent = $this->getTargetContent($ruleset, $post, $discussion);
+        $targetContent = $this->getTargetContent($ruleset, $post, $discussion, $useOriginal, $onlyField);
 
         if ($providers === null) {
             $providers = $this->evaluator->getProviders();
@@ -103,14 +103,19 @@ class RulesetMatcher
         return $result;
     }
 
-    public function getTargetContent(Ruleset $ruleset, Post $post, $discussion = null): string
+    public function getTargetContent(Ruleset $ruleset, Post $post, $discussion = null, bool $useOriginal = false, ?string $onlyField = null): string
     {
         if ($discussion === null) {
             $discussion = $post->discussion;
         }
 
-        $content = (string) $post->content;
-        $title = $discussion ? (string) $discussion->title : '';
+        if ($useOriginal) {
+            $content = (string) $post->getOriginal('content', $post->content);
+            $title = $discussion ? (string) $discussion->getOriginal('title', $discussion->title) : '';
+        } else {
+            $content = (string) $post->content;
+            $title = $discussion ? (string) $discussion->title : '';
+        }
 
         $isFirstPost = false;
         if ($discussion) {
@@ -120,6 +125,14 @@ class RulesetMatcher
         }
 
         $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter-rule-manager.global_evaluate_title', true);
+
+        if ($onlyField === 'title') {
+            return ($evaluateTitle && $title !== '' && $isFirstPost) ? $title : '';
+        }
+
+        if ($onlyField === 'content') {
+            return $content;
+        }
 
         if ($evaluateTitle && $title !== '' && $isFirstPost) {
             return $title."\n\n".$content;

@@ -12,7 +12,6 @@
 namespace Huoxin\FilterRuleManager;
 
 use Flarum\Extend;
-use Flarum\Post\Event\Saving;
 use Huoxin\FilterRuleManager\Api\Controller;
 use Huoxin\FilterRuleManager\Console\ClearOldBlockLogsCommand;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
@@ -50,9 +49,9 @@ return [
         ->post('/filter-rule-rulesets/reorder', 'filter-rule.rulesets.reorder', Controller\ReorderRulesetsController::class)
         ->get('/filter-rule-providers', 'filter-rule.providers.index', Controller\ListProvidersController::class),
 
-    // ── Block evaluation: fires on post save ──────────────────────────────────
+    // ── Block evaluation: fires on post save and discussion save ──────────────
     (new Extend\Event())
-        ->listen(Saving::class, EvaluateBlockRulesets::class)
+        ->subscribe(EvaluateBlockRulesets::class)
         ->subscribe(ExecuteModerationActions::class),
 
     // ── Custom exception → structured 422 response ────────────────────────────
