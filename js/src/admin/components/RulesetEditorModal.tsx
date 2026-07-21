@@ -79,6 +79,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   scopeType!: Stream<string>;
   scopeTagIds!: Stream<number[]>;
   bypassGroupIds!: Stream<number[]>;
+  strictEdit!: Stream<boolean | null>;
   displaySettings!: Stream<Record<string, unknown>>;
 
   oninit(vnode: Mithril.Vnode<RulesetEditorModalAttrs, this>) {
@@ -126,6 +127,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
     this.bypassGroupIds = Stream(this.ruleset ? this.ruleset.bypassGroupIds() || [] : []);
+    this.strictEdit = Stream(this.ruleset && this.ruleset.strictEdit() !== undefined ? this.ruleset.strictEdit() : null);
     this.displaySettings = Stream(this.ruleset ? Object.assign({}, this.ruleset.displaySettings() || {}) : {});
   }
 
@@ -527,6 +529,12 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
           this.requireApproval
         )}
 
+        {this.nullableBooleanSelect(
+          'huoxin-filter-rule-manager.admin.ruleset_strict_edit',
+          'huoxin-filter-rule-manager.admin.ruleset_strict_edit_help',
+          this.strictEdit
+        )}
+
         {this.requireApproval() === true && this.autoFlag() === false ? (
           <div className="Alert Alert--warning FilterRuleManager-RulesetEditor-warningAlert">
             <i className="fas fa-exclamation-circle"></i>{' '}
@@ -834,6 +842,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       this.isActive() !== r.isActive() ||
       this.autoFlag() !== r.autoFlag() ||
       this.requireApproval() !== r.requireApproval() ||
+      this.strictEdit() !== r.strictEdit() ||
       this.scopeType() !== r.scopeType() ||
       JSON.stringify(this.scopeTagIds() || []) !== JSON.stringify(r.scopeTagIds() || []) ||
       JSON.stringify(this.bypassGroupIds() || []) !== JSON.stringify(r.bypassGroupIds() || []) ||
@@ -906,6 +915,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       isActive: this.isActive(),
       autoFlag: this.autoFlag(),
       requireApproval: this.requireApproval(),
+      strictEdit: this.strictEdit(),
       scopeType: this.scopeType(),
       scopeTagIds: this.scopeTagIds(),
       bypassGroupIds: this.bypassGroupIds(),

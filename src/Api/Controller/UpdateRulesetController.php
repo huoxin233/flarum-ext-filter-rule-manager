@@ -117,6 +117,9 @@ class UpdateRulesetController extends AbstractShowController
         if (array_key_exists('requireApproval', $attributes)) {
             $ruleset->require_approval = $attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval'];
         }
+        if (array_key_exists('strictEdit', $attributes)) {
+            $ruleset->strict_edit = $attributes['strictEdit'] === null ? null : (bool) $attributes['strictEdit'];
+        }
         if (isset($attributes['scopeType'])) {
             $ruleset->scope_type = $this->validEnum($attributes['scopeType'], ['global', 'normal_post', 'private_post', 'tag'], $ruleset->scope_type);
         }

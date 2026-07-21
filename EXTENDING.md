@@ -113,10 +113,12 @@ class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterfac
             }
 
             // If the content is toxic, return an array of data strings.
-            // These strings are dynamically injected into the `{{matched_word}}`
+            // These strings are dynamically injected into the `{matched_word}`
             // placeholder in the admin's Flag or Block message!
             if ($score >= $threshold) {
-                return ["Score: {$score} (Threshold: {$threshold})"];
+                return [
+                    'matched_word' => "Score: {$score} (Threshold: {$threshold})"
+                ];
             }
         }
 
@@ -191,6 +193,17 @@ return [
         ->registerProvider('toxicity', ToxicityProvider::class),
 ];
 ```
+
+### Differential Evaluation & State Hashing
+
+Filter Rule Manager features a **Differential Evaluation Engine** that allows users to edit posts that have previously been flagged and approved by a moderator ("grandfathering"), as long as they do not _increase_ the violation severity.
+
+When a user edits a post, the engine runs your `evaluate()` method twice: once on the new text, and once on the old text. It then strictly compares the returned arrays using `===`.
+
+**Critical Requirement:** If your rule evaluates _quantities_ (e.g. counting the number of bad words, or the number of spam links), you **MUST** include a state indicator in your returned array (such as `'__count' => $totalMatches`).
+If you fail to do this, the engine will assume the new text and old text are identical, and users will be able to inject an infinite amount of additional spam into their grandfathered posts!
+
+If your rule is simply binary (e.g. "Is the user in Group X?"), you do not need to worry about this. Furthermore, administrators can optionally bypass this entirely by enabling **"Strict Edit Evaluation"** on the ruleset, which ruthlessly re-evaluates all edits.
 
 ---
 

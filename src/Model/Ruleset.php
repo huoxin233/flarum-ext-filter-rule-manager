@@ -55,6 +55,7 @@ class Ruleset extends AbstractModel
         'require_approval' => 'boolean',
         'scope_tag_ids' => 'array',
         'bypass_group_ids' => 'array',
+        'strict_edit' => 'boolean',
         'display_settings' => 'array',
     ];
 

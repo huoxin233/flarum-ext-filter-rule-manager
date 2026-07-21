@@ -178,6 +178,14 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <div className="Form-group">
           {this.buildSettingComponent({
             type: 'boolean',
+            setting: 'huoxin-filter-rule-manager.strict_edit_evaluation',
+            label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_strict_edit_evaluation')),
+            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_strict_edit_evaluation_help')),
+          })}
+        </div>
+        <div className="Form-group">
+          {this.buildSettingComponent({
+            type: 'boolean',
             setting: 'huoxin-filter-rule-manager.global_auto_flag',
             label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag')),
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_auto_flag_help')),

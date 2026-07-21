@@ -48,6 +48,7 @@ class RulesetSerializer extends AbstractSerializer
             'isActive' => (bool) $model->is_active,
             'autoFlag' => $model->auto_flag === null ? null : (bool) $model->auto_flag,
             'requireApproval' => $model->require_approval === null ? null : (bool) $model->require_approval,
+            'strictEdit' => $model->strict_edit === null ? null : (bool) $model->strict_edit,
             'scopeType' => $model->scope_type,
             'scopeTagIds' => $model->scope_tag_ids ?? [],
             'bypassGroupIds' => $model->bypass_group_ids ?? [],

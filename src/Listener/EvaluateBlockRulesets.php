@@ -86,7 +86,9 @@ class EvaluateBlockRulesets
                 continue;
             }
 
-            if ($post->exists) {
+            $strictEdit = $ruleset->strict_edit ?? (bool) $this->settings->get('huoxin-filter-rule-manager.strict_edit_evaluation', false);
+
+            if ($post->exists && ! $strictEdit) {
                 $oldTokens = $this->matcher->match($ruleset, $post, $actor, $providers, true, $onlyField);
 
                 if ($oldTokens !== null && $oldTokens === $tokens) {

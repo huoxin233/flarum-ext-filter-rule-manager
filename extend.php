@@ -67,6 +67,7 @@ return [
         ->default('huoxin-filter-rule-manager.global_evasion_timeout', 5)
         ->default('huoxin-filter-rule-manager.global_evasion_threshold', 2)
         ->default('huoxin-filter-rule-manager.global_evasion_log_keep_days', 30)
+        ->default('huoxin-filter-rule-manager.strict_edit_evaluation', false)
         ->default('huoxin-filter-rule-manager.obfuscate_active', true)
         ->default('huoxin-filter-rule-manager.obfuscate_key', 'HuoxinFilterRuleManager')
         ->serializeToForum('filterRuleObfuscateActive', 'huoxin-filter-rule-manager.obfuscate_active', 'boolval')

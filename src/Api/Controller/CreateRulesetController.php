@@ -90,6 +90,7 @@ class CreateRulesetController extends AbstractCreateController
             $ruleset->is_active = (bool) ($attributes['isActive'] ?? true);
             $ruleset->auto_flag = array_key_exists('autoFlag', $attributes) ? ($attributes['autoFlag'] === null ? null : (bool) $attributes['autoFlag']) : null;
             $ruleset->require_approval = array_key_exists('requireApproval', $attributes) ? ($attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval']) : null;
+            $ruleset->strict_edit = array_key_exists('strictEdit', $attributes) ? ($attributes['strictEdit'] === null ? null : (bool) $attributes['strictEdit']) : null;
             $ruleset->scope_type = $this->validEnum($attributes['scopeType'] ?? 'global', ['global', 'normal_post', 'private_post', 'tag'], 'global');
             $ruleset->scope_tag_ids = $this->sanitizeIds($attributes['scopeTagIds'] ?? null);
             $ruleset->bypass_group_ids = $this->sanitizeIds($attributes['bypassGroupIds'] ?? null);
