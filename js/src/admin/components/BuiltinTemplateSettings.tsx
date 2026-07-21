@@ -67,10 +67,24 @@ class ColorPickerInput extends Component<ColorPickerInputAttrs> {
               oninput={(e: Event) => onchange((e.target as HTMLInputElement).value)}
             />
             <div className="FilterRuleManager-ColorPicker-actions">
-              <div className="FilterRuleManager-ColorPicker-action" onclick={() => onchange('transparent')} title="Set transparent">
+              <div
+                className="FilterRuleManager-ColorPicker-action"
+                onclick={() => onchange('transparent')}
+                title={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_color_transparent'))}
+                aria-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_color_transparent'))}
+                role="button"
+                tabindex={0}
+              >
                 {icon('fas fa-eye-slash')}
               </div>
-              <div className="FilterRuleManager-ColorPicker-action" onclick={() => onchange('')} title="Clear to default">
+              <div
+                className="FilterRuleManager-ColorPicker-action"
+                onclick={() => onchange('')}
+                title={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_color_clear'))}
+                aria-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_color_clear'))}
+                role="button"
+                tabindex={0}
+              >
                 {icon('fas fa-eraser')}
               </div>
             </div>
@@ -168,7 +182,14 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
                   oninput={(e: Event) => displaySetting('icon', (e.target as HTMLInputElement).value)}
                 />
                 <div className="FilterRuleManager-IconPicker-actions">
-                  <div className="FilterRuleManager-IconPicker-action" onclick={() => displaySetting('icon', '')} title="Clear to default">
+                  <div
+                    className="FilterRuleManager-IconPicker-action"
+                    onclick={() => displaySetting('icon', '')}
+                    title={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_color_clear'))}
+                    aria-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_custom_color_clear'))}
+                    role="button"
+                    tabindex={0}
+                  >
                     {icon('fas fa-eraser')}
                   </div>
                 </div>
@@ -184,7 +205,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
                         displaySetting('icon', 'none');
                         this.showIconPicker = false;
                       }}
-                      title="No Icon"
+                      title={String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_no_icon'))}
                     >
                       {icon('fas fa-ban')} {String(app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_no_icon')) || 'None'}
                     </button>
