@@ -54,6 +54,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     scopeType: Stream<string>;
     scopeTagIds: Stream<number[]>;
     bypassGroupIds: Stream<number[]>;
+    strictEdit: Stream<boolean | null>;
     displaySettings: Stream<Record<string, unknown>>;
     oninit(vnode: Mithril.Vnode<RulesetEditorModalAttrs, this>): void;
     oncreate(vnode: Mithril.VnodeDOM<RulesetEditorModalAttrs, this>): void;
