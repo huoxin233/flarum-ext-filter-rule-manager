@@ -106,6 +106,8 @@ huoxin-filter-rule-manager:
     ruleset_custom_icon_color: "图标颜色"
     ruleset_custom_text_color: "文本颜色"
     ruleset_custom_bg_color: "背景颜色"
+    ruleset_custom_color_clear: "恢复默认"
+    ruleset_custom_color_transparent: "设置为透明"
     ruleset_no_icon: "无"
     ruleset_scope_type: "应用于"
     ruleset_scope_tags: "指定标签 ID"
