@@ -199,7 +199,7 @@ class DifferentialEvaluationTest extends FilterTestCase
     {
         // Change the discussion title directly in DB to contain the blockword
         $this->database()->table('discussions')->where('id', 1)->update(['title' => 'Title with blockword']);
-        
+
         // Deactivate the strict ruleset
         $this->database()->table('filter_rulesets')->where('id', 2)->update(['is_active' => 0]);
         // Also enable evaluate_title on the default ruleset
@@ -229,7 +229,7 @@ class DifferentialEvaluationTest extends FilterTestCase
     {
         // Deactivate the strict ruleset
         $this->database()->table('filter_rulesets')->where('id', 2)->update(['is_active' => 0]);
-        
+
         // Post 3 starts with the word "block" (which is only a partial match for "blockword", so it's clean)
         $this->database()->table('posts')->where('id', 3)->update(['content' => '<t><p>This contains just the word block</p></t>']);
 
@@ -284,7 +284,7 @@ class DifferentialEvaluationTest extends FilterTestCase
             'discussion_id' => 1,
             'user_id' => 2,
             'type' => 'comment',
-            'content' => '<t><p>' . $content . '</p></t>',
+            'content' => '<t><p>'.$content.'</p></t>',
             'is_approved' => 1,
             'number' => 10,
             'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()
@@ -300,7 +300,7 @@ class DifferentialEvaluationTest extends FilterTestCase
         $postId = $this->setupWordCountTest('One two three four five six seven');
 
         $response = $this->send(
-            $this->request('PATCH', '/api/posts/' . $postId, [
+            $this->request('PATCH', '/api/posts/'.$postId, [
                 'authenticatedAs' => 2,
                 'json' => [
                     'data' => [
@@ -324,7 +324,7 @@ class DifferentialEvaluationTest extends FilterTestCase
         $postId = $this->setupWordCountTest('One two three four five six seven');
 
         $response = $this->send(
-            $this->request('PATCH', '/api/posts/' . $postId, [
+            $this->request('PATCH', '/api/posts/'.$postId, [
                 'authenticatedAs' => 2,
                 'json' => [
                     'data' => [
@@ -348,7 +348,7 @@ class DifferentialEvaluationTest extends FilterTestCase
         $postId = $this->setupWordCountTest('One two three four five six seven');
 
         $response = $this->send(
-            $this->request('PATCH', '/api/posts/' . $postId, [
+            $this->request('PATCH', '/api/posts/'.$postId, [
                 'authenticatedAs' => 2,
                 'json' => [
                     'data' => [
@@ -400,7 +400,7 @@ class DifferentialEvaluationTest extends FilterTestCase
             'discussion_id' => 1,
             'user_id' => 2,
             'type' => 'comment',
-            'content' => '<t><p>' . $content . '</p></t>',
+            'content' => '<t><p>'.$content.'</p></t>',
             'is_approved' => 1,
             'number' => 11,
             'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()
@@ -416,7 +416,7 @@ class DifferentialEvaluationTest extends FilterTestCase
         $postId = $this->setupRegexTest('Call me at 5555-1234');
 
         $response = $this->send(
-            $this->request('PATCH', '/api/posts/' . $postId, [
+            $this->request('PATCH', '/api/posts/'.$postId, [
                 'authenticatedAs' => 2,
                 'json' => [
                     'data' => [
@@ -438,7 +438,7 @@ class DifferentialEvaluationTest extends FilterTestCase
         $postId = $this->setupRegexTest('Call me at 5555-1234', false);
 
         $response = $this->send(
-            $this->request('PATCH', '/api/posts/' . $postId, [
+            $this->request('PATCH', '/api/posts/'.$postId, [
                 'authenticatedAs' => 2,
                 'json' => [
                     'data' => [
@@ -462,7 +462,7 @@ class DifferentialEvaluationTest extends FilterTestCase
         $postId = $this->setupRegexTest('Call me at 5555-1234 badword', true);
 
         $response = $this->send(
-            $this->request('PATCH', '/api/posts/' . $postId, [
+            $this->request('PATCH', '/api/posts/'.$postId, [
                 'authenticatedAs' => 2,
                 'json' => [
                     'data' => [
@@ -529,7 +529,7 @@ class DifferentialEvaluationTest extends FilterTestCase
         $this->database()->table('users')->where('id', 2)->update(['comment_count' => 2]);
 
         $response = $this->send(
-            $this->request('PATCH', '/api/posts/' . $postId, [
+            $this->request('PATCH', '/api/posts/'.$postId, [
                 'authenticatedAs' => 2,
                 'json' => [
                     'data' => [

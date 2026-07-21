@@ -107,6 +107,7 @@ class ExecuteModerationActions
         $rulesets = $allActive->filter(function (Ruleset $ruleset) use ($globalAutoFlag, $globalRequireApproval, $hasFlags, $hasApproval) {
             $willFlag = $hasFlags && ($ruleset->auto_flag ?? $globalAutoFlag);
             $willApprove = $hasApproval && ($ruleset->require_approval ?? $globalRequireApproval);
+
             return $willFlag || $willApprove || $ruleset->block_cascade;
         });
 
@@ -294,7 +295,7 @@ class ExecuteModerationActions
                 $post->discussion->is_approved = false;
                 $post->discussion->save();
             }
-            
+
             $post->is_approved = false;
             $post->save();
         });
