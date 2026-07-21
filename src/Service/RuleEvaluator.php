@@ -49,7 +49,15 @@ class RuleEvaluator
 
     public function evaluateAST(array $node, EvaluationContext $context, array $providers, Ruleset $ruleset): ?array
     {
+        if (! isset($node['type'])) {
+            return null;
+        }
+
         if ($node['type'] === 'logical') {
+            if (! isset($node['left']) || ! isset($node['right']) || ! isset($node['operator'])) {
+                return null;
+            }
+
             $left = $this->evaluateAST($node['left'], $context, $providers, $ruleset);
 
             if ($node['operator'] === 'OR') {
@@ -79,12 +87,18 @@ class RuleEvaluator
         }
 
         if ($node['type'] === 'not') {
+            if (! isset($node['node'])) {
+                return null;
+            }
             $result = $this->evaluateAST($node['node'], $context, $providers, $ruleset);
 
             return $result === null ? [] : null;
         }
 
         if ($node['type'] === 'rule') {
+            if (! isset($node['provider'])) {
+                return null;
+            }
             return $this->evaluateRuleNode($node, $context, $providers);
         }
 
