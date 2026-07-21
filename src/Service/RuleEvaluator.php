@@ -99,6 +99,7 @@ class RuleEvaluator
             if (! isset($node['provider'])) {
                 return null;
             }
+
             return $this->evaluateRuleNode($node, $context, $providers);
         }
 
