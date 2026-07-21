@@ -34,8 +34,7 @@ export default class FilterRuleModal extends Modal<FilterRuleModalAttrs> {
     const type = this.attrs.type || 'info';
     const settings = this.attrs.displaySettings || {};
     if (settings.title) {
-      const trans = app.translator.trans(settings.title as string);
-      return m.trust(Array.isArray(trans) ? trans.join('') : String(trans));
+      return m.trust(settings.title as string);
     }
     return app.translator.trans(`huoxin-filter-rule-manager.forum.modal_title_${type}`);
   }
