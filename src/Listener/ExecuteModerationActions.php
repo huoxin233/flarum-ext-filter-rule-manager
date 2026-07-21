@@ -12,9 +12,10 @@
 namespace Huoxin\FilterRuleManager\Listener;
 
 use Carbon\Carbon;
+use Flarum\Discussion\Event\Saving as DiscussionSaving;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Flags\Flag;
-use Flarum\Post\Event\Saving;
+use Flarum\Post\Event\Saving as PostSaving;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Model\Ruleset;
@@ -39,10 +40,11 @@ class ExecuteModerationActions
 
     public function subscribe(Dispatcher $events): void
     {
-        $events->listen(Saving::class, [$this, 'moderatePost']);
+        $events->listen(PostSaving::class, [$this, 'moderatePost']);
+        $events->listen(DiscussionSaving::class, [$this, 'moderateDiscussion']);
     }
 
-    public function moderatePost(Saving $event): void
+    public function moderatePost(PostSaving $event): void
     {
         $hasApproval = $this->extensions->isEnabled('flarum-approval');
         $hasFlags = $this->extensions->isEnabled('flarum-flags');
@@ -65,6 +67,34 @@ class ExecuteModerationActions
             return;
         }
 
+        $onlyField = $post->exists ? 'content' : null;
+        $this->evaluateModeration($event, $post, $event->actor, $onlyField);
+    }
+
+    public function moderateDiscussion(DiscussionSaving $event): void
+    {
+        $discussion = $event->discussion;
+
+        // Only evaluate if the discussion already exists and its title was modified.
+        // New discussions are handled by moderatePost because their first post is also saved.
+        if ($discussion->exists && $discussion->isDirty('title')) {
+            $firstPost = $discussion->firstPost;
+            if ($firstPost) {
+                $firstPost->setRelation('discussion', $discussion);
+                $this->evaluateModeration($event, $firstPost, $event->actor, 'title');
+            }
+        }
+    }
+
+    private function evaluateModeration($event, $post, $actor, ?string $onlyField = null): void
+    {
+        $hasApproval = $this->extensions->isEnabled('flarum-approval');
+        $hasFlags = $this->extensions->isEnabled('flarum-flags');
+
+        if (! $hasApproval && ! $hasFlags) {
+            return;
+        }
+
         $globalAutoFlag = (bool) $this->settings->get('huoxin-filter-rule-manager.global_auto_flag', true);
         $globalRequireApproval = (bool) $this->settings->get('huoxin-filter-rule-manager.global_require_approval', true);
         $globalEvasionActive = (bool) $this->settings->get('huoxin-filter-rule-manager.global_evasion_active', false);
@@ -81,9 +111,8 @@ class ExecuteModerationActions
         $providers = $this->evaluator->getProviders();
 
         [$defaultRulesets, $customMessages, $requiresApproval, $requiresFlag] =
-            $this->collectModerationMatches($rulesets, $event, $providers, $globalAutoFlag, $globalRequireApproval);
+            $this->collectModerationMatches($rulesets, $post, $actor, $providers, $globalAutoFlag, $globalRequireApproval, $onlyField);
 
-        $actor = $event->actor;
         $blockedRulesetName = $this->resolveEvasion($actor, $allActive, $globalEvasionActive, $globalEvasionTimeout, $globalEvasionThreshold);
         $isEvasion = $blockedRulesetName !== null;
 
@@ -105,16 +134,18 @@ class ExecuteModerationActions
 
         $reasonDetail = $this->buildReasonDetail($defaultRulesets, $customMessages, $isEvasion, $blockedRulesetName);
 
+        $entityBeingSaved = $event instanceof PostSaving ? $event->post : $event->discussion;
+
         if ($shouldApprove) {
-            $this->applyApproval($post);
+            $this->applyApproval($entityBeingSaved, $post);
         }
 
         if ($shouldFlag) {
-            $this->createFlag($post, $reasonDetail, 'autoMod');
+            $this->createFlag($entityBeingSaved, $post, $reasonDetail, 'autoMod');
         }
     }
 
-    private function collectModerationMatches(Collection $rulesets, Saving $event, array $providers, bool $globalAutoFlag, bool $globalRequireApproval): array
+    private function collectModerationMatches(Collection $rulesets, $post, $actor, array $providers, bool $globalAutoFlag, bool $globalRequireApproval, ?string $onlyField = null): array
     {
         $defaultRulesets = [];
         $customMessages = [];
@@ -122,8 +153,15 @@ class ExecuteModerationActions
         $requiresFlag = false;
 
         foreach ($rulesets as $ruleset) {
-            $tokens = $this->matcher->match($ruleset, $event->post, $event->actor, $providers);
+            $tokens = $this->matcher->match($ruleset, $post, $actor, $providers, false, $onlyField);
             if ($tokens !== null) {
+                if ($post->exists) {
+                    $oldTokens = $this->matcher->match($ruleset, $post, $actor, $providers, true, $onlyField);
+
+                    if ($oldTokens !== null && $oldTokens === $tokens) {
+                        continue; // Violation already existed prior to this edit.
+                    }
+                }
                 if (! empty($ruleset->flag_message)) {
                     $customMessages[] = $this->evaluator->interpolate($ruleset->flag_message, $tokens);
                 } else {
@@ -241,19 +279,22 @@ class ExecuteModerationActions
         return null;
     }
 
-    private function applyApproval($post): void
+    private function applyApproval($entityBeingSaved, $post): void
     {
-        $post->is_approved = false;
+        $entityBeingSaved->is_approved = false;
 
-        $post->afterSave(function ($post) {
+        $entityBeingSaved->afterSave(function () use ($post) {
             if ($post->number == 1 && $post->discussion) {
                 $post->discussion->is_approved = false;
                 $post->discussion->save();
             }
+            
+            $post->is_approved = false;
+            $post->save();
         });
     }
 
-    private function createFlag($post, string $reasonDetail, string $type): void
+    private function createFlag($entityBeingSaved, $post, string $reasonDetail, string $type): void
     {
         // Prevent duplicate moderation actions on edits
         if ($post->exists) {
@@ -262,7 +303,7 @@ class ExecuteModerationActions
             }
         }
 
-        $post->afterSave(function ($post) use ($reasonDetail, $type) {
+        $entityBeingSaved->afterSave(function () use ($post, $reasonDetail, $type) {
             $flag = new Flag();
             $flag->post_id = $post->id;
             $flag->type = $type;

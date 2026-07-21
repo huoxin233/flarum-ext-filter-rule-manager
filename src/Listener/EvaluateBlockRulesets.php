@@ -12,7 +12,8 @@
 namespace Huoxin\FilterRuleManager\Listener;
 
 use Carbon\Carbon;
-use Flarum\Post\Event\Saving;
+use Flarum\Discussion\Event\Saving as DiscussionSaving;
+use Flarum\Post\Event\Saving as PostSaving;
 use Flarum\Post\Exception\FloodingException;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
@@ -20,6 +21,7 @@ use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
+use Illuminate\Contracts\Events\Dispatcher;
 
 class EvaluateBlockRulesets
 {
@@ -31,7 +33,13 @@ class EvaluateBlockRulesets
     ) {
     }
 
-    public function handle(Saving $event): void
+    public function subscribe(Dispatcher $events): void
+    {
+        $events->listen(PostSaving::class, [$this, 'handlePost']);
+        $events->listen(DiscussionSaving::class, [$this, 'handleDiscussion']);
+    }
+
+    public function handlePost(PostSaving $event): void
     {
         $post = $event->post;
 
@@ -41,6 +49,27 @@ class EvaluateBlockRulesets
             return;
         }
 
+        $onlyField = $post->exists ? 'content' : null;
+        $this->evaluate($post, $event->actor, $onlyField);
+    }
+
+    public function handleDiscussion(DiscussionSaving $event): void
+    {
+        $discussion = $event->discussion;
+
+        // Only evaluate if the discussion already exists and its title was modified.
+        // New discussions are handled by handlePost because their first post is also saved.
+        if ($discussion->exists && $discussion->isDirty('title')) {
+            $firstPost = $discussion->firstPost;
+            if ($firstPost) {
+                $firstPost->setRelation('discussion', $discussion);
+                $this->evaluate($firstPost, $event->actor, 'title');
+            }
+        }
+    }
+
+    private function evaluate($post, $actor, ?string $onlyField = null): void
+    {
         $content = (string) $post->content;
         $discussion = $post->discussion;
         $title = $discussion ? (string) $discussion->title : '';
@@ -52,13 +81,21 @@ class EvaluateBlockRulesets
         $triggered = [];
 
         foreach ($rulesets as $ruleset) {
-            $tokens = $this->matcher->match($ruleset, $post, $event->actor, $providers);
+            $tokens = $this->matcher->match($ruleset, $post, $actor, $providers, false, $onlyField);
             if ($tokens === null) {
                 continue;
             }
 
+            if ($post->exists) {
+                $oldTokens = $this->matcher->match($ruleset, $post, $actor, $providers, true, $onlyField);
+
+                if ($oldTokens !== null && $oldTokens === $tokens) {
+                    continue; // Violation already existed prior to this edit.
+                }
+            }
+
             if ($ruleset->intervention_type === 'block') {
-                $targetContent = $this->matcher->getTargetContent($ruleset, $post, $discussion);
+                $targetContent = $this->matcher->getTargetContent($ruleset, $post, $discussion, false, $onlyField);
 
                 $triggered[] = [
                     'ruleset_id' => $ruleset->id,
@@ -77,7 +114,6 @@ class EvaluateBlockRulesets
         }
 
         if (! empty($triggered)) {
-            $actor = $event->actor;
             if ($actor && ! $actor->isGuest()) {
                 $now = Carbon::now();
 
