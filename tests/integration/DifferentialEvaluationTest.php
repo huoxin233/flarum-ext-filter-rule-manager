@@ -12,6 +12,7 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
+use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use PHPUnit\Framework\Attributes\Test;
@@ -23,7 +24,7 @@ class DifferentialEvaluationTest extends FilterTestCase
         parent::setUp();
 
         $this->prepareDatabase([
-            \Flarum\Discussion\Discussion::class => [
+            Discussion::class => [
                 ['id' => 1, 'title' => 'Clean Title', 'user_id' => 2, 'comment_count' => 3, 'participant_count' => 1, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
             ],
             Post::class => [
