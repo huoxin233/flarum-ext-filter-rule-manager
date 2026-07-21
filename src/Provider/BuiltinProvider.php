@@ -91,16 +91,21 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
                 return null;
             }
             $matches = [];
+            $totalCount = 0;
             foreach ($words as $word) {
-                if (stripos($context->content, $word) !== false) {
-                    $matches[] = $word;
-                    if (! $scanAll) {
-                        break;
+                $count = substr_count(mb_strtolower($context->content), mb_strtolower($word));
+                if ($count > 0) {
+                    if (empty($matches) || $scanAll) {
+                        $matches[] = $word;
                     }
+                    $totalCount += $count;
                 }
             }
             if (! empty($matches)) {
-                return ['matched_word' => implode(', ', $matches)];
+                return [
+                    'matched_word' => implode(', ', $matches),
+                    '__count' => (string) $totalCount
+                ];
             }
 
             return null;
@@ -113,16 +118,20 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
             }
             $matchedPatterns = [];
             $matchedStrings = [];
+            $totalCount = 0;
             foreach ($patterns as $pattern) {
                 $regex = str_starts_with($pattern, '/')
                     ? $pattern
                     : '/'.str_replace('/', '\/', $pattern).'/i';
 
-                if (@preg_match($regex, $context->content, $matches)) {
-                    $matchedPatterns[] = $pattern;
-                    $matchedStrings[] = $matches[0] ?? '';
-                    if (! $scanAll) {
-                        break;
+                if (@preg_match_all($regex, $context->content, $matches)) {
+                    $count = count($matches[0]);
+                    if ($count > 0) {
+                        if (empty($matchedPatterns) || $scanAll) {
+                            $matchedPatterns[] = $pattern;
+                            $matchedStrings[] = $matches[0][0] ?? '';
+                        }
+                        $totalCount += $count;
                     }
                 }
             }
@@ -130,6 +139,7 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
                 return [
                     'matched_pattern' => implode(', ', $matchedPatterns),
                     'matched_string' => implode(', ', $matchedStrings),
+                    '__count' => (string) $totalCount
                 ];
             }
 

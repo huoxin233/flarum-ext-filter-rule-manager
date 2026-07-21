@@ -40,7 +40,11 @@ interface RuleProviderInterface
      * @param array  $config  Rule config JSON decoded to array
      * @param EvaluationContext $context The context object containing content, actor, and post
      *
-     * @return array|null  null = not triggered; array (may be empty) = triggered with tokens
+     * @return array|null  null = not triggered. If triggered, return an array of tokens (e.g. ['word' => 'spam']).
+     *                     FOR DIFFERENTIAL EVALUATION: The engine uses strict equality (`===`) on this returned
+     *                     array to determine if an edit introduces a *new* violation. If your rule supports multiple occurrences 
+     *                     of a violation (e.g. multiple bad words), you MUST return a state indicator (such as `'__count' => $total`) 
+     *                     in this array so the engine can accurately detect when a user adds more violations to an already-flagged post.
      */
     public function evaluate(string $type, array $config, EvaluationContext $context): ?array;
 
