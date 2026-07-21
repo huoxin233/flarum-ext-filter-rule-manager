@@ -206,6 +206,10 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                 ->set(function (Ruleset $model, $value) {
                     $model->bypass_group_ids = $this->sanitizeIds($value);
                 }),
+            Schema\Boolean::make('strictEdit')
+                ->property('strict_edit')
+                ->writable()
+                ->nullable(),
             Schema\Arr::make('displaySettings')
                 ->property('display_settings')
                 ->writable()

@@ -29,6 +29,7 @@ Object.assign(Ruleset.prototype, {
   isActive: Model.attribute('isActive'),
   autoFlag: Model.attribute('autoFlag'),
   requireApproval: Model.attribute('requireApproval'),
+  strictEdit: Model.attribute('strictEdit'),
   scopeType: Model.attribute('scopeType'),
   scopeTagIds: Model.attribute('scopeTagIds'),
   bypassGroupIds: Model.attribute('bypassGroupIds'),

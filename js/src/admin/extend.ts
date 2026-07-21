@@ -35,6 +35,12 @@ const extenders = [
       type: 'boolean',
     }))
     .setting(() => ({
+      setting: 'huoxin-filter-rule-manager.strict_edit_evaluation',
+      label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_strict_edit_evaluation')),
+      help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_strict_edit_evaluation_help')),
+      type: 'boolean',
+    }))
+    .setting(() => ({
       setting: 'huoxin-filter-rule-manager.global_evasion_active',
       label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active')),
       help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_active_help')),
