@@ -81,6 +81,12 @@ class EvaluateBlockRulesets
         $triggered = [];
 
         foreach ($rulesets as $ruleset) {
+            // Optimization: If the ruleset isn't a block and doesn't break the cascade, 
+            // it has zero effect in this listener. Skip it immediately to save AST computation.
+            if ($ruleset->intervention_type !== 'block' && ! $ruleset->block_cascade) {
+                continue;
+            }
+
             $tokens = $this->matcher->match($ruleset, $post, $actor, $providers, false, $onlyField);
             if ($tokens === null) {
                 continue;
