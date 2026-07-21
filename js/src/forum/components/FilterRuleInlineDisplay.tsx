@@ -105,6 +105,7 @@ export default class FilterRuleInlineDisplay extends Component<FilterRuleInlineD
               this.dismissedAlerts.add(alert.key || String(i));
             }}
             title={String(app.translator.trans('core.lib.error.dismiss_button')) || 'Dismiss'}
+            aria-label={String(app.translator.trans('core.lib.error.dismiss_button')) || 'Dismiss'}
           >
             {icon('fas fa-times')}
           </button>

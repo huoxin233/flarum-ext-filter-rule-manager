@@ -162,6 +162,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
               icon="fas fa-times"
               onclick={() => onchange(null)}
               title={String(app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.delete_rule'))}
+              aria-label={String(app.translator.trans('huoxin-filter-rule-manager.admin.rule_builder.delete_rule'))}
             />
           </div>
         </div>

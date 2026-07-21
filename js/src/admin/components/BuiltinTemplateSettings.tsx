@@ -197,6 +197,7 @@ export default class BuiltinTemplateSettings extends Component<BuiltinTemplateSe
                           this.showIconPicker = false;
                         }}
                         title={iconClass}
+                        aria-label={iconClass}
                       >
                         {icon(iconClass)}
                       </button>
