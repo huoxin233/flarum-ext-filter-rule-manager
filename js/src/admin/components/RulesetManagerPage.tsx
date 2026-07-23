@@ -21,6 +21,7 @@ import type Model from 'flarum/common/Model';
 import type { ASTNode } from '../../common/FilterEngine';
 
 import RulesetEditorModal from './RulesetEditorModal';
+import ImportRulesetsModal from './ImportRulesetsModal';
 
 const SCOPES = ['all', 'global', 'normal_post', 'private_post', 'tag'];
 
@@ -138,9 +139,19 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           </div>
           <div className="FilterRuleManager-Page-actions">
             {this.activeTab === 'rulesets' && (
-              <Button className="Button Button--primary" icon="fas fa-plus" onclick={() => this.showEditor(null)}>
-                {app.translator.trans('huoxin-filter-rule-manager.admin.add_ruleset')}
-              </Button>
+              <>
+                <div className="ButtonGroup">
+                  <Button className="Button" icon="fas fa-file-import" onclick={() => this.showImportModal()}>
+                    {app.translator.trans('huoxin-filter-rule-manager.admin.import')}
+                  </Button>
+                  <Button className="Button" icon="fas fa-file-export" onclick={() => this.exportRulesets()}>
+                    {app.translator.trans('huoxin-filter-rule-manager.admin.export_all')}
+                  </Button>
+                </div>
+                <Button className="Button Button--primary" style={{ marginLeft: '10px' }} icon="fas fa-plus" onclick={() => this.showEditor(null)}>
+                  {app.translator.trans('huoxin-filter-rule-manager.admin.add_ruleset')}
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -452,6 +463,9 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             <Button icon="fas fa-copy" onclick={() => this.duplicateRuleset(ruleset)}>
               {app.translator.trans('huoxin-filter-rule-manager.admin.duplicate')}
             </Button>
+            <Button icon="fas fa-file-export" onclick={() => this.exportRulesets(ruleset.id() as string)}>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.export')}
+            </Button>
             <Separator />
             <Button className="has-Icon text-danger" icon="fas fa-trash" onclick={() => this.deleteRuleset(ruleset)}>
               {app.translator.trans('huoxin-filter-rule-manager.admin.delete')}
@@ -664,6 +678,42 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
       ruleset,
       providers: this.providers,
       onsave: () => this.loadData(),
+    });
+  }
+
+  async exportRulesets(id?: string) {
+    let url = app.forum.attribute('apiUrl') + '/filter-rule/export-rulesets';
+    if (id) {
+      url += '?id=' + id;
+    }
+
+    try {
+      const response = await app.request({
+        method: 'GET',
+        url: url,
+      });
+
+      const jsonString = JSON.stringify(response, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const blobUrl = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `rulesets_export_${id || 'all'}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (e) {
+      console.error('Export failed:', e);
+      app.alerts.show({ type: 'error' }, 'Failed to export rulesets.');
+    }
+  }
+
+  showImportModal() {
+    app.modal.show(ImportRulesetsModal, {
+      onsuccess: () => window.location.reload(),
     });
   }
 

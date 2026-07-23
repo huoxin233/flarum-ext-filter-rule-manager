@@ -30,6 +30,8 @@ huoxin-filter-rule-manager:
     move_to_top: "Move to top"
     move_to_bottom: "Move to bottom"
     duplicate: "Duplicate"
+    import: "Import"
+    export: "Export"
     reorder_error: "Could not save the new order. Showing the latest server state."
     toggle_error: "Could not update the ruleset's active state."
     active: "Active"
@@ -38,6 +40,20 @@ huoxin-filter-rule-manager:
     unsaved_changes_message: "You have unsaved changes. Are you sure you want to discard them?"
     discard_changes: "Discard Changes"
     keep_editing: "Keep Editing"
+
+    # ── Import/Export ──────────────────────────────────────────────────────
+    import_rulesets: "Import Rulesets"
+    import_json_label: "Paste JSON payload or upload file"
+    upload_json: "Upload .json file"
+    import_override_mode: "Override existing rulesets"
+    import_preserve_priority: "Preserve original priorities"
+    import_preserve_priority_help: "If disabled, imported rulesets will be appended to the bottom of your list while maintaining their relative order. If enabled, they will retain their original absolute priority numbers."
+    import_override_warning: "Warning: This will permanently delete ALL existing rulesets and replace them with the imported ones!"
+    import_override_confirm: "I understand this will delete my current rulesets"
+    import_submit: "Import Rulesets"
+    import_invalid_json: "Invalid JSON payload: {error}"
+    import_success: "Rulesets imported successfully!"
+    export_all: "Export All"
 
     # ── List headers & Filters ─────────────────────────────────────────────
     headers:

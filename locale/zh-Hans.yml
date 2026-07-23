@@ -30,6 +30,8 @@ huoxin-filter-rule-manager:
     move_to_top: "移至顶部"
     move_to_bottom: "移至底部"
     duplicate: "复制规则集"
+    import: "导入"
+    export: "导出"
     reorder_error: "保存排序失败，已重置为服务器最新状态。"
     toggle_error: "更新规则集状态失败。"
     active: "开启"
@@ -38,6 +40,21 @@ huoxin-filter-rule-manager:
     unsaved_changes_message: "您有未保存的更改。确定要放弃这些更改吗？"
     discard_changes: "放弃更改"
     keep_editing: "继续编辑"
+
+    # ── Import/Export ──────────────────────────────────────────────────────
+    import: "导入"
+    import_rulesets: "导入规则集"
+    import_json_label: "粘贴 JSON 数据"
+    upload_json: "上传 .json 文件"
+    import_override_mode: "覆盖现有规则集"
+    import_preserve_priority: "保留原始排序"
+    import_preserve_priority_help: "关闭时，导入的规则集将追加到您当前列表的底部并保持其相对顺序。开启时，它们将强制保留其原有的绝对排序数字。"
+    import_override_warning: "警告：这将永久删除所有现有的规则集，并用导入的规则集替换它们！"
+    import_override_confirm: "我明白这将删除我当前的规则集"
+    import_submit: "导入规则集"
+    import_invalid_json: "无效的 JSON 数据: {error}"
+    import_success: "规则集导入成功！"
+    export_all: "导出全部"
 
     # ── List headers & Filters ─────────────────────────────────────────────
     headers:

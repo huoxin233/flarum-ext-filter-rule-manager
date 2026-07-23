@@ -47,6 +47,9 @@ return [
         ->patch('/filter-rule-rulesets/{id}', 'filter-rule.rulesets.update', Controller\UpdateRulesetController::class)
         ->delete('/filter-rule-rulesets/{id}', 'filter-rule.rulesets.delete', Controller\DeleteRulesetController::class)
         ->post('/filter-rule-rulesets/reorder', 'filter-rule.rulesets.reorder', Controller\ReorderRulesetsController::class)
+        ->get('/filter-rule/export-rulesets', 'filter-rule.rulesets.export', Controller\ExportRulesetsController::class)
+        ->get('/filter-rule/export-rulesets/{id}', 'filter-rule.rulesets.export.single', Controller\ExportRulesetsController::class)
+        ->post('/filter-rule/import-rulesets', 'filter-rule.rulesets.import', Controller\ImportRulesetsController::class)
         ->get('/filter-rule-providers', 'filter-rule.providers.index', Controller\ListProvidersController::class),
 
     // ── Block evaluation: fires on post save and discussion save ──────────────
