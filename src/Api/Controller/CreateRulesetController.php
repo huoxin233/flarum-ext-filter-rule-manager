@@ -83,6 +83,7 @@ class CreateRulesetController extends AbstractCreateController
             $ruleset->flag_message = array_key_exists('flagMessage', $attributes) ? ($attributes['flagMessage'] === null ? null : (string) $attributes['flagMessage']) : null;
             $ruleset->evaluate_all_rules = (bool) ($attributes['evaluateAllRules'] ?? false);
             $ruleset->evaluate_title = array_key_exists('evaluateTitle', $attributes) ? ($attributes['evaluateTitle'] === null ? null : (bool) $attributes['evaluateTitle']) : null;
+            $ruleset->strip_mentions = array_key_exists('stripMentions', $attributes) ? ($attributes['stripMentions'] === null ? null : (bool) $attributes['stripMentions']) : null;
             $ruleset->evasion_active = array_key_exists('evasionActive', $attributes) ? ($attributes['evasionActive'] === null ? null : (bool) $attributes['evasionActive']) : null;
             $ruleset->evasion_timeout = array_key_exists('evasionTimeout', $attributes) ? ($attributes['evasionTimeout'] === null ? null : max(0, (int) $attributes['evasionTimeout'])) : null;
             $ruleset->evasion_threshold = array_key_exists('evasionThreshold', $attributes) ? ($attributes['evasionThreshold'] === null ? null : max(1, (int) $attributes['evasionThreshold'])) : null;

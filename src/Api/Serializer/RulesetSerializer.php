@@ -41,6 +41,7 @@ class RulesetSerializer extends AbstractSerializer
             'flagMessage' => $model->flag_message,
             'evaluateAllRules' => (bool) $model->evaluate_all_rules,
             'evaluateTitle' => $model->evaluate_title === null ? null : (bool) $model->evaluate_title,
+            'stripMentions' => $model->strip_mentions === null ? null : (bool) $model->strip_mentions,
             'evasionActive' => $model->evasion_active === null ? null : (bool) $model->evasion_active,
             'evasionTimeout' => $model->evasion_timeout === null ? null : (int) $model->evasion_timeout,
             'evasionThreshold' => $model->evasion_threshold === null ? null : (int) $model->evasion_threshold,

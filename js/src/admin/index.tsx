@@ -28,6 +28,7 @@ Object.assign(Ruleset.prototype, {
   flagMessage: Model.attribute('flagMessage'),
   evaluateAllRules: Model.attribute('evaluateAllRules'),
   evaluateTitle: Model.attribute('evaluateTitle'),
+  stripMentions: Model.attribute('stripMentions'),
   evasionActive: Model.attribute('evasionActive'),
   evasionTimeout: Model.attribute('evasionTimeout'),
   evasionThreshold: Model.attribute('evasionThreshold'),
