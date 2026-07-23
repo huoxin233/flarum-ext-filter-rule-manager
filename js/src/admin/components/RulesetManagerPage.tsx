@@ -721,6 +721,9 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     try {
       const attributes = Object.assign({}, ruleset.data.attributes);
       delete attributes.id;
+      delete attributes.compiledAst;
+      delete attributes.createdAt;
+      delete attributes.updatedAt;
       attributes.name = (ruleset.name() + ' (Copy)').substring(0, 100);
 
       const duplicate = app.store.createRecord('filter-rule-rulesets');
