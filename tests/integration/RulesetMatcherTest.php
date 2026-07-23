@@ -97,7 +97,23 @@ class RulesetMatcherTest extends FilterTestCase
                     'is_active' => 1,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString()
-                ]
+                ],
+                [
+                    'id' => 5,
+                    'name' => 'Mentions Stripper Ruleset',
+                    'priority' => 4,
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['admin']]
+                    ]),
+                    'intervention_type' => 'block',
+                    'display_mode' => 'banner',
+                    'scope_type' => 'global',
+                    'strip_mentions' => 1, // Mentions stripped!
+                    'message' => 'Cannot use the word admin',
+                    'is_active' => 1,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString()
+                ],
             ]
         ]);
     }
@@ -164,5 +180,77 @@ class RulesetMatcherTest extends FilterTestCase
         $this->assertEquals(422, $response->getStatusCode());
         $body = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals('Scam detected in title or content', $body['errors'][0]['detail']);
+    }
+
+    /** @test */
+    public function test_strip_mentions_ignores_mentioned_users()
+    {
+        // 1. Sending a post with JUST an unparsed mention of admin should NOT be blocked
+        $response = $this->send(
+            $this->request('POST', '/api/posts', [
+                'authenticatedAs' => 3,
+                'json' => [
+                    'data' => [
+                        'type' => 'posts',
+                        'attributes' => [
+                            'content' => 'Hello @"admin"#1, how are you?'
+                        ],
+                        'relationships' => [
+                            'discussion' => ['data' => ['type' => 'discussions', 'id' => '1']]
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->assertEquals(201, $response->getStatusCode(), 'Mention of admin should not be blocked because it was stripped.');
+
+        // Advance time to bypass Flarum's post flood control (429 Too Many Requests)
+        Carbon::setTestNow(Carbon::now()->addSeconds(15));
+
+        // 2. Sending a post with a raw plain-text @admin mention should ALSO NOT be blocked (due to the secondary fallback regex)
+        $response = $this->send(
+            $this->request('POST', '/api/posts', [
+                'authenticatedAs' => 3,
+                'json' => [
+                    'data' => [
+                        'type' => 'posts',
+                        'attributes' => [
+                            'content' => 'Hello @admin, how are you?'
+                        ],
+                        'relationships' => [
+                            'discussion' => ['data' => ['type' => 'discussions', 'id' => '1']]
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->assertEquals(201, $response->getStatusCode(), 'Plain text @admin should not be blocked because it was stripped.');
+
+        // Advance time again to bypass flood control
+        Carbon::setTestNow(Carbon::now()->addSeconds(15));
+
+        // 3. Sending a post with the word 'admin' without a mention SHOULD be blocked
+        $response = $this->send(
+            $this->request('POST', '/api/posts', [
+                'authenticatedAs' => 3,
+                'json' => [
+                    'data' => [
+                        'type' => 'posts',
+                        'attributes' => [
+                            'content' => 'I am the admin now'
+                        ],
+                        'relationships' => [
+                            'discussion' => ['data' => ['type' => 'discussions', 'id' => '1']]
+                        ]
+                    ]
+                ]
+            ])
+        );
+
+        $this->assertEquals(422, $response->getStatusCode(), 'The word admin should be blocked when not a mention.');
+        $body = json_decode($response->getBody()->getContents(), true);
+        $this->assertEquals('Cannot use the word admin', $body['errors'][0]['detail']);
     }
 }
