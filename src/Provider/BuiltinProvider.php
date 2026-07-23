@@ -173,14 +173,14 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
             $excludeMentions = $config['exclude_mentions'] ?? true;
             if ($excludeMentions) {
                 // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
-                $text = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $text);
-                $text = preg_replace('/@\w+/', '', $text);
+                $text = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $text) ?? $text;
+                $text = preg_replace('/@\w+/', '', $text) ?? $text;
             }
 
             $excludeUrls = $config['exclude_urls'] ?? true;
             if ($excludeUrls) {
                 // Remove URLs to avoid them skewing word counts
-                $text = preg_replace('#https?://[^\s]+#i', '', $text);
+                $text = preg_replace('#https?://[^\s]+#i', '', $text) ?? $text;
             }
 
             // CJK Character Range:
@@ -192,7 +192,7 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
             preg_match_all($cjkRegex, $text, $cjkMatches);
             $cjkCount = count($cjkMatches[0] ?? []);
 
-            $latinText = preg_replace($cjkRegex, ' ', $text);
+            $latinText = preg_replace($cjkRegex, ' ', $text) ?? $text;
             $latinCount = str_word_count($latinText);
 
             $count = $cjkCount + $latinCount;
