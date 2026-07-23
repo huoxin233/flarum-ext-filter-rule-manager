@@ -69,6 +69,8 @@ huoxin-filter-rule-manager:
     settings:
       global_evaluate_title: "检查主题标题"
       global_evaluate_title_help: "开启后，规则引擎将同时检查主题的标题和帖子的内容。"
+      global_strip_mentions: "默认检查前剔除提及 (@)"
+      global_strip_mentions_help: "开启后，默认从检查文本中删除所有提及（除非在规则集中明确禁用）。"
       global_auto_flag: "自动举报"
       global_auto_flag_help: "开启后，触发此规则集的帖子将自动被举报并进入管理队列。（需要 flarum/flags 扩展）"
       global_require_approval: "进入审核队列"
@@ -122,6 +124,8 @@ huoxin-filter-rule-manager:
 
     ruleset_evaluate_title_label: "检查主题标题"
     ruleset_evaluate_title_help: "开启后，规则引擎将同时检查主题的标题和帖子的内容。"
+    ruleset_strip_mentions: "检查前剔除提及 (@)"
+    ruleset_strip_mentions_help: "开启后，将从检查文本中删除所有针对用户和回帖的提及，防止包含敏感词的用户名引发误报。"
     ruleset_auto_flag: "匹配时自动举报"
     ruleset_auto_flag_help: "开启后，触发此规则集的帖子将自动被举报并进入管理队列。（需要 flarum/flags 扩展）"
     ruleset_require_approval: "匹配时进入审核队列"

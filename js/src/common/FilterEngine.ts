@@ -24,6 +24,9 @@ export interface ASTNode {
   _key?: number;
 }
 
+const MENTION_FORMAT_REGEX = /@"?[^"#\n]+"?#(?:p)?\d+/g;
+const PLAIN_MENTION_REGEX = /@\w+/g;
+
 export interface FilterRuleProvider {
   getSupportedTypes(): string[];
   getTypeLabels?(): Record<string, string>;
@@ -40,6 +43,7 @@ export interface Ruleset {
   scopeType: string;
   scopeTagIds?: (string | number)[];
   evaluateTitle?: boolean;
+  stripMentions?: boolean;
   evaluateAllRules?: boolean | (() => boolean);
   blockCascade?: boolean;
   compiledAst?: () => ASTNode;
@@ -291,12 +295,36 @@ export class FilterEngine {
     const activeAlerts: ActiveAlert[] = [];
     this.currentRunAlerts = activeAlerts;
 
+    // Cache stripped versions lazily to avoid running regexes multiple times
+    // if several rulesets have stripMentions enabled.
+    let contentStripped: string | null = null;
+    let combined: string | null = null;
+    let combinedStripped: string | null = null;
+
     for (const ruleset of this.rulesets) {
       if (!this.scopeMatches(ruleset, composer, application)) continue;
 
       let targetContent = content;
-      if (ruleset.evaluateTitle !== false && title) {
-        targetContent = title + '\n\n' + content;
+      const useCombined = ruleset.evaluateTitle !== false && title;
+
+      if (ruleset.stripMentions !== false) {
+        if (useCombined) {
+          if (combinedStripped === null) {
+            combined = combined || title + '\n\n' + content;
+            combinedStripped = combined.replace(MENTION_FORMAT_REGEX, '').replace(PLAIN_MENTION_REGEX, '');
+          }
+          targetContent = combinedStripped;
+        } else {
+          if (contentStripped === null) {
+            contentStripped = content.replace(MENTION_FORMAT_REGEX, '').replace(PLAIN_MENTION_REGEX, '');
+          }
+          targetContent = contentStripped;
+        }
+      } else {
+        if (useCombined) {
+          combined = combined || title + '\n\n' + content;
+          targetContent = combined;
+        }
       }
 
       const tokens = this.evaluateRuleset(ruleset, targetContent);

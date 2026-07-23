@@ -69,6 +69,8 @@ huoxin-filter-rule-manager:
     settings:
       global_evaluate_title: "Evaluate Discussion Title"
       global_evaluate_title_help: "When enabled, the rules engine will evaluate the title of the discussion alongside the post content."
+      global_strip_mentions: "Strip Mentions by Default"
+      global_strip_mentions_help: "If enabled, rulesets will strip all mentions from the text before evaluation by default (unless explicitly disabled on the ruleset)."
       global_auto_flag: "Auto Flag"
       global_auto_flag_help: "If enabled, triggering this ruleset will automatically create a flag for moderators to review. (Requires flarum/flags)"
       global_require_approval: "Require Approval"
@@ -122,6 +124,8 @@ huoxin-filter-rule-manager:
 
     ruleset_evaluate_title_label: "Evaluate Discussion Title"
     ruleset_evaluate_title_help: "When enabled, the rules engine will evaluate the title of the discussion alongside the post content."
+    ruleset_strip_mentions: "Strip Mentions Before Evaluation"
+    ruleset_strip_mentions_help: "If enabled, all user and post mentions will be stripped from the text before it is evaluated by the rules."
     ruleset_auto_flag: "Auto-flag post on match"
     ruleset_auto_flag_help: "If enabled, triggering this ruleset will automatically create a flag for moderators to review. (Requires flarum/flags)"
     ruleset_require_approval: "Require approval on match"
