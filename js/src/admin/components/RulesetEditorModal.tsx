@@ -281,6 +281,12 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
         </div>
 
         {this.nullableBooleanSelect(
+          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title',
+          'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_help',
+          this.evaluateTitle
+        )}
+
+        {this.nullableBooleanSelect(
           'huoxin-filter-rule-manager.admin.ruleset_strip_mentions',
           'huoxin-filter-rule-manager.admin.ruleset_strip_mentions_help',
           this.stripMentions
