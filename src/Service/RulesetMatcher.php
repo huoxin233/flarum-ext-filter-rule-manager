@@ -142,8 +142,8 @@ class RulesetMatcher
 
         if ($stripMentions) {
             // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
-            $targetContent = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $targetContent);
-            $targetContent = preg_replace('/@\w+/', '', $targetContent);
+            $targetContent = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $targetContent) ?? $targetContent;
+            $targetContent = preg_replace('/@\w+/', '', $targetContent) ?? $targetContent;
         }
 
         return $targetContent;
