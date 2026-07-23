@@ -713,7 +713,12 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
 
   showImportModal() {
     app.modal.show(ImportRulesetsModal, {
-      onsuccess: () => window.location.reload(),
+      onsuccess: () => {
+        this.loading = true;
+        m.redraw();
+        app.store.all('filter-rule-rulesets').forEach((r) => app.store.remove(r));
+        this.loadData();
+      },
     });
   }
 
