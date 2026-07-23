@@ -34,63 +34,64 @@ export default class ImportRulesetsModal extends Modal<ImportRulesetsModalAttrs>
   content() {
     return (
       <div className="Modal-body">
-        <div className="Form-group">
-          <div className="FilterRuleManager-ImportRulesetsModal-header">
-            <label>{app.translator.trans('huoxin-filter-rule-manager.admin.import_json_label')}</label>
-            <div>
-              <input type="file" id="import-json-file" accept=".json" style={{ display: 'none' }} onchange={this.handleFileUpload.bind(this)} />
-              <Button className="Button" icon="fas fa-upload" onclick={() => document.getElementById('import-json-file')?.click()}>
-                {app.translator.trans('huoxin-filter-rule-manager.admin.upload_json')}
-              </Button>
+        <div className="Form">
+          <div className="Form-group">
+            <div className="FilterRuleManager-ImportRulesetsModal-header">
+              <label>{app.translator.trans('huoxin-filter-rule-manager.admin.import_json_label')}</label>
+              <div>
+                <input type="file" id="import-json-file" accept=".json" style={{ display: 'none' }} onchange={this.handleFileUpload.bind(this)} />
+                <Button className="Button" icon="fas fa-upload" onclick={() => document.getElementById('import-json-file')?.click()}>
+                  {app.translator.trans('huoxin-filter-rule-manager.admin.upload_json')}
+                </Button>
+              </div>
             </div>
+            <textarea
+              className="FormControl"
+              rows={10}
+              value={this.jsonPayload}
+              oninput={(e: InputEvent) => (this.jsonPayload = (e.target as HTMLTextAreaElement).value)}
+              placeholder='[{"name": "My Ruleset", ...}]'
+            />
           </div>
-          <textarea
-            className="FormControl"
-            rows={10}
-            value={this.jsonPayload}
-            oninput={(e: InputEvent) => (this.jsonPayload = (e.target as HTMLTextAreaElement).value)}
-            placeholder='[{"name": "My Ruleset", ...}]'
-          />
-        </div>
 
-        <div className="Form-group">
-          <Switch state={this.preservePriority} onchange={(val: boolean) => (this.preservePriority = val)}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.import_preserve_priority')}
-          </Switch>
-          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.import_preserve_priority_help')}</div>
-        </div>
-
-        <div className="Form-group">
-          <Switch state={this.overrideMode} onchange={this.toggleOverride.bind(this)}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.import_override_mode')}
-          </Switch>
-        </div>
-
-        {this.overrideMode && (
-          <div className="Alert Alert--error Form-group">
-            <strong style={{ display: 'block', marginBottom: '8px' }}>
-              {app.translator.trans('huoxin-filter-rule-manager.admin.import_override_warning')}
-            </strong>
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={this.overrideConfirmed}
-                onchange={(e: Event) => (this.overrideConfirmed = (e.target as HTMLInputElement).checked)}
-              />
-              {app.translator.trans('huoxin-filter-rule-manager.admin.import_override_confirm')}
-            </label>
+          <div className="Form-group">
+            <Switch state={this.preservePriority} onchange={(val: boolean) => (this.preservePriority = val)}>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.import_preserve_priority')}
+            </Switch>
+            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.import_preserve_priority_help')}</div>
           </div>
-        )}
 
-        <div className="Form-group">
-          <Button
-            className="Button Button--primary Button--block"
-            loading={this.loading}
-            disabled={!this.jsonPayload.trim() || (this.overrideMode && !this.overrideConfirmed)}
-            onclick={this.onsubmit.bind(this)}
-          >
-            {app.translator.trans('huoxin-filter-rule-manager.admin.import_submit')}
-          </Button>
+          <div className="Form-group">
+            <Switch state={this.overrideMode} onchange={this.toggleOverride.bind(this)}>
+              {app.translator.trans('huoxin-filter-rule-manager.admin.import_override_mode')}
+            </Switch>
+          </div>
+
+          {this.overrideMode && (
+            <div className="Alert Alert--error Form-group">
+              <strong style={{ display: 'block', marginBottom: '8px' }}>
+                {app.translator.trans('huoxin-filter-rule-manager.admin.import_override_warning')}
+              </strong>
+              <label className="checkbox">
+                <input
+                  type="checkbox"
+                  checked={this.overrideConfirmed}
+                  onchange={(e: Event) => (this.overrideConfirmed = (e.target as HTMLInputElement).checked)}
+                />
+                {app.translator.trans('huoxin-filter-rule-manager.admin.import_override_confirm')}
+              </label>
+            </div>
+          )}
+          <div className="Form-group">
+            <Button
+              type="submit"
+              className="Button Button--primary Button--block"
+              loading={this.loading}
+              disabled={!this.jsonPayload.trim() || (this.overrideMode && !this.overrideConfirmed)}
+            >
+              {app.translator.trans('huoxin-filter-rule-manager.admin.import_submit')}
+            </Button>
+          </div>
         </div>
       </div>
     );
