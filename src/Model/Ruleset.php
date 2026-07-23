@@ -36,6 +36,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property array|null $bypass_group_ids
  * @property bool|null $auto_flag
  * @property bool|null $require_approval
+ * @property bool|null $strict_edit
  * @property bool|null $strip_mentions
  * @property array|null $display_settings
  */

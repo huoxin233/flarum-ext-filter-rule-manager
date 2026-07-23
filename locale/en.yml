@@ -122,8 +122,8 @@ huoxin-filter-rule-manager:
     ruleset_message_placeholder: "Your post contains a restricted word: '{{matched_word}}'"
     ruleset_is_active: "Enabled"
 
-    ruleset_evaluate_title_label: "Evaluate Discussion Title"
-    ruleset_evaluate_title_help: "When enabled, the rules engine will evaluate the title of the discussion alongside the post content."
+    ruleset_evaluate_title: "Evaluate Discussion Title"
+    ruleset_evaluate_title_help: "If enabled, the discussion title is prepended to the first post before evaluation."
     ruleset_strip_mentions: "Strip Mentions Before Evaluation"
     ruleset_strip_mentions_help: "If enabled, all user and post mentions will be stripped from the text before it is evaluated by the rules."
     ruleset_auto_flag: "Auto-flag post on match"
