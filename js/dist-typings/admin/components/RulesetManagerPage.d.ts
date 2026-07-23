@@ -26,6 +26,8 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     renderTemplates(): Mithril.Children;
     renderModes(): Mithril.Children;
     showEditor(ruleset: any): void;
+    exportRulesets(id?: string): Promise<void>;
+    showImportModal(): void;
     duplicateRuleset(ruleset: any): Promise<void>;
     moveToEdge(ruleset: any, edge: 'top' | 'bottom'): Promise<void>;
     deleteRuleset(ruleset: any): Promise<void>;
