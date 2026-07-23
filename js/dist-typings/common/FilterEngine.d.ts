@@ -25,6 +25,7 @@ export interface Ruleset {
     scopeType: string;
     scopeTagIds?: (string | number)[];
     evaluateTitle?: boolean;
+    stripMentions?: boolean;
     evaluateAllRules?: boolean | (() => boolean);
     blockCascade?: boolean;
     compiledAst?: () => ASTNode;

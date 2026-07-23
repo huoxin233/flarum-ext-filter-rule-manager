@@ -44,6 +44,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     flagMessage: Stream<string>;
     evaluateAllRules: Stream<boolean>;
     evaluateTitle: Stream<boolean | null>;
+    stripMentions: Stream<boolean | null>;
     evasionActive: Stream<boolean | null>;
     evasionTimeout: Stream<number | null>;
     evasionThreshold: Stream<number | null>;
