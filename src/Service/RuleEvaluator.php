@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Service;
 
+use Flarum\Discussion\Discussion;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Model\Ruleset;
@@ -159,6 +160,9 @@ class RuleEvaluator
         }
     }
 
+    /**
+     * @param Discussion|null $discussion
+     */
     public function scopeMatches(Ruleset $ruleset, $discussion): bool
     {
         $isPrivate = false;
@@ -181,6 +185,7 @@ class RuleEvaluator
                     return false;
                 }
 
+                /** @phpstan-ignore-next-line */
                 $tags = $discussion->tags;
                 if (! $tags) {
                     return false;
@@ -200,7 +205,7 @@ class RuleEvaluator
         if (preg_match('/^[a-zA-Z0-9\-_]+(?:\.[a-zA-Z0-9\-_]+)+$/', $template)) {
             $trans = $this->translator->trans($template, $tokens);
             if ($trans !== $template && $trans !== '') {
-                $template = is_array($trans) ? $trans[0] : $trans;
+                $template = $trans;
             }
         }
 

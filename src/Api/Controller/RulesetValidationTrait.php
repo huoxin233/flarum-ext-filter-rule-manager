@@ -19,7 +19,7 @@ use Huoxin\FilterRuleManager\Provider\ValidatesConfigInterface;
 
 trait RulesetValidationTrait
 {
-    protected function sanitizeIds($raw): ?array
+    protected function sanitizeIds(mixed $raw): ?array
     {
         if (! is_array($raw)) {
             return null;

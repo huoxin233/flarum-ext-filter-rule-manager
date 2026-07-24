@@ -12,11 +12,14 @@
 namespace Huoxin\FilterRuleManager\Listener;
 
 use Carbon\Carbon;
+use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Event\Saving as DiscussionSaving;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Flags\Flag;
 use Flarum\Post\Event\Saving as PostSaving;
+use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\User;
 use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
@@ -56,6 +59,7 @@ class ExecuteModerationActions
         $post = $event->post;
 
         // If the post is being explicitly approved by a moderator, forgive evasion for this user
+        /** @phpstan-ignore-next-line */
         if ($post->exists && $post->isDirty('is_approved') && $post->is_approved && $post->user_id) {
             FilterBlockLog::where('user_id', $post->user_id)
                 ->update(['is_cleared' => true]);
@@ -86,6 +90,12 @@ class ExecuteModerationActions
         }
     }
 
+    /**
+     * @param PostSaving|DiscussionSaving $event
+     * @param Post $post
+     * @param User|null $actor
+     * @param string|null $onlyField
+     */
     private function evaluateModeration($event, $post, $actor, ?string $onlyField = null): void
     {
         $hasApproval = $this->extensions->isEnabled('flarum-approval');
@@ -148,6 +158,18 @@ class ExecuteModerationActions
         }
     }
 
+    /**
+     * @param Collection $rulesets
+     * @param Post $post
+     * @param User|null $actor
+     * @param array $providers
+     * @param bool $globalAutoFlag
+     * @param bool $globalRequireApproval
+     * @param bool $hasFlags
+     * @param bool $hasApproval
+     * @param string|null $onlyField
+     * @return array
+     */
     private function collectModerationMatches(Collection $rulesets, $post, $actor, array $providers, bool $globalAutoFlag, bool $globalRequireApproval, bool $hasFlags, bool $hasApproval, ?string $onlyField = null): array
     {
         $defaultRulesets = [];
@@ -201,7 +223,7 @@ class ExecuteModerationActions
         if (! empty($defaultRulesets)) {
             $rulesStr = implode(', ', $defaultRulesets);
             $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
-            $messages[] = is_array($trans) ? $trans[0] : $trans;
+            $messages[] = $trans;
         }
 
         foreach ($customMessages as $customMsg) {
@@ -210,7 +232,7 @@ class ExecuteModerationActions
 
         if ($isEvasion) {
             $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.evasion_flag_message', ['{ruleset}' => $blockedRulesetName ?? '']);
-            $messages[] = is_array($trans) ? $trans[0] : $trans;
+            $messages[] = $trans;
         }
 
         $reasonDetail = implode("\n\n", $messages);
@@ -218,6 +240,14 @@ class ExecuteModerationActions
         return html_entity_decode($reasonDetail, ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * @param User|null $actor
+     * @param Collection $allActive
+     * @param bool $globalEvasionActive
+     * @param int $globalEvasionTimeout
+     * @param int $globalEvasionThreshold
+     * @return string|null
+     */
     private function resolveEvasion($actor, $allActive, bool $globalEvasionActive, int $globalEvasionTimeout, int $globalEvasionThreshold): ?string
     {
         if (! $actor || $actor->isGuest()) {
@@ -286,21 +316,35 @@ class ExecuteModerationActions
         return null;
     }
 
+    /**
+     * @param AbstractModel $entityBeingSaved
+     * @param Post $post
+     */
     private function applyApproval($entityBeingSaved, $post): void
     {
+        /** @phpstan-ignore-next-line */
         $entityBeingSaved->is_approved = false;
 
         $entityBeingSaved->afterSave(function () use ($post) {
+            /** @phpstan-ignore-next-line */
             if ($post->number == 1 && $post->discussion) {
+                /** @phpstan-ignore-next-line */
                 $post->discussion->is_approved = false;
                 $post->discussion->save();
             }
 
+            /** @phpstan-ignore-next-line */
             $post->is_approved = false;
             $post->save();
         });
     }
 
+    /**
+     * @param AbstractModel $entityBeingSaved
+     * @param Post $post
+     * @param string $reasonDetail
+     * @param string $type
+     */
     private function createFlag($entityBeingSaved, $post, string $reasonDetail, string $type): void
     {
         // Prevent duplicate moderation actions on edits

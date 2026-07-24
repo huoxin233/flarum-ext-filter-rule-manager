@@ -29,7 +29,7 @@ class RulesetRepository
     ) {
     }
 
-    public function getActiveRulesets()
+    public function getActiveRulesets(): Collection
     {
         if ($this->activeRulesets === null) {
             $this->activeRulesets = Ruleset::active()->ordered()->get();

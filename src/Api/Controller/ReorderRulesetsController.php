@@ -50,7 +50,7 @@ class ReorderRulesetsController implements RequestHandlerInterface
                 $trans = $this->translator->trans('huoxin-filter-rule-manager.admin.validation.invalid_ruleset_ids');
 
                 throw new ValidationException([
-                    'ids' => is_array($trans) ? $trans[0] : $trans,
+                    'ids' => $trans,
                 ]);
             }
 

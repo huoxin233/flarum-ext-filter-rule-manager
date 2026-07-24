@@ -15,7 +15,9 @@ use Carbon\Carbon;
 use Flarum\Discussion\Event\Saving as DiscussionSaving;
 use Flarum\Post\Event\Saving as PostSaving;
 use Flarum\Post\Exception\FloodingException;
+use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\User;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
@@ -68,6 +70,11 @@ class EvaluateBlockRulesets
         }
     }
 
+    /**
+     * @param Post $post
+     * @param User|null $actor
+     * @param string|null $onlyField
+     */
     private function evaluate($post, $actor, ?string $onlyField = null): void
     {
         $content = (string) $post->content;

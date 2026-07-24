@@ -28,7 +28,7 @@ class ClearOldBlockLogsCommand extends Command
         parent::__construct();
     }
 
-    public function handle()
+    public function handle(): void
     {
         $maxTimeout = Ruleset::max('evasion_timeout') ?? 0;
         $keepDays = (int) $this->settings->get('huoxin-filter-rule-manager.global_evasion_log_keep_days', 0);

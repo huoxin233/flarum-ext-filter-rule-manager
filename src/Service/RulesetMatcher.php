@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Service;
 
+use Flarum\Discussion\Discussion;
 use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
@@ -26,7 +27,7 @@ class RulesetMatcher
     protected WeakMap $evaluationCache;
 
     /**
-     * @var WeakMap<User, array<int>>
+     * @var WeakMap<User, array>
      */
     protected WeakMap $userGroupsCache;
 
@@ -103,7 +104,7 @@ class RulesetMatcher
         return $result;
     }
 
-    public function getTargetContent(Ruleset $ruleset, Post $post, $discussion = null, bool $useOriginal = false, ?string $onlyField = null): string
+    public function getTargetContent(Ruleset $ruleset, Post $post, Discussion $discussion = null, bool $useOriginal = false, ?string $onlyField = null): string
     {
         if ($discussion === null) {
             $discussion = $post->discussion;
