@@ -12,18 +12,21 @@
 namespace Huoxin\FilterRuleManager\Listener;
 
 use Carbon\Carbon;
+use Flarum\Database\AbstractModel;
 use Flarum\Discussion\Event\Saving as DiscussionSaving;
 use Flarum\Extension\ExtensionManager;
 use Flarum\Flags\Flag;
 use Flarum\Post\Event\Saving as PostSaving;
+use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\User;
 use Huoxin\FilterRuleManager\Model\FilterBlockLog;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExecuteModerationActions
@@ -56,6 +59,7 @@ class ExecuteModerationActions
         $post = $event->post;
 
         // If the post is being explicitly approved by a moderator, forgive evasion for this user
+        /** @phpstan-ignore property.notFound */
         if ($post->exists && $post->isDirty('is_approved') && $post->is_approved && $post->user_id) {
             FilterBlockLog::where('user_id', $post->user_id)
                 ->update(['is_cleared' => true]);
@@ -86,6 +90,12 @@ class ExecuteModerationActions
         }
     }
 
+    /**
+     * @param PostSaving|DiscussionSaving $event
+     * @param Post $post
+     * @param User|null $actor
+     * @param string|null $onlyField
+     */
     private function evaluateModeration($event, $post, $actor, ?string $onlyField = null): void
     {
         $hasApproval = $this->extensions->isEnabled('flarum-approval');
@@ -102,6 +112,7 @@ class ExecuteModerationActions
         $globalEvasionThreshold = (int) $this->settings->get('huoxin-filter-rule-manager.global_evasion_threshold', 2);
 
         // Load all active rulesets once from in-memory cache, filter per concern.
+        /** @var Collection<int, Ruleset> $allActive */
         $allActive = $this->rulesets->getActiveRulesets();
 
         $rulesets = $allActive->filter(function (Ruleset $ruleset) use ($globalAutoFlag, $globalRequireApproval, $hasFlags, $hasApproval) {
@@ -148,6 +159,18 @@ class ExecuteModerationActions
         }
     }
 
+    /**
+     * @param Collection<int, Ruleset> $rulesets
+     * @param Post $post
+     * @param User|null $actor
+     * @param array $providers
+     * @param bool $globalAutoFlag
+     * @param bool $globalRequireApproval
+     * @param bool $hasFlags
+     * @param bool $hasApproval
+     * @param string|null $onlyField
+     * @return array
+     */
     private function collectModerationMatches(Collection $rulesets, $post, $actor, array $providers, bool $globalAutoFlag, bool $globalRequireApproval, bool $hasFlags, bool $hasApproval, ?string $onlyField = null): array
     {
         $defaultRulesets = [];
@@ -201,7 +224,7 @@ class ExecuteModerationActions
         if (! empty($defaultRulesets)) {
             $rulesStr = implode(', ', $defaultRulesets);
             $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
-            $messages[] = is_array($trans) ? $trans[0] : $trans;
+            $messages[] = $trans;
         }
 
         foreach ($customMessages as $customMsg) {
@@ -210,7 +233,7 @@ class ExecuteModerationActions
 
         if ($isEvasion) {
             $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.evasion_flag_message', ['{ruleset}' => $blockedRulesetName ?? '']);
-            $messages[] = is_array($trans) ? $trans[0] : $trans;
+            $messages[] = $trans;
         }
 
         $reasonDetail = implode("\n\n", $messages);
@@ -218,6 +241,14 @@ class ExecuteModerationActions
         return html_entity_decode($reasonDetail, ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * @param User|null $actor
+     * @param Collection<int, Ruleset> $allActive
+     * @param bool $globalEvasionActive
+     * @param int $globalEvasionTimeout
+     * @param int $globalEvasionThreshold
+     * @return string|null
+     */
     private function resolveEvasion($actor, $allActive, bool $globalEvasionActive, int $globalEvasionTimeout, int $globalEvasionThreshold): ?string
     {
         if (! $actor || $actor->isGuest()) {
@@ -250,6 +281,11 @@ class ExecuteModerationActions
         return $triggered ? $triggered->name : null;
     }
 
+    /**
+     * @param Collection<int, Ruleset> $evasionRulesets
+     * @param int $globalEvasionTimeout
+     * @return int
+     */
     private function computeMaxEvasionTimeout(Collection $evasionRulesets, int $globalEvasionTimeout): int
     {
         $maxTimeout = 0;
@@ -263,6 +299,13 @@ class ExecuteModerationActions
         return $maxTimeout;
     }
 
+    /**
+     * @param Collection<int, Ruleset> $evasionRulesets
+     * @param Collection<int, FilterBlockLog> $recentLogs
+     * @param int $globalEvasionTimeout
+     * @param int $globalEvasionThreshold
+     * @return Ruleset|null
+     */
     private function findTriggeredEvasionRuleset(Collection $evasionRulesets, Collection $recentLogs, int $globalEvasionTimeout, int $globalEvasionThreshold): ?Ruleset
     {
         foreach ($evasionRulesets as $rulesetId => $ruleset) {
@@ -286,21 +329,35 @@ class ExecuteModerationActions
         return null;
     }
 
+    /**
+     * @param AbstractModel $entityBeingSaved
+     * @param Post $post
+     */
     private function applyApproval($entityBeingSaved, $post): void
     {
+        /** @phpstan-ignore property.notFound */
         $entityBeingSaved->is_approved = false;
 
         $entityBeingSaved->afterSave(function () use ($post) {
+            /** @phpstan-ignore binaryOp.invalid */
             if ($post->number == 1 && $post->discussion) {
+                /** @phpstan-ignore property.notFound */
                 $post->discussion->is_approved = false;
                 $post->discussion->save();
             }
 
+            /** @phpstan-ignore property.notFound */
             $post->is_approved = false;
             $post->save();
         });
     }
 
+    /**
+     * @param AbstractModel $entityBeingSaved
+     * @param Post $post
+     * @param string $reasonDetail
+     * @param string $type
+     */
     private function createFlag($entityBeingSaved, $post, string $reasonDetail, string $type): void
     {
         // Prevent duplicate moderation actions on edits

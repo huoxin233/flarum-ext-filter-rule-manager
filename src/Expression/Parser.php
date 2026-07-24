@@ -16,11 +16,9 @@ use InvalidArgumentException;
 class Parser
 {
     private int $position = 0;
-    private int $length;
 
     public function __construct(private array $tokens)
     {
-        $this->length = count($tokens);
     }
 
     public function parse(): NodeInterface

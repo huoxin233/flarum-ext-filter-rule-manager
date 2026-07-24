@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Model;
 
+use Carbon\Carbon;
 use Flarum\Database\AbstractModel;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -39,6 +40,8 @@ use Illuminate\Database\Eloquent\Builder;
  * @property bool|null $strict_edit
  * @property bool|null $strip_mentions
  * @property array|null $display_settings
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 class Ruleset extends AbstractModel
 {

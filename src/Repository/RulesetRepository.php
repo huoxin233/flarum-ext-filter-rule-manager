@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Collection;
 class RulesetRepository
 {
     /**
-     * @var Collection|null
+     * @var Collection<int, Ruleset>|null
      */
     protected $activeRulesets;
 
@@ -29,7 +29,10 @@ class RulesetRepository
     ) {
     }
 
-    public function getActiveRulesets()
+    /**
+     * @return Collection<int, Ruleset>
+     */
+    public function getActiveRulesets(): Collection
     {
         if ($this->activeRulesets === null) {
             $this->activeRulesets = Ruleset::active()->ordered()->get();

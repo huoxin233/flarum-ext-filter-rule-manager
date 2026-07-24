@@ -15,12 +15,16 @@ use Carbon\Carbon;
 use Flarum\Discussion\Event\Saving as DiscussionSaving;
 use Flarum\Post\Event\Saving as PostSaving;
 use Flarum\Post\Exception\FloodingException;
+use Flarum\Post\Post;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\User;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Model\FilterBlockLog;
+use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class EvaluateBlockRulesets
@@ -68,12 +72,18 @@ class EvaluateBlockRulesets
         }
     }
 
+    /**
+     * @param Post $post
+     * @param User|null $actor
+     * @param string|null $onlyField
+     */
     private function evaluate($post, $actor, ?string $onlyField = null): void
     {
         $content = (string) $post->content;
         $discussion = $post->discussion;
         $title = $discussion ? (string) $discussion->title : '';
 
+        /** @var Collection<int, Ruleset> $rulesets */
         $rulesets = $this->rulesets->getActiveRulesets();
 
         $providers = $this->evaluator->getProviders();

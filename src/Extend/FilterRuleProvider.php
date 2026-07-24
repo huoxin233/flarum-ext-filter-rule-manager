@@ -72,6 +72,7 @@ class FilterRuleProvider implements ExtenderInterface
         }
 
         // Stash for later resolution by FilterRuleManagerServiceProvider.
+        /** @var array<string, class-string<RuleProviderInterface>> $pending */
         $pending = $container->bound(self::PENDING_KEY)
             ? $container->make(self::PENDING_KEY)
             : [];

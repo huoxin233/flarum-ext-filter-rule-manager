@@ -16,13 +16,16 @@ use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
+use Illuminate\Contracts\Foundation\Application;
 
 class FilterRuleManagerServiceProvider extends AbstractServiceProvider
 {
     public function register(): void
     {
-        $this->container->scoped(RulesetRepository::class);
-        $this->container->scoped(RulesetMatcher::class);
+        /** @var Application $container */
+        $container = $this->container;
+        $container->scoped(RulesetRepository::class);
+        $container->scoped(RulesetMatcher::class);
 
         $this->container->singleton(FilterRuleProvider::REGISTRY_KEY, function ($container) {
             $providers = [

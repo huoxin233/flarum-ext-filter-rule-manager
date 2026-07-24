@@ -190,7 +190,7 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
             $cjkRegex = '/[\x{4e00}-\x{9fa5}\x{3040}-\x{309F}\x{30A0}-\x{30FF}\x{AC00}-\x{D7AF}]/u';
 
             preg_match_all($cjkRegex, $text, $cjkMatches);
-            $cjkCount = count($cjkMatches[0] ?? []);
+            $cjkCount = count($cjkMatches[0]);
 
             $latinText = preg_replace($cjkRegex, ' ', $text) ?? $text;
             $latinCount = str_word_count($latinText);

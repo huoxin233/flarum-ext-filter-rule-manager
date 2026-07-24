@@ -233,7 +233,7 @@ class RulesetResource extends Resource\AbstractDatabaseResource
         return [];
     }
 
-    private function sanitizeIds($raw): ?array
+    private function sanitizeIds(mixed $raw): ?array
     {
         if (! is_array($raw)) {
             return null;

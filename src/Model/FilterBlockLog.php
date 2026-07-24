@@ -14,6 +14,7 @@ namespace Huoxin\FilterRuleManager\Model;
 use Carbon\Carbon;
 use Flarum\Database\AbstractModel;
 use Flarum\User\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int    $id
@@ -39,12 +40,12 @@ class FilterBlockLog extends AbstractModel
 
     protected $fillable = ['user_id', 'ruleset_id', 'content', 'message', 'tokens', 'created_at', 'is_cleared'];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function ruleset()
+    public function ruleset(): BelongsTo
     {
         return $this->belongsTo(Ruleset::class);
     }
