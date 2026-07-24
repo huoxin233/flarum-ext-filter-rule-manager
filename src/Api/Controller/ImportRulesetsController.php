@@ -12,15 +12,15 @@
 namespace Huoxin\FilterRuleManager\Api\Controller;
 
 use Flarum\Group\Group;
-use Flarum\Tags\Tag;
 use Flarum\Http\RequestUtil;
+use Flarum\Tags\Tag;
 use Huoxin\FilterRuleManager\Model\Ruleset;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Arr;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Illuminate\Database\ConnectionInterface;
 
 class ImportRulesetsController implements RequestHandlerInterface
 {
@@ -84,8 +84,9 @@ class ImportRulesetsController implements RequestHandlerInterface
                 $tagIds = [];
                 if (! empty($data['scope_tags']) && is_array($data['scope_tags'])) {
                     foreach ($data['scope_tags'] as $slug) {
-                        if (isset($tagMap[$slug]))
+                        if (isset($tagMap[$slug])) {
                             $tagIds[] = $tagMap[$slug];
+                        }
                     }
                 }
                 $ruleset->scope_tag_ids = empty($tagIds) ? null : $tagIds;
@@ -94,8 +95,9 @@ class ImportRulesetsController implements RequestHandlerInterface
                 $groupIds = [];
                 if (! empty($data['bypass_groups']) && is_array($data['bypass_groups'])) {
                     foreach ($data['bypass_groups'] as $name) {
-                        if (isset($groupMap[$name]))
+                        if (isset($groupMap[$name])) {
                             $groupIds[] = $groupMap[$name];
+                        }
                     }
                 }
                 $ruleset->bypass_group_ids = empty($groupIds) ? null : $groupIds;

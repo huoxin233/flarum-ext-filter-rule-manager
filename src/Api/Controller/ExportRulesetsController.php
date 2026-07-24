@@ -12,8 +12,8 @@
 namespace Huoxin\FilterRuleManager\Api\Controller;
 
 use Flarum\Group\Group;
-use Flarum\Tags\Tag;
 use Flarum\Http\RequestUtil;
+use Flarum\Tags\Tag;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Support\Arr;
 use Laminas\Diactoros\Response\JsonResponse;
@@ -41,17 +41,21 @@ class ExportRulesetsController implements RequestHandlerInterface
         $allTagIds = [];
         $allGroupIds = [];
         foreach ($rulesets as $ruleset) {
-            if (!empty($ruleset->scope_tag_ids)) $allTagIds = array_merge($allTagIds, $ruleset->scope_tag_ids);
-            if (!empty($ruleset->bypass_group_ids)) $allGroupIds = array_merge($allGroupIds, $ruleset->bypass_group_ids);
+            if (! empty($ruleset->scope_tag_ids)) {
+                $allTagIds = array_merge($allTagIds, $ruleset->scope_tag_ids);
+            }
+            if (! empty($ruleset->bypass_group_ids)) {
+                $allGroupIds = array_merge($allGroupIds, $ruleset->bypass_group_ids);
+            }
         }
-        
+
         $tagMap = [];
-        if (!empty($allTagIds) && class_exists(Tag::class)) {
+        if (! empty($allTagIds) && class_exists(Tag::class)) {
             $tagMap = Tag::whereIn('id', array_unique($allTagIds))->pluck('slug', 'id')->toArray();
         }
 
         $groupMap = [];
-        if (!empty($allGroupIds)) {
+        if (! empty($allGroupIds)) {
             $groupMap = Group::whereIn('id', array_unique($allGroupIds))->pluck('name_singular', 'id')->toArray();
         }
 
