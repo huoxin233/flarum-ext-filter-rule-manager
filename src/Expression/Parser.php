@@ -18,6 +18,7 @@ class Parser
     /** @var Token[] */
     private array $tokens;
     private int $position = 0;
+
     public function __construct(array $tokens)
     {
         $this->tokens = $tokens;

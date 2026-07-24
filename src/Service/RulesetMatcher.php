@@ -104,7 +104,7 @@ class RulesetMatcher
         return $result;
     }
 
-    public function getTargetContent(Ruleset $ruleset, Post $post, Discussion $discussion = null, bool $useOriginal = false, ?string $onlyField = null): string
+    public function getTargetContent(Ruleset $ruleset, Post $post, ?Discussion $discussion = null, bool $useOriginal = false, ?string $onlyField = null): string
     {
         if ($discussion === null) {
             $discussion = $post->discussion;
