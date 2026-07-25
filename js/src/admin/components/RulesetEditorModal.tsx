@@ -30,6 +30,7 @@ import { parseExpression } from '../utils/ExpressionParser';
 export interface RulesetEditorModalAttrs extends IFormModalAttrs {
   ruleset?: Model & Record<string, any>;
   providers: Record<string, unknown>[];
+  modifiers: Record<string, any>;
   onsave?: () => void;
 }
 
@@ -54,6 +55,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
   ruleset?: Model & Record<string, any>;
   providers!: Record<string, unknown>[];
+  modifiers!: Record<string, any>;
   loading: boolean = false;
   messageTextarea: HTMLTextAreaElement | null = null;
   flagMessageTextarea: HTMLTextAreaElement | null = null;
@@ -90,6 +92,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
 
     this.ruleset = this.attrs.ruleset;
     this.providers = this.attrs.providers;
+    this.modifiers = this.attrs.modifiers || {};
     this.loading = false;
     this.messageTextarea = null;
     this.flagMessageTextarea = null;
@@ -631,7 +634,12 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
           <h4>{app.translator.trans('huoxin-filter-rule-manager.admin.section_rules')}</h4>
         </div>
 
-        <RuleBuilder expression={this.expression()} onchange={(v: string) => this.expression(v)} providers={this.providers} />
+        <RuleBuilder
+          expression={this.expression()}
+          onchange={(v: string) => this.expression(v)}
+          providers={this.providers}
+          modifiers={this.modifiers}
+        />
 
         <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.rule_regex_warning')}</div>
       </div>

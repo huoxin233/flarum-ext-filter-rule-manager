@@ -68,7 +68,7 @@
 
   .FilterRuleManager-RuleNode-header {
     display: grid;
-    grid-template-columns: 1fr 1.5fr auto auto;
+    grid-template-columns: 1fr 1.5fr 1fr auto auto;
     gap: 15px;
     align-items: center;
     margin-bottom: 15px;
@@ -82,6 +82,35 @@
         overflow: hidden;
         white-space: nowrap;
       }
+    }
+
+    .FilterRuleManager-RuleNode-modifiers {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+
+
+      .FilterRuleManager-Modifiersequence {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        margin-right: 8px;
+        background: var(--primary-color);
+        color: var(--button-primary-color);
+        border-radius: var(--border-radius);
+        font-weight: bold;
+        font-size: 12px;
+
+        &.empty {
+          background: transparent;
+          color: transparent;
+          opacity: 0;
+        }
+      }
+
+
     }
   }
   .FilterRuleManager-RuleNode-negateToggle {

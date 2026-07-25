@@ -21,6 +21,7 @@ export interface ASTNode {
   left?: ASTNode;
   right?: ASTNode;
   node?: ASTNode;
+  targetModifiers?: string[];
   _key?: number;
 }
 
@@ -81,6 +82,7 @@ function escapeHtml(str: string): string {
 export class FilterEngine {
   public rulesets: Ruleset[] = [];
   public providers: Record<string, FilterRuleProvider> = {};
+  public modifiers: Record<string, (content: string) => string> = {};
   public templates: Record<
     string,
     { component: Mithril.ComponentTypes<unknown, unknown>; settingsComponent: Mithril.ComponentTypes<unknown, unknown> | null }
@@ -139,6 +141,13 @@ export class FilterEngine {
    */
   registerProvider(name: string, provider: FilterRuleProvider): void {
     this.providers[name] = provider;
+  }
+
+  /**
+   * Register a frontend modifier function.
+   */
+  registerModifier(name: string, modifier: (content: string) => string): void {
+    this.modifiers[name] = modifier;
   }
 
   /**
@@ -359,39 +368,45 @@ export class FilterEngine {
     const ast = typeof ruleset.compiledAst === 'function' ? ruleset.compiledAst() : ruleset.compiled_ast;
     if (!ast) return null;
 
-    return this.evaluateAST(ast, content, ruleset);
+    const modifiedContentCache: Record<string, string> = {};
+    return this.evaluateAST(ast, content, ruleset, modifiedContentCache);
   }
 
-  evaluateAST(node: ASTNode | null | undefined, content: string, ruleset: Ruleset): Record<string, string> | null {
+  evaluateAST(
+    node: ASTNode | null | undefined,
+    content: string,
+    ruleset: Ruleset,
+    modifiedContentCache: Record<string, string>
+  ): Record<string, string> | null {
     if (!node) return null;
 
     if (node.type === 'logical') {
-      const left = this.evaluateAST(node.left, content, ruleset);
+      const left = this.evaluateAST(node.left, content, ruleset, modifiedContentCache);
 
       if (node.operator === 'OR') {
         const evaluateAll = typeof ruleset.evaluateAllRules === 'function' ? ruleset.evaluateAllRules() : ruleset.evaluateAllRules;
         if (left !== null && !evaluateAll) return left;
 
-        const right = this.evaluateAST(node.right, content, ruleset);
+        const right = this.evaluateAST(node.right, content, ruleset, modifiedContentCache);
         if (left !== null && right !== null) return this.mergeResults([left, right]);
         return left !== null ? left : right;
       }
 
       if (node.operator === 'AND') {
         if (left === null) return null;
-        const right = this.evaluateAST(node.right, content, ruleset);
+        const right = this.evaluateAST(node.right, content, ruleset, modifiedContentCache);
         if (right === null) return null;
         return this.mergeResults([left, right]);
       }
     }
 
     if (node.type === 'not') {
-      const result = this.evaluateAST(node.node, content, ruleset);
+      const result = this.evaluateAST(node.node, content, ruleset, modifiedContentCache);
       return result === null ? {} : null;
     }
 
     if (node.type === 'rule') {
-      return this.evaluateRuleNode(node, content);
+      return this.evaluateRuleNode(node, content, modifiedContentCache);
     }
 
     return null;
@@ -415,18 +430,38 @@ export class FilterEngine {
     return merged;
   }
 
-  evaluateRuleNode(node: ASTNode, content: string): Record<string, string> | null {
+  evaluateRuleNode(node: ASTNode, content: string, modifiedContentCache: Record<string, string>): Record<string, string> | null {
     if (!node.provider) return null;
     const provider = this.providers[node.provider];
     if (!provider || typeof provider.evaluate !== 'function') return null;
     if (!provider.getSupportedTypes().includes(node.ruleType as string)) return null;
 
+    let isObject = typeof node.value === 'object' && node.value !== null && !Array.isArray(node.value);
+
+    let targetContent = content;
+    let modifierKeys: string[] = node.targetModifiers && Array.isArray(node.targetModifiers) ? node.targetModifiers : [];
+
+    if (modifierKeys.length > 0) {
+      let currentCacheKey = '';
+      modifierKeys.forEach((modifierKey) => {
+        currentCacheKey = currentCacheKey === '' ? modifierKey : `${currentCacheKey},${modifierKey}`;
+
+        if (modifiedContentCache[currentCacheKey] !== undefined) {
+          targetContent = modifiedContentCache[currentCacheKey];
+        } else {
+          if (this.modifiers[modifierKey]) {
+            targetContent = this.modifiers[modifierKey](targetContent);
+          }
+          modifiedContentCache[currentCacheKey] = targetContent;
+        }
+      });
+    }
+
     let result = null;
     try {
-      const isObject = typeof node.value === 'object' && node.value !== null && !Array.isArray(node.value);
       let config: any = isObject ? { ...(node.value as object), operator: node.operator } : { operator: node.operator, value: node.value };
 
-      result = provider.evaluate(node.ruleType as string, content, config);
+      result = provider.evaluate(node.ruleType as string, targetContent, config);
     } catch (e) {
       console.error(`[filter-rule-manager] rule ${String(node.provider)}/${String(node.ruleType)} threw`, e);
       return null;

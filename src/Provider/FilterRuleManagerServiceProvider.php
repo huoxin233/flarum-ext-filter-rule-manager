@@ -12,6 +12,7 @@
 namespace Huoxin\FilterRuleManager\Provider;
 
 use Flarum\Foundation\AbstractServiceProvider;
+use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
@@ -42,6 +43,17 @@ class FilterRuleManagerServiceProvider extends AbstractServiceProvider
 
             return $providers;
         });
+
+        $this->container->singleton(FilterContentModifier::REGISTRY_KEY, function ($container) {
+            $modifiers = [];
+
+            if ($container->bound(FilterContentModifier::PENDING_KEY)) {
+                $modifiers = $container->make(FilterContentModifier::PENDING_KEY);
+            }
+
+            return $modifiers;
+        });
+
     }
 
     public function boot(): void
