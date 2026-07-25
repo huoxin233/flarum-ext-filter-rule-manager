@@ -205,6 +205,10 @@ huoxin-filter-rule-manager:
     providers:
       builtin: "Built-in"
 
+    modifiers:
+      entire_post: "Entire Post"
+      multiple_selected: "{count} Modifiers"
+
     displays:
       none: "None (Hidden)"
       none_help: "No UI will be shown on the frontend."

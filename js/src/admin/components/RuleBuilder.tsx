@@ -11,6 +11,7 @@ import app from 'flarum/admin/app';
 import Component, { ComponentAttrs } from 'flarum/common/Component';
 import Button from 'flarum/common/components/Button';
 import Select from 'flarum/common/components/Select';
+import Dropdown from 'flarum/common/components/Dropdown';
 import Switch from 'flarum/common/components/Switch';
 import icon from 'flarum/common/helpers/icon';
 import { parseExpression, stringifyExpression } from '../utils/ExpressionParser';
@@ -44,11 +45,12 @@ interface LogicalNodeViewAttrs extends ComponentAttrs {
   node: ASTNode;
   onchange: (v: ASTNode | null) => void;
   providers: FrontendProvider[];
+  modifiers?: Record<string, any>;
 }
 
 class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
   view(): Mithril.Children {
-    const { node, onchange, providers } = this.attrs;
+    const { node, onchange, providers, modifiers } = this.attrs;
     const isAnd = node.operator === 'AND';
     const isOr = node.operator === 'OR';
 
@@ -61,6 +63,7 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
             else onchange({ ...node, left: v });
           }}
           providers={providers}
+          modifiers={modifiers}
         />
 
         {isAnd ? (
@@ -98,6 +101,7 @@ class LogicalNodeView extends Component<LogicalNodeViewAttrs> {
             else onchange({ ...node, right: v });
           }}
           providers={providers}
+          modifiers={modifiers}
         />
       </div>
     );
@@ -110,11 +114,12 @@ interface RuleNodeViewAttrs extends ComponentAttrs {
   onchange: (v: ASTNode | null) => void;
   onNegateChange: (v: boolean) => void;
   providers: FrontendProvider[];
+  modifiers?: Record<string, any>;
 }
 
 class RuleNodeView extends Component<RuleNodeViewAttrs> {
   view(): Mithril.Children {
-    const { node, onchange, providers } = this.attrs;
+    const { node, onchange, providers, modifiers } = this.attrs;
 
     const providerOptions: Record<string, string> = {};
     providers.forEach((p) => {
@@ -130,6 +135,15 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
       acc[p.type] = p.label || p.type;
       return acc;
     }, {});
+
+    const modifierOptions: Record<string, string> = {};
+    if (modifiers) {
+      Object.entries(modifiers).forEach(([key, modifier]) => {
+        modifierOptions[key] = modifier.label || key;
+      });
+    }
+
+    const targetModifiers: string[] = node.targetModifiers && Array.isArray(node.targetModifiers) ? node.targetModifiers : [];
 
     return (
       <div className="FilterRuleManager-Expression-RuleNode">
@@ -149,6 +163,53 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
             onchange={(val: string) => onchange({ ...node, ruleType: val, value: '' })}
             disabled={!node.provider}
           />
+
+          <div className="FilterRuleManager-RuleNode-modifiers">
+            <Dropdown
+              buttonClassName={`Button ${Object.keys(modifierOptions).length === 0 ? 'disabled' : ''}`}
+              label={
+                targetModifiers.length === 0
+                  ? app.translator.trans('huoxin-filter-rule-manager.admin.modifiers.entire_post')
+                  : targetModifiers.length === 1
+                  ? modifierOptions[targetModifiers[0]] || targetModifiers[0]
+                  : app.translator.trans('huoxin-filter-rule-manager.admin.modifiers.multiple_selected', { count: targetModifiers.length }) ||
+                    `${targetModifiers.length} Modifiers`
+              }
+            >
+              {Object.entries(modifierOptions).map(([key, label]) => {
+                const selectedIndex = targetModifiers.indexOf(key);
+                const isSelected = selectedIndex !== -1;
+
+                return (
+                  <li>
+                    <Button
+                      className="Button Button--link"
+                      onclick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        let newModifiers = [...targetModifiers];
+                        if (isSelected) {
+                          newModifiers = newModifiers.filter((m) => m !== key);
+                        } else {
+                          newModifiers.push(key);
+                        }
+
+                        let newVal: any = node.value;
+                        if (typeof newVal !== 'object' || newVal === null || Array.isArray(newVal)) newVal = { value: newVal };
+                        else newVal = { ...newVal };
+
+                        onchange({ ...node, value: newVal, targetModifiers: newModifiers.length === 0 ? undefined : newModifiers });
+                      }}
+                    >
+                      <span className={`FilterRuleManager-Modifiersequence ${!isSelected ? 'empty' : ''}`.trim()}>
+                        {isSelected ? selectedIndex + 1 : '0'}
+                      </span>
+                      {label}
+                    </Button>
+                  </li>
+                );
+              })}
+            </Dropdown>
+          </div>
 
           <div className="FilterRuleManager-RuleNode-negateToggle">
             <Switch state={this.attrs.isNegated} onchange={this.attrs.onNegateChange}>
@@ -191,7 +252,13 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
           config={configObj}
           type={node.ruleType}
           onchange={(newConfig: Record<string, unknown>) => {
-            onchange({ ...node, value: newConfig });
+            const preserved: Record<string, unknown> = {};
+            if (typeof node.value === 'object' && node.value !== null && !Array.isArray(node.value)) {
+              for (const [k, v] of Object.entries(node.value)) {
+                if (k.startsWith('_')) preserved[k] = v;
+              }
+            }
+            onchange({ ...node, value: { ...newConfig, ...preserved } });
           }}
         />
       );
@@ -225,11 +292,12 @@ interface NodeViewAttrs extends ComponentAttrs {
   node: ASTNode | null | undefined;
   onchange: (v: ASTNode | null) => void;
   providers: FrontendProvider[];
+  modifiers?: Record<string, any>;
 }
 
 class NodeView extends Component<NodeViewAttrs> {
   view(): Mithril.Children {
-    const { node, onchange, providers } = this.attrs;
+    const { node, onchange, providers, modifiers } = this.attrs;
 
     if (!node) {
       return (
@@ -245,7 +313,7 @@ class NodeView extends Component<NodeViewAttrs> {
     }
 
     if (node.type === 'logical') {
-      return <LogicalNodeView node={node} onchange={onchange} providers={providers} />;
+      return <LogicalNodeView node={node} onchange={onchange} providers={providers} modifiers={modifiers} />;
     }
 
     if (node.type === 'rule') {
@@ -256,6 +324,7 @@ class NodeView extends Component<NodeViewAttrs> {
             isNegated={false}
             onchange={onchange}
             providers={providers}
+            modifiers={modifiers}
             onNegateChange={(v: boolean) => {
               if (v) {
                 onchange({ _key: nodeIdCounter++, type: 'not', node: node });
@@ -278,6 +347,7 @@ class NodeView extends Component<NodeViewAttrs> {
                 else onchange({ ...node, node: v });
               }}
               providers={providers}
+              modifiers={modifiers}
               onNegateChange={(v: boolean) => {
                 if (!v) {
                   onchange(node.node || null);
@@ -298,6 +368,7 @@ class NodeView extends Component<NodeViewAttrs> {
               else onchange({ ...node, node: v });
             }}
             providers={providers}
+            modifiers={modifiers}
           />
         </div>
       );
@@ -311,6 +382,7 @@ export interface RuleBuilderAttrs extends ComponentAttrs {
   expression?: string;
   onchange?: (v: string) => void;
   providers?: FrontendProvider[];
+  modifiers?: Record<string, any>;
 }
 
 export default class RuleBuilder extends Component<RuleBuilderAttrs> {
@@ -398,6 +470,7 @@ export default class RuleBuilder extends Component<RuleBuilderAttrs> {
                 this.syncToEditor();
               }}
               providers={providers}
+              modifiers={this.attrs.modifiers}
             />
             {this.ast ? (
               <div className="FilterRuleManager-RuleBuilder-appendButtons">

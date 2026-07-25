@@ -205,6 +205,9 @@ huoxin-filter-rule-manager:
     providers:
       builtin: "内置"
 
+    modifiers:
+      entire_post: "完整内容"
+      multiple_selected: "{count} 个预处理器"
     displays:
       none: "无 (隐藏)"
       none_help: "前端不显示任何提示UI。"

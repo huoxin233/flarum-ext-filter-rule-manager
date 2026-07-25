@@ -12,7 +12,9 @@
 namespace Huoxin\FilterRuleManager\Service;
 
 use Flarum\Discussion\Discussion;
+use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
+use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
@@ -38,17 +40,22 @@ class RuleEvaluator
         return $this->container->make(FilterRuleProvider::REGISTRY_KEY);
     }
 
-    public function evaluateRuleset(Ruleset $ruleset, EvaluationContext $context, array $providers): ?array
+    public function evaluateRuleset(Ruleset $ruleset, EvaluationContext $context, array $providers = []): ?array
     {
         $ast = $ruleset->compiled_ast;
-        if (empty($ast)) {
+        if (! $ast) {
             return null;
         }
 
-        return $this->evaluateAST($ast, $context, $providers, $ruleset);
+        if (empty($providers)) {
+            $providers = $this->getProviders();
+        }
+        $modifiedContentCache = [];
+
+        return $this->evaluateAST($ast, $context, $providers, $ruleset, $modifiedContentCache);
     }
 
-    public function evaluateAST(array $node, EvaluationContext $context, array $providers, Ruleset $ruleset): ?array
+    private function evaluateAST(array $node, EvaluationContext $context, array $providers, Ruleset $ruleset, array &$modifiedContentCache): ?array
     {
         if (! isset($node['type'])) {
             return null;
@@ -59,13 +66,13 @@ class RuleEvaluator
                 return null;
             }
 
-            $left = $this->evaluateAST($node['left'], $context, $providers, $ruleset);
+            $left = $this->evaluateAST($node['left'], $context, $providers, $ruleset, $modifiedContentCache);
 
             if ($node['operator'] === 'OR') {
                 if ($left !== null && ! $ruleset->evaluate_all_rules) {
                     return $left;
                 }
-                $right = $this->evaluateAST($node['right'], $context, $providers, $ruleset);
+                $right = $this->evaluateAST($node['right'], $context, $providers, $ruleset, $modifiedContentCache);
 
                 if ($left !== null && $right !== null) {
                     return $this->mergeResults([$left, $right]);
@@ -78,7 +85,7 @@ class RuleEvaluator
                 if ($left === null) {
                     return null;
                 }
-                $right = $this->evaluateAST($node['right'], $context, $providers, $ruleset);
+                $right = $this->evaluateAST($node['right'], $context, $providers, $ruleset, $modifiedContentCache);
                 if ($right === null) {
                     return null;
                 }
@@ -91,7 +98,7 @@ class RuleEvaluator
             if (! isset($node['node'])) {
                 return null;
             }
-            $result = $this->evaluateAST($node['node'], $context, $providers, $ruleset);
+            $result = $this->evaluateAST($node['node'], $context, $providers, $ruleset, $modifiedContentCache);
 
             return $result === null ? [] : null;
         }
@@ -101,7 +108,7 @@ class RuleEvaluator
                 return null;
             }
 
-            return $this->evaluateRuleNode($node, $context, $providers);
+            return $this->evaluateRuleNode($node, $context, $providers, $modifiedContentCache);
         }
 
         return null;
@@ -127,7 +134,7 @@ class RuleEvaluator
         return $merged;
     }
 
-    public function evaluateRuleNode(array $node, EvaluationContext $context, array $providers): ?array
+    public function evaluateRuleNode(array $node, EvaluationContext $context, array $providers, array &$modifiedContentCache): ?array
     {
         $provider = $providers[$node['provider']] ?? null;
         if ($provider === null) {
@@ -136,6 +143,33 @@ class RuleEvaluator
 
         if (! in_array($node['ruleType'], $provider->getSupportedBackendTypes(), true)) {
             return null;
+        }
+
+        $originalContent = $context->content;
+
+        $targetModifiers = [];
+        if (! empty($node['targetModifiers']) && is_array($node['targetModifiers'])) {
+            $targetModifiers = $node['targetModifiers'];
+        }
+
+        if (! empty($targetModifiers) && $this->container->bound(FilterContentModifier::REGISTRY_KEY)) {
+            $currentCacheKey = '';
+            $modifiers = $this->container->make(FilterContentModifier::REGISTRY_KEY);
+
+            foreach ($targetModifiers as $modifierKey) {
+                $currentCacheKey = $currentCacheKey === '' ? $modifierKey : $currentCacheKey . ',' . $modifierKey;
+
+                if (isset($modifiedContentCache[$currentCacheKey])) {
+                    $context->content = $modifiedContentCache[$currentCacheKey];
+                } else {
+                    if (isset($modifiers[$modifierKey])) {
+                        /** @var ModifierInterface $modifierClass */
+                        $modifierClass = $this->container->make($modifiers[$modifierKey]['class']);
+                        $context->content = $modifierClass->modify($context->content);
+                    }
+                    $modifiedContentCache[$currentCacheKey] = $context->content;
+                }
+            }
         }
 
         try {
@@ -157,6 +191,8 @@ class RuleEvaluator
             ]);
 
             return null;
+        } finally {
+            $context->content = $originalContent;
         }
     }
 

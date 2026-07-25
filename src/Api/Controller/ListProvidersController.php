@@ -12,7 +12,9 @@
 namespace Huoxin\FilterRuleManager\Api\Controller;
 
 use Flarum\Http\RequestUtil;
+use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
+use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Illuminate\Contracts\Container\Container;
 use Laminas\Diactoros\Response\JsonResponse;
@@ -52,6 +54,14 @@ class ListProvidersController implements RequestHandlerInterface
             }
         }
 
-        return new JsonResponse(['data' => $result]);
+        /** @var array<string, array{label: string, class: class-string<ModifierInterface>}> $modifiers */
+        $modifiers = $this->container->bound(FilterContentModifier::REGISTRY_KEY)
+            ? $this->container->make(FilterContentModifier::REGISTRY_KEY)
+            : [];
+
+        return new JsonResponse([
+            'data' => $result,
+            'modifiers' => $modifiers,
+        ]);
     }
 }

@@ -318,3 +318,65 @@ app.initializers.add("your-namespace/toxicity-rules", () => {
   app.filterRuleManager.registerProvider("toxicity", new ToxicityProvider());
 });
 ```
+
+---
+
+## 4. Content Preprocessors (Modifiers)
+
+If you want to strip out or extract specific parts of the text _before_ the rule providers evaluate it, you can register a **Content Modifier** (also known as a preprocessor).
+
+For example, if you want a rule to strictly only evaluate text after ignoring quotes or ignoring spoiler blocks. Note that users can chain multiple modifiers together sequentially in the UI (e.g., stripping quotes, then stripping spoiler).
+
+### 4.1 Backend Implementation (PHP)
+
+First, implement the modifier logic on the backend by implementing `Huoxin\FilterRuleManager\Modifier\ModifierInterface`:
+
+```php
+<?php
+namespace YourNamespace\Modifier;
+
+use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
+
+class StripSpoilersModifier implements ModifierInterface
+{
+    public function modify(string $content): string
+    {
+        // Strip out spoiler tags
+        return preg_replace('/>!.*?!</s', '', $content);
+    }
+}
+```
+
+Then, register it in your `extend.php`:
+
+```php
+<?php
+use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
+use YourNamespace\Modifier\StripSpoilersModifier;
+
+return [
+    (new FilterContentModifier())
+        ->register('no_spoilers', 'Ignore Spoilers', StripSpoilersModifier::class),
+];
+```
+
+The modifier will now automatically appear as an option in the "Target Text Preprocessors" dropdown in the visual rule builder!
+
+### 4.2 Frontend Implementation (Optional)
+
+If your rulesets use **Info** or **Warning** interventions, they are evaluated directly in the browser via JavaScript to provide real-time feedback.
+
+To make your modifier work in real-time on the frontend, you must register a JavaScript equivalent in your `forum` payload:
+
+```typescript
+import app from "flarum/forum/app";
+
+app.initializers.add("your-namespace/modifiers", () => {
+  if (!app.filterRuleManager) return;
+
+  app.filterRuleManager.registerModifier("no_spoilers", (content: string) => {
+    // Strip out spoiler tags using JS regex
+    return content.replace(/>![\s\S]*?!</g, "");
+  });
+});
+```

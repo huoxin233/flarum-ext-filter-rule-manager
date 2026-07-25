@@ -31,6 +31,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
   scopeFilter: string = 'all';
   rulesets: Model[] = [];
   providers: Record<string, any>[] = [];
+  modifiers: Record<string, any> = {};
   reordering: boolean = false;
   toggling: Set<string> = new Set();
   registryFilter: string = 'providers';
@@ -43,6 +44,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     this.scopeFilter = 'all';
     this.rulesets = [];
     this.providers = [];
+    this.modifiers = {};
     this.reordering = false;
     this.toggling = new Set();
     this.registryFilter = 'providers';
@@ -83,6 +85,14 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           });
         }
       });
+      this.modifiers = providersResponse.modifiers || {};
+      if (app.filterRuleManager && app.filterRuleManager.modifiers) {
+        Object.keys(app.filterRuleManager.modifiers).forEach((key) => {
+          if (!this.modifiers[key]) {
+            this.modifiers[key] = { label: key };
+          }
+        });
+      }
     } catch (err) {
       console.error('Failed to load filter-rule data:', err);
       app.alerts.show({ type: 'error' }, app.translator.trans('huoxin-filter-rule-manager.admin.load_error'));
@@ -677,6 +687,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     app.modal.show(RulesetEditorModal, {
       ruleset,
       providers: this.providers,
+      modifiers: this.modifiers,
       onsave: () => this.loadData(),
     });
   }
