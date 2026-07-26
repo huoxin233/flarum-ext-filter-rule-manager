@@ -403,24 +403,24 @@ export class FilterEngine {
     let targetContent = content;
     let modifierKeys: string[] = node.targetModifiers && Array.isArray(node.targetModifiers) ? node.targetModifiers : [];
 
-    if (modifierKeys.length > 0) {
-      let currentCacheKey = '';
-      modifierKeys.forEach((modifierKey) => {
-        currentCacheKey = currentCacheKey === '' ? modifierKey : `${currentCacheKey},${modifierKey}`;
-
-        if (modifiedContentCache[currentCacheKey] !== undefined) {
-          targetContent = modifiedContentCache[currentCacheKey];
-        } else {
-          if (this.modifiers[modifierKey]) {
-            targetContent = this.modifiers[modifierKey](targetContent);
-          }
-          modifiedContentCache[currentCacheKey] = targetContent;
-        }
-      });
-    }
-
     let result = null;
     try {
+      if (modifierKeys.length > 0) {
+        let currentCacheKey = '';
+        modifierKeys.forEach((modifierKey) => {
+          currentCacheKey = currentCacheKey === '' ? modifierKey : `${currentCacheKey},${modifierKey}`;
+
+          if (modifiedContentCache[currentCacheKey] !== undefined) {
+            targetContent = modifiedContentCache[currentCacheKey];
+          } else {
+            if (this.modifiers[modifierKey]) {
+              targetContent = this.modifiers[modifierKey](targetContent);
+            }
+            modifiedContentCache[currentCacheKey] = targetContent;
+          }
+        });
+      }
+
       let config: any = isObject ? { ...(node.value as object), operator: node.operator } : { operator: node.operator, value: node.value };
 
       result = provider.evaluate(node.ruleType as string, targetContent, config);
