@@ -339,6 +339,21 @@ use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 
 class StripSpoilersModifier implements ModifierInterface
 {
+    public function key(): string
+    {
+        return 'no_spoilers';
+    }
+
+    public function name(): string
+    {
+        return 'Ignore Spoilers';
+    }
+
+    public function description(): string
+    {
+        return 'Removes spoiler tags before evaluation.';
+    }
+
     public function modify(string $content): string
     {
         // Strip out spoiler tags
@@ -356,7 +371,7 @@ use YourNamespace\Modifier\StripSpoilersModifier;
 
 return [
     (new FilterContentModifier())
-        ->register('no_spoilers', 'Ignore Spoilers', StripSpoilersModifier::class),
+        ->register(StripSpoilersModifier::class),
 ];
 ```
 
