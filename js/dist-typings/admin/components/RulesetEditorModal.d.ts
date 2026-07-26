@@ -6,6 +6,7 @@ import type Model from 'flarum/common/Model';
 export interface RulesetEditorModalAttrs extends IFormModalAttrs {
     ruleset?: Model & Record<string, any>;
     providers: Record<string, unknown>[];
+    modifiers: Record<string, any>;
     onsave?: () => void;
 }
 /**
@@ -28,6 +29,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     static readonly isDismissibleViaEscKey = false;
     ruleset?: Model & Record<string, any>;
     providers: Record<string, unknown>[];
+    modifiers: Record<string, any>;
     loading: boolean;
     messageTextarea: HTMLTextAreaElement | null;
     flagMessageTextarea: HTMLTextAreaElement | null;
@@ -44,7 +46,6 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     flagMessage: Stream<string>;
     evaluateAllRules: Stream<boolean>;
     evaluateTitle: Stream<boolean | null>;
-    stripMentions: Stream<boolean | null>;
     evasionActive: Stream<boolean | null>;
     evasionTimeout: Stream<number | null>;
     evasionThreshold: Stream<number | null>;

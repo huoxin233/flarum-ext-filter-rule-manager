@@ -8,6 +8,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     scopeFilter: string;
     rulesets: Model[];
     providers: Record<string, any>[];
+    modifiers: Record<string, any>;
     reordering: boolean;
     toggling: Set<string>;
     registryFilter: string;
