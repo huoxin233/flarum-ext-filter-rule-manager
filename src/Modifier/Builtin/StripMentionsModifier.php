@@ -15,6 +15,21 @@ use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 
 class StripMentionsModifier implements ModifierInterface
 {
+    public function key(): string
+    {
+        return 'strip_mentions';
+    }
+
+    public function name(): string
+    {
+        return 'huoxin-filter-rule-manager.admin.modifiers.strip_mentions';
+    }
+
+    public function description(): string
+    {
+        return 'huoxin-filter-rule-manager.admin.modifiers.strip_mentions_help';
+    }
+
     public function modify(string $content): string
     {
         // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
