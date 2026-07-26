@@ -236,8 +236,12 @@ class RuleEvaluator
         }
     }
 
-    public function interpolate(string $template, array $tokens): string
+    public function interpolate(?string $template, array $tokens): string
     {
+        if ($template === null || $template === '') {
+            return '';
+        }
+
         if (preg_match('/^[a-zA-Z0-9\-_]+(?:\.[a-zA-Z0-9\-_]+)+$/', $template)) {
             $trans = $this->translator->trans($template, $tokens);
             if ($trans !== $template && $trans !== '') {
