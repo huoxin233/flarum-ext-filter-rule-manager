@@ -13,6 +13,7 @@ import filterEngine from '../common/FilterEngine';
 import BuiltinProvider from './providers/BuiltinProvider';
 import BuiltinTemplate from '../common/components/BuiltinTemplate';
 import BuiltinTemplateSettings from './components/BuiltinTemplateSettings';
+import stripMentions from '../common/modifiers/stripMentions';
 
 export { default as extend } from './extend';
 
@@ -28,6 +29,8 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
 
   filterEngine.registerProvider('builtin', new BuiltinProvider() as any);
   filterEngine.registerTemplate('builtin', BuiltinTemplate as any, BuiltinTemplateSettings as any);
+
+  filterEngine.registerModifier('strip_mentions', stripMentions);
 
   /*
     // Temporarily removed until Flarum natively supports a "Nobody" permission.
