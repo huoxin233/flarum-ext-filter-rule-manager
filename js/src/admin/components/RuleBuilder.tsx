@@ -121,20 +121,24 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
   view(): Mithril.Children {
     const { node, onchange, providers, modifiers } = this.attrs;
 
-    const providerOptions: Record<string, string> = {};
+    const groupedProviders: Record<string, { label: string; types: { type: string; label: string }[] }> = {};
     providers.forEach((p) => {
-      if (p.provider) {
+      if (!p.provider) return;
+
+      if (!groupedProviders[p.provider]) {
         const transKey = `huoxin-filter-rule-manager.admin.providers.${p.provider}`;
         const translated = app.translator.trans(transKey);
-        providerOptions[p.provider] = translated !== transKey && translated ? String(translated) : p.providerLabel || p.provider;
+        groupedProviders[p.provider] = {
+          label: translated !== transKey && translated ? String(translated) : p.providerLabel || p.provider,
+          types: [],
+        };
       }
-    });
 
-    const availableTypes = providers.filter((p) => p.provider === node.provider);
-    const typeOptions = availableTypes.reduce((acc: Record<string, string>, p) => {
-      acc[p.type] = p.label || p.type;
-      return acc;
-    }, {});
+      groupedProviders[p.provider].types.push({
+        type: p.type,
+        label: p.label || p.type,
+      });
+    });
 
     const modifierOptions: Record<string, { label: string; description: string }> = {};
     if (modifiers) {
@@ -151,21 +155,28 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
     return (
       <div className="FilterRuleManager-Expression-RuleNode">
         <div className="FilterRuleManager-RuleNode-header">
-          <Select
-            options={providerOptions}
-            value={node.provider}
-            onchange={(val: string) => {
-              const firstType = providers.find((p) => p.provider === val);
-              onchange({ ...node, provider: val, ruleType: firstType ? firstType.type : '', value: '' });
-            }}
-          />
-
-          <Select
-            options={typeOptions}
-            value={node.ruleType}
-            onchange={(val: string) => onchange({ ...node, ruleType: val, value: '' })}
-            disabled={!node.provider}
-          />
+          <span className="Select">
+            <select
+              className="Select-input FormControl"
+              value={`${node.provider}:${node.ruleType}`}
+              onchange={(e: Event) => {
+                const val = (e.target as HTMLSelectElement).value;
+                const [provider, ruleType] = val.split(':');
+                if (provider !== node.provider || ruleType !== node.ruleType) {
+                  onchange({ ...node, provider, ruleType, value: '' });
+                }
+              }}
+            >
+              {Object.entries(groupedProviders).map(([providerKey, data]) => (
+                <optgroup label={data.label}>
+                  {data.types.map((typeObj) => (
+                    <option value={`${providerKey}:${typeObj.type}`}>{typeObj.label}</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+            {icon('fas fa-caret-down', { className: 'Select-caret' })}
+          </span>
 
           <div className="FilterRuleManager-RuleNode-modifiers">
             <Dropdown
