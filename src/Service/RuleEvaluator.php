@@ -152,27 +152,27 @@ class RuleEvaluator
             $targetModifiers = $node['targetModifiers'];
         }
 
-        if (! empty($targetModifiers) && $this->container->bound(FilterContentModifier::REGISTRY_KEY)) {
-            $currentCacheKey = '';
-            $modifiers = $this->container->make(FilterContentModifier::REGISTRY_KEY);
+        try {
+            if (! empty($targetModifiers) && $this->container->bound(FilterContentModifier::REGISTRY_KEY)) {
+                $currentCacheKey = '';
+                $modifiers = $this->container->make(FilterContentModifier::REGISTRY_KEY);
 
-            foreach ($targetModifiers as $modifierKey) {
-                $currentCacheKey = $currentCacheKey === '' ? $modifierKey : $currentCacheKey . ',' . $modifierKey;
+                foreach ($targetModifiers as $modifierKey) {
+                    $currentCacheKey = $currentCacheKey === '' ? $modifierKey : $currentCacheKey . ',' . $modifierKey;
 
-                if (isset($modifiedContentCache[$currentCacheKey])) {
-                    $context->content = $modifiedContentCache[$currentCacheKey];
-                } else {
-                    if (isset($modifiers[$modifierKey])) {
-                        /** @var ModifierInterface $modifierClass */
-                        $modifierClass = $this->container->make($modifiers[$modifierKey]['class']);
-                        $context->content = $modifierClass->modify($context->content);
+                    if (isset($modifiedContentCache[$currentCacheKey])) {
+                        $context->content = $modifiedContentCache[$currentCacheKey];
+                    } else {
+                        if (isset($modifiers[$modifierKey])) {
+                            /** @var ModifierInterface $modifierClass */
+                            $modifierClass = $this->container->make($modifiers[$modifierKey]['class']);
+                            $context->content = $modifierClass->modify($context->content);
+                        }
+                        $modifiedContentCache[$currentCacheKey] = $context->content;
                     }
-                    $modifiedContentCache[$currentCacheKey] = $context->content;
                 }
             }
-        }
 
-        try {
             $isObject = is_array($node['value']) && ! array_is_list($node['value']);
 
             if ($isObject) {
