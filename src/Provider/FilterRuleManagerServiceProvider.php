@@ -61,7 +61,6 @@ class FilterRuleManagerServiceProvider extends AbstractServiceProvider
 
             return $modifiers;
         });
-
     }
 
     public function boot(): void
