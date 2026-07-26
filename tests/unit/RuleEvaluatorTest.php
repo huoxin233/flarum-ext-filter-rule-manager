@@ -71,15 +71,6 @@ class RuleEvaluatorTest extends TestCase
                 return parent::interpolate($template, $tokens);
             }
 
-            // Expose protected/private methods for testing
-            public function testMergeResults(array $results): array
-            {
-                // We use reflection since it's private
-                $reflection = new ReflectionClass(RuleEvaluator::class);
-                $method = $reflection->getMethod('mergeResults');
-
-                return $method->invoke($this, $results);
-            }
         };
     }
 
@@ -120,7 +111,10 @@ class RuleEvaluatorTest extends TestCase
         $left = ['matched_word' => 'apple, banana'];
         $right = ['matched_word' => 'banana, orange', 'other_token' => 'cat'];
 
-        $merged = $this->evaluator->testMergeResults([$left, $right]);
+        $reflection = new ReflectionClass(RuleEvaluator::class);
+        $method = $reflection->getMethod('mergeResults');
+
+        $merged = $method->invoke($this->evaluator, [$left, $right]);
 
         $this->assertEquals('apple, banana, orange', $merged['matched_word']);
         $this->assertEquals('cat', $merged['other_token']);
