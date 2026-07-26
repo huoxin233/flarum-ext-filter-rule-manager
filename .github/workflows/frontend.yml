@@ -3,7 +3,7 @@ name: Filter Rule Manager JS
 on: [workflow_dispatch, push, pull_request]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   run:
