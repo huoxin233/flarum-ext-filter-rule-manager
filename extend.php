@@ -87,5 +87,5 @@ return [
 
     // ── Modifiers ─────────────────────────────────────────────────────────────
     (new FilterContentModifier())
-        ->register('strip_mentions', 'huoxin-filter-rule-manager.admin.modifiers.strip_mentions', StripMentionsModifier::class),
+        ->register(StripMentionsModifier::class),
 ];

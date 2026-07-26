@@ -17,6 +17,10 @@ use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 
 class StripQuotesModifier implements ModifierInterface
 {
+    public function key(): string { return 'strip_quotes'; }
+    public function name(): string { return 'Strip Quotes'; }
+    public function description(): string { return 'test'; }
+
     public function modify(string $content): string
     {
         return preg_replace('/>.*?$/m', '', $content);
@@ -25,6 +29,10 @@ class StripQuotesModifier implements ModifierInterface
 
 class StripSpoilersModifier implements ModifierInterface
 {
+    public function key(): string { return 'strip_spoilers'; }
+    public function name(): string { return 'Strip Spoilers'; }
+    public function description(): string { return 'test'; }
+
     public function modify(string $content): string
     {
         return preg_replace('/\[spoiler\].*?\[\/spoiler\]/is', '', $content);
@@ -34,6 +42,10 @@ class StripSpoilersModifier implements ModifierInterface
 class StateTrackingModifier implements ModifierInterface
 {
     public static int $executionCount = 0;
+
+    public function key(): string { return 'state_tracker'; }
+    public function name(): string { return 'State Tracker'; }
+    public function description(): string { return 'test'; }
 
     public function modify(string $content): string
     {
@@ -48,9 +60,9 @@ class ModifierTest extends FilterTestCase
     {
         $this->extend(
             (new FilterContentModifier())
-                ->register('strip_quotes', 'Strip Quotes', StripQuotesModifier::class)
-                ->register('strip_spoilers', 'Strip Spoilers', StripSpoilersModifier::class)
-                ->register('state_tracker', 'State Tracker', StateTrackingModifier::class)
+                ->register(StripQuotesModifier::class)
+                ->register(StripSpoilersModifier::class)
+                ->register(StateTrackingModifier::class)
         );
 
         parent::setUp();

@@ -24,16 +24,11 @@ class FilterContentModifier implements ExtenderInterface
     private array $modifiers = [];
 
     /**
-     * @param string $key          Unique modifier key
-     * @param string $label        Human-readable label for the UI
      * @param class-string<ModifierInterface> $class  Class implementing ModifierInterface
      */
-    public function register(string $key, string $label, string $class): static
+    public function register(string $class): static
     {
-        $this->modifiers[$key] = [
-            'label' => $label,
-            'class' => $class
-        ];
+        $this->modifiers[] = $class;
 
         return $this;
     }
@@ -44,11 +39,18 @@ class FilterContentModifier implements ExtenderInterface
             return;
         }
 
-        $modifiers = $this->modifiers;
+        $modifiersToAdd = $this->modifiers;
 
         if ($container->bound(self::REGISTRY_KEY)) {
-            $container->extend(self::REGISTRY_KEY, function (array $existing) use ($modifiers) {
-                return array_merge($existing, $modifiers);
+            $container->extend(self::REGISTRY_KEY, function (array $existing) use ($container, $modifiersToAdd) {
+                foreach ($modifiersToAdd as $class) {
+                    $instance = $container->make($class);
+                    $existing[$instance->key()] = [
+                        'label' => $instance->name(),
+                        'class' => $class
+                    ];
+                }
+                return $existing;
             });
             return;
         }
@@ -57,6 +59,6 @@ class FilterContentModifier implements ExtenderInterface
             ? (array) $container->make(self::PENDING_KEY)
             : [];
 
-        $container->instance(self::PENDING_KEY, array_merge($pending, $modifiers));
+        $container->instance(self::PENDING_KEY, array_merge($pending, $modifiersToAdd));
     }
 }

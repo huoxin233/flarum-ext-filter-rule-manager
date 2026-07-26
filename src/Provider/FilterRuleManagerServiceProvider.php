@@ -48,7 +48,14 @@ class FilterRuleManagerServiceProvider extends AbstractServiceProvider
             $modifiers = [];
 
             if ($container->bound(FilterContentModifier::PENDING_KEY)) {
-                $modifiers = $container->make(FilterContentModifier::PENDING_KEY);
+                $pendingClasses = $container->make(FilterContentModifier::PENDING_KEY);
+                foreach ($pendingClasses as $class) {
+                    $instance = $container->make($class);
+                    $modifiers[$instance->key()] = [
+                        'label' => $instance->name(),
+                        'class' => $class
+                    ];
+                }
             }
 
             return $modifiers;
