@@ -14,9 +14,9 @@ namespace Huoxin\FilterRuleManager\Service;
 use Flarum\Discussion\Discussion;
 use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
-use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Model\Ruleset;
+use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 use Huoxin\FilterRuleManager\Provider\RuleProviderInterface;
 use Illuminate\Contracts\Container\Container;
 use Psr\Log\LoggerInterface;
@@ -158,7 +158,7 @@ class RuleEvaluator
                 $modifiers = $this->container->make(FilterContentModifier::REGISTRY_KEY);
 
                 foreach ($targetModifiers as $modifierKey) {
-                    $currentCacheKey = $currentCacheKey === '' ? $modifierKey : $currentCacheKey . ',' . $modifierKey;
+                    $currentCacheKey = $currentCacheKey === '' ? $modifierKey : $currentCacheKey.','.$modifierKey;
 
                     if (isset($modifiedContentCache[$currentCacheKey])) {
                         $context->content = $modifiedContentCache[$currentCacheKey];

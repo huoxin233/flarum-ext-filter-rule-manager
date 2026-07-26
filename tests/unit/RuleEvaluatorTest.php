@@ -70,7 +70,6 @@ class RuleEvaluatorTest extends TestCase
 
                 return parent::interpolate($template, $tokens);
             }
-
         };
     }
 
