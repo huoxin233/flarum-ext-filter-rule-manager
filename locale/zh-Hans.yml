@@ -175,7 +175,7 @@ huoxin-filter-rule-manager:
     section_moderation: "审核操作"
     section_rules: "规则"
 
-    # ── Intervention / scope / display labels ────────────────────────────────────
+    # ── Intervention / scope / display / modifiers labels ────────────────────────────────────
     interventions:
       info: "提示 (Info)"
       info_help: "用户输入时实时显示的提示信息。不会阻止发帖。"
@@ -204,6 +204,9 @@ huoxin-filter-rule-manager:
     modifiers:
       entire_post: "完整内容"
       multiple_selected: "{count} 个预处理器"
+      strip_mentions: "检查前剔除提及 (@)"
+      strip_mentions_help: "在将文本送往此规则检查之前，先删除其中包含的所有用户提及和回帖提及，防止由于提及的用户名含有敏感词而引发误报。"
+      
     displays:
       none: "无 (隐藏)"
       none_help: "前端不显示任何提示UI。"

@@ -16,9 +16,11 @@ use Huoxin\FilterRuleManager\Api\Controller;
 use Huoxin\FilterRuleManager\Console\ClearOldBlockLogsCommand;
 use Huoxin\FilterRuleManager\Exception\RuleBlockException;
 use Huoxin\FilterRuleManager\Exception\RuleBlockExceptionHandler;
+use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 use Huoxin\FilterRuleManager\Listener\EvaluateBlockRulesets;
 use Huoxin\FilterRuleManager\Listener\ExecuteModerationActions;
 use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
+use Huoxin\FilterRuleManager\Modifier\Builtin\StripMentionsModifier;
 use Huoxin\FilterRuleManager\Provider\FilterRuleManagerServiceProvider;
 use Illuminate\Console\Scheduling\Event as ScheduleEvent;
 
@@ -82,4 +84,8 @@ return [
         ->schedule(ClearOldBlockLogsCommand::class, function (ScheduleEvent $event) {
             $event->daily();
         }),
+
+    // ── Modifiers ─────────────────────────────────────────────────────────────
+    (new FilterContentModifier())
+        ->register('strip_mentions', 'huoxin-filter-rule-manager.admin.modifiers.strip_mentions', StripMentionsModifier::class),
 ];

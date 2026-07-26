@@ -103,12 +103,11 @@ class RulesetMatcherTest extends FilterTestCase
                     'name' => 'Mentions Stripper Ruleset',
                     'priority' => 4,
                     'compiled_ast' => json_encode([
-                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['admin']]
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'targetModifiers' => ['strip_mentions'], 'value' => ['words' => ['admin']]
                     ]),
                     'intervention_type' => 'block',
                     'display_mode' => 'banner',
                     'scope_type' => 'global',
-                    'strip_mentions' => 1, // Mentions stripped!
                     'message' => 'Cannot use the word admin',
                     'is_active' => 1,
                     'created_at' => Carbon::now()->toDateTimeString(),

@@ -25,6 +25,7 @@ import FilterRuleInlineDisplay from './components/FilterRuleInlineDisplay';
 import FilterRuleWarningModal from './components/FilterRuleWarningModal';
 import BuiltinProvider from './providers/BuiltinProvider';
 import BuiltinTemplate from '../common/components/BuiltinTemplate';
+import stripMentions from '../common/modifiers/stripMentions';
 
 app.initializers.add(
   'huoxin/filter-rule-manager',
@@ -40,6 +41,8 @@ app.initializers.add(
 
     filterEngine.registerProvider('builtin', new BuiltinProvider() as any);
     filterEngine.registerTemplate('builtin', BuiltinTemplate as any);
+
+    filterEngine.registerModifier('strip_mentions', stripMentions);
 
     let rulesets: Ruleset[] = [];
     try {
