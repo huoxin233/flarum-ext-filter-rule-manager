@@ -182,8 +182,8 @@ class Lexer
         $value = '';
         while ($this->position < $this->length) {
             $char = $this->input[$this->position];
-            // fields can be provider.type
-            if (ctype_alnum($char) || $char === '_' || $char === '.') {
+            // fields can be provider.type or provider.type@modifier
+            if (ctype_alnum($char) || $char === '_' || $char === '.' || $char === '@') {
                 $value .= $char;
                 $this->position++;
             } else {

@@ -85,9 +85,13 @@ class Parser
     {
         $fieldToken = $this->consume(Token::T_FIELD, 'Expected field identifier (e.g. provider.type)');
 
-        $parts = explode('.', $fieldToken->value, 2);
+        $tokenParts = explode('@', $fieldToken->value);
+        $fieldPath = array_shift($tokenParts);
+        $targetModifiers = $tokenParts;
+
+        $parts = explode('.', $fieldPath, 2);
         if (count($parts) !== 2) {
-            throw new InvalidArgumentException("Field '{$fieldToken->value}' must be in format provider.type");
+            throw new InvalidArgumentException("Field '{$fieldPath}' must be in format provider.type");
         }
 
         $provider = $parts[0];
@@ -104,7 +108,7 @@ class Parser
             $value = true;
         }
 
-        return new RuleNode($provider, $ruleType, $operator, $value);
+        return new RuleNode($provider, $ruleType, $operator, $value, $targetModifiers);
     }
 
     private function parseValue(): mixed
