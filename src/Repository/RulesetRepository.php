@@ -61,7 +61,6 @@ class RulesetRepository
                     'displayMode' => $r->display_mode,
                     'message' => $r->message,
                     'evaluateTitle' => $r->evaluate_title === null ? null : (bool) $r->evaluate_title,
-                    'stripMentions' => $r->strip_mentions === null ? null : (bool) $r->strip_mentions,
                     'blockCascade' => $r->block_cascade,
                     'scopeType' => $r->scope_type,
                     'scopeTagIds' => $r->scope_tag_ids ?? [],

@@ -96,9 +96,6 @@ class UpdateRulesetController extends AbstractShowController
         if (array_key_exists('evaluateTitle', $attributes)) {
             $ruleset->evaluate_title = $attributes['evaluateTitle'] === null ? null : (bool) $attributes['evaluateTitle'];
         }
-        if (array_key_exists('stripMentions', $attributes)) {
-            $ruleset->strip_mentions = $attributes['stripMentions'] === null ? null : (bool) $attributes['stripMentions'];
-        }
         if (array_key_exists('evasionActive', $attributes)) {
             $ruleset->evasion_active = $attributes['evasionActive'] === null ? null : (bool) $attributes['evasionActive'];
         }

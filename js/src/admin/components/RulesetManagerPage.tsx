@@ -196,16 +196,6 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evaluate_title_help')),
           })}
         </div>
-
-        <div className="Form-group">
-          {this.buildSettingComponent({
-            type: 'boolean',
-            setting: 'huoxin-filter-rule-manager.global_strip_mentions',
-            label: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_strip_mentions')),
-            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_strip_mentions_help')),
-          })}
-        </div>
-
         <div className="Form-group">
           {this.buildSettingComponent({
             type: 'boolean',

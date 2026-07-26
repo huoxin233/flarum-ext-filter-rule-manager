@@ -127,26 +127,18 @@ class RulesetMatcher
 
         $evaluateTitle = $ruleset->evaluate_title ?? (bool) $this->settings->get('huoxin-filter-rule-manager.global_evaluate_title', true);
 
-        $targetContent = '';
-
         if ($onlyField === 'title') {
-            $targetContent = ($evaluateTitle && $title !== '' && $isFirstPost) ? $title : '';
-        } elseif ($onlyField === 'content') {
-            $targetContent = $content;
-        } elseif ($evaluateTitle && $title !== '' && $isFirstPost) {
-            $targetContent = $title."\n\n".$content;
-        } else {
-            $targetContent = $content;
+            return ($evaluateTitle && $title !== '' && $isFirstPost) ? $title : '';
         }
 
-        $stripMentions = $ruleset->strip_mentions ?? (bool) $this->settings->get('huoxin-filter-rule-manager.global_strip_mentions', true);
-
-        if ($stripMentions) {
-            // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
-            $targetContent = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $targetContent) ?? $targetContent;
-            $targetContent = preg_replace('/@\w+/', '', $targetContent) ?? $targetContent;
+        if ($onlyField === 'content') {
+            return $content;
         }
 
-        return $targetContent;
+        if ($evaluateTitle && $title !== '' && $isFirstPost) {
+            return $title."\n\n".$content;
+        }
+
+        return $content;
     }
 }

@@ -85,8 +85,6 @@ huoxin-filter-rule-manager:
     settings:
       global_evaluate_title: "检查主题标题"
       global_evaluate_title_help: "开启后，在检查主题的首个回复时，默认将主题标题拼接到正文前面一起检查。"
-      global_strip_mentions: "检查前剔除提及 (@)"
-      global_strip_mentions_help: "开启后，默认从检查文本中删除所有提及。"
       global_strict_edit_evaluation: "严格编辑检查"
       global_strict_edit_evaluation_help: "开启后，任何编辑都会被严格检查，防止违规内容被变相“洗白”。"
       global_auto_flag: "自动举报"
@@ -144,8 +142,6 @@ huoxin-filter-rule-manager:
     ruleset_evaluate_all_rules_help: "开启后，引擎将检查此规则集中的所有规则，即使已经找到匹配项。这允许您收集所有命中的变量用于自定义消息。如果关闭，引擎在找到第一个匹配项后就会立即停止，以提高性能。"
     ruleset_evaluate_title: "检查主题标题"
     ruleset_evaluate_title_help: "开启后，在检查主题的首个回复时，会将主题标题拼接到正文前面一起检查。"
-    ruleset_strip_mentions: "检查前剔除提及 (@)"
-    ruleset_strip_mentions_help: "开启后，将从检查文本中删除所有针对用户和回帖的提及，防止包含敏感词的用户名引发误报。"
     ruleset_auto_flag: "匹配时自动举报"
     ruleset_auto_flag_help: "开启后，触发此规则集的帖子将自动被举报并进入管理队列。（需要 flarum/flags 扩展）"
     ruleset_require_approval: "匹配时进入审核队列"

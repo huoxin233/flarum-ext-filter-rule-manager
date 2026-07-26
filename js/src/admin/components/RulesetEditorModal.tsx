@@ -71,7 +71,6 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   flagMessage!: Stream<string>;
   evaluateAllRules!: Stream<boolean>;
   evaluateTitle!: Stream<boolean | null>;
-  stripMentions!: Stream<boolean | null>;
   evasionActive!: Stream<boolean | null>;
   evasionTimeout!: Stream<number | null>;
   evasionThreshold!: Stream<number | null>;
@@ -121,7 +120,6 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     this.flagMessage = Stream(this.ruleset ? this.ruleset.flagMessage() : '');
     this.evaluateAllRules = Stream(this.ruleset ? this.ruleset.evaluateAllRules() : false);
     this.evaluateTitle = Stream(this.ruleset ? this.ruleset.evaluateTitle() : null);
-    this.stripMentions = Stream(this.ruleset ? this.ruleset.stripMentions() : null);
     this.evasionActive = Stream(this.ruleset ? this.ruleset.evasionActive() : null);
     this.evasionTimeout = Stream(this.ruleset ? this.ruleset.evasionTimeout() : null);
     this.evasionThreshold = Stream(this.ruleset ? this.ruleset.evasionThreshold() : null);
@@ -287,12 +285,6 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
           'huoxin-filter-rule-manager.admin.ruleset_evaluate_title',
           'huoxin-filter-rule-manager.admin.ruleset_evaluate_title_help',
           this.evaluateTitle
-        )}
-
-        {this.nullableBooleanSelect(
-          'huoxin-filter-rule-manager.admin.ruleset_strip_mentions',
-          'huoxin-filter-rule-manager.admin.ruleset_strip_mentions_help',
-          this.stripMentions
         )}
       </div>
     );
@@ -857,7 +849,6 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       this.flagMessage() !== r.flagMessage() ||
       this.evaluateAllRules() !== r.evaluateAllRules() ||
       this.evaluateTitle() !== r.evaluateTitle() ||
-      this.stripMentions() !== r.stripMentions() ||
       this.evasionActive() !== r.evasionActive() ||
       this.evasionTimeout() !== r.evasionTimeout() ||
       this.evasionThreshold() !== r.evasionThreshold() ||
@@ -931,7 +922,6 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       flagMessage: this.flagMessage(),
       evaluateAllRules: this.evaluateAllRules(),
       evaluateTitle: this.evaluateTitle(),
-      stripMentions: this.stripMentions(),
       evasionActive: this.evasionActive(),
       evasionTimeout: this.evasionTimeout(),
       evasionThreshold: this.evasionThreshold(),
