@@ -15,7 +15,6 @@ use Flarum\Group\Group;
 use Flarum\Http\RequestUtil;
 use Flarum\Tags\Tag;
 use Huoxin\FilterRuleManager\Model\Ruleset;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Arr;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
@@ -24,13 +23,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ImportRulesetsController implements RequestHandlerInterface
 {
-    protected ConnectionInterface $db;
-
-    public function __construct(ConnectionInterface $db)
-    {
-        $this->db = $db;
-    }
-
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         RequestUtil::getActor($request)->assertAdmin();
@@ -70,7 +62,7 @@ class ImportRulesetsController implements RequestHandlerInterface
             $groupMap = Group::whereIn('name_singular', array_unique($allGroupNames))->pluck('id', 'name_singular')->toArray();
         }
 
-        $this->db->transaction(function () use ($rulesetsData, $mode, $preservePriority, $tagMap, $groupMap) {
+        Ruleset::query()->getConnection()->transaction(function () use ($rulesetsData, $mode, $preservePriority, $tagMap, $groupMap) {
             if ($mode === 'override') {
                 Ruleset::query()->delete();
             }
