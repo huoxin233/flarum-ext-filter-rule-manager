@@ -13,7 +13,6 @@ namespace Huoxin\FilterRuleManager\Repository;
 
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Collection;
 
 class RulesetRepository
@@ -24,7 +23,6 @@ class RulesetRepository
     protected $activeRulesets;
 
     public function __construct(
-        protected ConnectionInterface $db,
         protected CacheRepository $cache
     ) {
     }
@@ -79,7 +77,7 @@ class RulesetRepository
 
     public function reorder(array $values): void
     {
-        $this->db->transaction(function () use ($values) {
+        Ruleset::query()->getConnection()->transaction(function () use ($values) {
             Ruleset::upsert($values, ['id'], ['priority']);
         });
 
