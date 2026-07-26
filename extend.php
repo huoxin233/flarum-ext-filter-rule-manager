@@ -61,7 +61,6 @@ return [
     // ── Default Settings ──────────────────────────────────────────────────
     (new Extend\Settings())
         ->default('huoxin-filter-rule-manager.global_evaluate_title', true)
-        ->default('huoxin-filter-rule-manager.global_strip_mentions', true)
         ->default('huoxin-filter-rule-manager.global_auto_flag', true)
         ->default('huoxin-filter-rule-manager.global_require_approval', true)
         ->default('huoxin-filter-rule-manager.global_evasion_active', false)

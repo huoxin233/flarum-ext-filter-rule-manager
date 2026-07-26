@@ -154,10 +154,6 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                 ->property('evaluate_title')
                 ->writable()
                 ->nullable(),
-            Schema\Boolean::make('stripMentions')
-                ->property('strip_mentions')
-                ->writable()
-                ->nullable(),
             Schema\Boolean::make('evasionActive')
                 ->property('evasion_active')
                 ->writable()
