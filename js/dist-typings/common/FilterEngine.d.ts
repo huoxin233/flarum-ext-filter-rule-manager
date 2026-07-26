@@ -8,6 +8,7 @@ export interface ASTNode {
     left?: ASTNode;
     right?: ASTNode;
     node?: ASTNode;
+    targetModifiers?: string[];
     _key?: number;
 }
 export interface FilterRuleProvider {
@@ -25,7 +26,6 @@ export interface Ruleset {
     scopeType: string;
     scopeTagIds?: (string | number)[];
     evaluateTitle?: boolean;
-    stripMentions?: boolean;
     evaluateAllRules?: boolean | (() => boolean);
     blockCascade?: boolean;
     compiledAst?: () => ASTNode;
@@ -54,6 +54,7 @@ export type SubscriberCallback = (state: EngineState) => void;
 export declare class FilterEngine {
     rulesets: Ruleset[];
     providers: Record<string, FilterRuleProvider>;
+    modifiers: Record<string, (content: string) => string>;
     templates: Record<string, {
         component: Mithril.ComponentTypes<unknown, unknown>;
         settingsComponent: Mithril.ComponentTypes<unknown, unknown> | null;
@@ -94,6 +95,10 @@ export declare class FilterEngine {
      */
     registerProvider(name: string, provider: FilterRuleProvider): void;
     /**
+     * Register a frontend modifier function.
+     */
+    registerModifier(name: string, modifier: (content: string) => string): void;
+    /**
      * Look up a registered provider by name. Returns null if unknown.
      * Used by the admin RuleBuilder to find a provider's `getConfigComponent`.
      */
@@ -133,9 +138,9 @@ export declare class FilterEngine {
     clearBlockResults(): void;
     evaluate(): void;
     evaluateRuleset(ruleset: Ruleset, content: string): Record<string, string> | null;
-    evaluateAST(node: ASTNode | null | undefined, content: string, ruleset: Ruleset): Record<string, string> | null;
+    evaluateAST(node: ASTNode | null | undefined, content: string, ruleset: Ruleset, modifiedContentCache: Record<string, string>): Record<string, string> | null;
     mergeResults(results: Record<string, string>[]): Record<string, string>;
-    evaluateRuleNode(node: ASTNode, content: string): Record<string, string> | null;
+    evaluateRuleNode(node: ASTNode, content: string, modifiedContentCache: Record<string, string>): Record<string, string> | null;
     scopeMatches(ruleset: Ruleset, composer: any, application: any): boolean;
     /**
      * Interpolate {{token}} placeholders.

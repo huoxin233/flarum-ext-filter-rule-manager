@@ -12,6 +12,7 @@ export interface RuleBuilderAttrs extends ComponentAttrs {
     expression?: string;
     onchange?: (v: string) => void;
     providers?: FrontendProvider[];
+    modifiers?: Record<string, any>;
 }
 export default class RuleBuilder extends Component<RuleBuilderAttrs> {
     mode: string;
