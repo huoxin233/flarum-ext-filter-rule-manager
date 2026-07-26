@@ -180,7 +180,7 @@ class Lexer {
     let value = '';
     while (this.position < this.length) {
       const char = this.input[this.position];
-      if (/[a-zA-Z0-9_.]/.test(char)) {
+      if (/[a-zA-Z0-9_.@]/.test(char)) {
         value += char;
         this.position++;
       } else break;
@@ -269,8 +269,12 @@ export class Parser {
 
   parseRule(): ASTNode {
     const fieldToken = this.consume(T_FIELD, 'Expected field identifier (e.g. provider.type)');
-    const parts = String(fieldToken.value).split('.');
-    if (parts.length !== 2) throw new Error(`Field '${fieldToken.value}' must be in format provider.type`);
+    const tokenParts = String(fieldToken.value).split('@');
+    const fieldPath = tokenParts[0];
+    const targetModifiers = tokenParts.slice(1);
+
+    const parts = fieldPath.split('.');
+    if (parts.length !== 2) throw new Error(`Field '${fieldPath}' must be in format provider.type`);
     const [provider, ruleType] = parts;
 
     let operator = 'eq';
@@ -281,7 +285,7 @@ export class Parser {
       value = this.parseValue();
     }
 
-    return { type: 'rule', provider, ruleType, operator, value };
+    return { type: 'rule', provider, ruleType, operator, value, targetModifiers };
   }
 
   parseValue(): unknown {
@@ -392,7 +396,13 @@ export function stringifyExpression(ast: ASTNode | null | undefined): string {
           .join(', ') +
         `}`;
     } else valStr = String(ast.value);
-    return `${String(ast.provider)}.${String(ast.ruleType)} ${String(ast.operator)} ${valStr}`;
+
+    let modifierStr = '';
+    if (ast.targetModifiers && ast.targetModifiers.length > 0) {
+      modifierStr = '@' + ast.targetModifiers.join('@');
+    }
+
+    return `${String(ast.provider)}.${String(ast.ruleType)}${modifierStr} ${String(ast.operator)} ${valStr}`;
   }
   return '';
 }

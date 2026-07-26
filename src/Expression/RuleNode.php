@@ -17,7 +17,8 @@ class RuleNode implements NodeInterface
         public string $provider,
         public string $ruleType,
         public string $operator,
-        public mixed $value
+        public mixed $value,
+        public array $targetModifiers = []
     ) {
     }
 
@@ -29,6 +30,7 @@ class RuleNode implements NodeInterface
             'ruleType' => $this->ruleType,
             'operator' => $this->operator,
             'value' => $this->value,
+            'targetModifiers' => $this->targetModifiers,
         ];
     }
 }
