@@ -136,10 +136,13 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
       return acc;
     }, {});
 
-    const modifierOptions: Record<string, string> = {};
+    const modifierOptions: Record<string, { label: string; description: string }> = {};
     if (modifiers) {
       Object.entries(modifiers).forEach(([key, modifier]) => {
-        modifierOptions[key] = modifier.label || key;
+        modifierOptions[key] = {
+          label: modifier.label ? app.translator.trans(modifier.label).toString() : key,
+          description: modifier.description ? app.translator.trans(modifier.description).toString() : '',
+        };
       });
     }
 
@@ -171,12 +174,12 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
                 targetModifiers.length === 0
                   ? app.translator.trans('huoxin-filter-rule-manager.admin.modifiers.entire_post')
                   : targetModifiers.length === 1
-                  ? modifierOptions[targetModifiers[0]] || targetModifiers[0]
+                  ? modifierOptions[targetModifiers[0]]?.label || targetModifiers[0]
                   : app.translator.trans('huoxin-filter-rule-manager.admin.modifiers.multiple_selected', { count: targetModifiers.length }) ||
                     `${targetModifiers.length} Modifiers`
               }
             >
-              {Object.entries(modifierOptions).map(([key, label]) => {
+              {Object.entries(modifierOptions).map(([key, opt]) => {
                 const selectedIndex = targetModifiers.indexOf(key);
                 const isSelected = selectedIndex !== -1;
 
@@ -184,6 +187,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
                   <li>
                     <Button
                       className="Button Button--link"
+                      title={opt.description}
                       onclick={(e: MouseEvent) => {
                         e.stopPropagation();
                         let newModifiers = [...targetModifiers];
@@ -203,7 +207,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
                       <span className={`FilterRuleManager-Modifiersequence ${!isSelected ? 'empty' : ''}`.trim()}>
                         {isSelected ? selectedIndex + 1 : '0'}
                       </span>
-                      {label}
+                      {opt.label}
                     </Button>
                   </li>
                 );

@@ -53,6 +53,7 @@ class FilterRuleManagerServiceProvider extends AbstractServiceProvider
                     $instance = $container->make($class);
                     $modifiers[$instance->key()] = [
                         'label' => $instance->name(),
+                        'description' => $instance->description(),
                         'class' => $class
                     ];
                 }

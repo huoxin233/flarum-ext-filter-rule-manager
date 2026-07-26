@@ -47,6 +47,7 @@ class FilterContentModifier implements ExtenderInterface
                     $instance = $container->make($class);
                     $existing[$instance->key()] = [
                         'label' => $instance->name(),
+                        'description' => $instance->description(),
                         'class' => $class
                     ];
                 }
