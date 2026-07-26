@@ -12,14 +12,25 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
-use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
+use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 
 class StripQuotesModifier implements ModifierInterface
 {
-    public function key(): string { return 'strip_quotes'; }
-    public function name(): string { return 'Strip Quotes'; }
-    public function description(): string { return 'test'; }
+    public function key(): string
+    {
+        return 'strip_quotes';
+    }
+
+    public function name(): string
+    {
+        return 'Strip Quotes';
+    }
+
+    public function description(): string
+    {
+        return 'test';
+    }
 
     public function modify(string $content): string
     {
@@ -29,9 +40,20 @@ class StripQuotesModifier implements ModifierInterface
 
 class StripSpoilersModifier implements ModifierInterface
 {
-    public function key(): string { return 'strip_spoilers'; }
-    public function name(): string { return 'Strip Spoilers'; }
-    public function description(): string { return 'test'; }
+    public function key(): string
+    {
+        return 'strip_spoilers';
+    }
+
+    public function name(): string
+    {
+        return 'Strip Spoilers';
+    }
+
+    public function description(): string
+    {
+        return 'test';
+    }
 
     public function modify(string $content): string
     {
@@ -43,13 +65,25 @@ class StateTrackingModifier implements ModifierInterface
 {
     public static int $executionCount = 0;
 
-    public function key(): string { return 'state_tracker'; }
-    public function name(): string { return 'State Tracker'; }
-    public function description(): string { return 'test'; }
+    public function key(): string
+    {
+        return 'state_tracker';
+    }
+
+    public function name(): string
+    {
+        return 'State Tracker';
+    }
+
+    public function description(): string
+    {
+        return 'test';
+    }
 
     public function modify(string $content): string
     {
         self::$executionCount++;
+
         return $content; // Just track execution
     }
 }
@@ -192,8 +226,6 @@ class ModifierTest extends FilterTestCase
         $response = $this->submitReply('Test [spoiler]badword[/spoiler]', 5);
         $this->assertEquals(201, $response->getStatusCode());
     }
-
-
 
     /** @test */
     public function modifier_does_not_leak_context_to_sibling_rules()

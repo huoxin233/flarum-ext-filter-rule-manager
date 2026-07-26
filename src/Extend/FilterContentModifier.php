@@ -51,8 +51,10 @@ class FilterContentModifier implements ExtenderInterface
                         'class' => $class
                     ];
                 }
+
                 return $existing;
             });
+
             return;
         }
 
