@@ -304,54 +304,11 @@ class ModifierTest extends FilterTestCase
     #[Test]
     public function modifier_does_not_leak_context_to_sibling_rules()
     {
-        $this->prepareDatabase([
-            'filter_rulesets' => [
-                [
-                    'id' => 1,
-                    'name' => 'Sibling Rule Context Test',
-                    'priority' => 0,
-                    'compiled_ast' => json_encode([
-                        'type' => 'logical',
-                        'operator' => 'AND',
-                        'left' => [
-                            'type' => 'rule',
-                            'provider' => 'builtin',
-                            'ruleType' => 'contains_word',
-                            'operator' => 'EQUALS',
-                            'targetModifiers' => ['strip_spoilers'],
-                            'value' => [
-                                'words' => ['badword']
-                            ]
-                        ],
-                        'right' => [
-                            'type' => 'rule',
-                            'provider' => 'builtin',
-                            'ruleType' => 'contains_word',
-                            'operator' => 'EQUALS',
-                            'value' => [
-                                'words' => ['badword'],
-                                // NO modifiers here. It should see the RAW string!
-                            ]
-                        ]
-                    ]),
-                    'intervention_type' => 'block',
-                    'scope_type' => 'global',
-                    'is_active' => 1,
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                    'updated_at' => Carbon::now()->toDateTimeString()
-                ]
-            ]
-        ]);
-
-        // Post: 'Test [spoiler]badword[/spoiler]'
-        // Left Rule (has strip_spoilers): Sees 'Test ' -> Does NOT contain badword -> False.
-        // Right Rule (no modifiers): Sees 'Test [spoiler]badword[/spoiler]' -> Contains badword -> True.
-        // Result of AND group: False AND True = False (Allowed).
-        // If the context leaked, both would be False!
-        // But wait, to prove it didn't leak, we want to know what the right rule saw.
-        // Actually, if the left rule is False, Flarum's AST might short-circuit!
-        // Let's use OR. False OR True = True (Blocked).
-        // If it leaked, it would be False OR False = False (Allowed).
+        // Verify state isolation using an OR condition.
+        // Left Rule (strip_spoilers): Evaluates 'Test ' -> False (does not contain 'badword').
+        // Right Rule (no modifiers): Evaluates 'Test [spoiler]badword[/spoiler]' -> True.
+        // Expected outcome: False OR True = True (Blocked).
+        // If the stripped state leaked from Left to Right, both would evaluate to False (Allowed).
         $this->prepareDatabase([
             'filter_rulesets' => [
                 [
