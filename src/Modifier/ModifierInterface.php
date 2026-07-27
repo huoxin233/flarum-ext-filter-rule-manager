@@ -2,6 +2,8 @@
 
 namespace Huoxin\FilterRuleManager\Modifier;
 
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
+
 interface ModifierInterface
 {
     public function key(): string;
@@ -13,5 +15,5 @@ interface ModifierInterface
     /**
      * Modify the content before it's evaluated.
      */
-    public function modify(string $content): string;
+    public function modify(string $content, ?EvaluationContext $context = null): string;
 }

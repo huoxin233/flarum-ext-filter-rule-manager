@@ -78,7 +78,7 @@ function escapeHtml(str: string): string {
 export class FilterEngine {
   public rulesets: Ruleset[] = [];
   public providers: Record<string, FilterRuleProvider> = {};
-  public modifiers: Record<string, (content: string) => string> = {};
+  public modifiers: Record<string, (content: string, context?: any) => string> = {};
   public templates: Record<
     string,
     { component: Mithril.ComponentTypes<unknown, unknown>; settingsComponent: Mithril.ComponentTypes<unknown, unknown> | null }
@@ -142,7 +142,7 @@ export class FilterEngine {
   /**
    * Register a frontend modifier function.
    */
-  registerModifier(name: string, modifier: (content: string) => string): void {
+  registerModifier(name: string, modifier: (content: string, context?: any) => string): void {
     this.modifiers[name] = modifier;
   }
 
@@ -294,6 +294,8 @@ export class FilterEngine {
     const content = (composer.fields && composer.fields.content && composer.fields.content()) || '';
     const title = (composer.fields && composer.fields.title && composer.fields.title()) || '';
 
+    const context = { composer, application };
+
     const stateKey = `${title}\n\n${content}`;
     if (stateKey === this._lastStateKey) return;
     this._lastStateKey = stateKey;
@@ -308,7 +310,7 @@ export class FilterEngine {
         targetContent = title + '\n\n' + content;
       }
 
-      const tokens = this.evaluateRuleset(ruleset, targetContent);
+      const tokens = this.evaluateRuleset(ruleset, targetContent, context);
       if (tokens !== null) {
         let displaySettings = ruleset.displaySettings || {};
         if (typeof displaySettings.title === 'string') {
@@ -336,49 +338,50 @@ export class FilterEngine {
     }
   }
 
-  evaluateRuleset(ruleset: Ruleset, content: string): Record<string, string> | null {
+  evaluateRuleset(ruleset: Ruleset, content: string, context: any = {}): Record<string, string> | null {
     const ast = typeof ruleset.compiledAst === 'function' ? ruleset.compiledAst() : ruleset.compiled_ast;
     if (!ast) return null;
 
     const modifiedContentCache: Record<string, string> = {};
-    return this.evaluateAST(ast, content, ruleset, modifiedContentCache);
+    return this.evaluateAST(ast, content, ruleset, modifiedContentCache, context);
   }
 
   evaluateAST(
     node: ASTNode | null | undefined,
     content: string,
     ruleset: Ruleset,
-    modifiedContentCache: Record<string, string>
+    modifiedContentCache: Record<string, string>,
+    context: any = {}
   ): Record<string, string> | null {
     if (!node) return null;
 
     if (node.type === 'logical') {
-      const left = this.evaluateAST(node.left, content, ruleset, modifiedContentCache);
+      const left = this.evaluateAST(node.left, content, ruleset, modifiedContentCache, context);
 
       if (node.operator === 'OR') {
         const evaluateAll = typeof ruleset.evaluateAllRules === 'function' ? ruleset.evaluateAllRules() : ruleset.evaluateAllRules;
         if (left !== null && !evaluateAll) return left;
 
-        const right = this.evaluateAST(node.right, content, ruleset, modifiedContentCache);
+        const right = this.evaluateAST(node.right, content, ruleset, modifiedContentCache, context);
         if (left !== null && right !== null) return this.mergeResults([left, right]);
         return left !== null ? left : right;
       }
 
       if (node.operator === 'AND') {
         if (left === null) return null;
-        const right = this.evaluateAST(node.right, content, ruleset, modifiedContentCache);
+        const right = this.evaluateAST(node.right, content, ruleset, modifiedContentCache, context);
         if (right === null) return null;
         return this.mergeResults([left, right]);
       }
     }
 
     if (node.type === 'not') {
-      const result = this.evaluateAST(node.node, content, ruleset, modifiedContentCache);
+      const result = this.evaluateAST(node.node, content, ruleset, modifiedContentCache, context);
       return result === null ? {} : null;
     }
 
     if (node.type === 'rule') {
-      return this.evaluateRuleNode(node, content, modifiedContentCache);
+      return this.evaluateRuleNode(node, content, modifiedContentCache, context);
     }
 
     return null;
@@ -402,7 +405,7 @@ export class FilterEngine {
     return merged;
   }
 
-  evaluateRuleNode(node: ASTNode, content: string, modifiedContentCache: Record<string, string>): Record<string, string> | null {
+  evaluateRuleNode(node: ASTNode, content: string, modifiedContentCache: Record<string, string>, context: any = {}): Record<string, string> | null {
     if (!node.provider) return null;
     const provider = this.providers[node.provider];
     if (!provider || typeof provider.evaluate !== 'function') return null;
@@ -424,7 +427,7 @@ export class FilterEngine {
             targetContent = modifiedContentCache[currentCacheKey];
           } else {
             if (this.modifiers[modifierKey]) {
-              targetContent = this.modifiers[modifierKey](targetContent);
+              targetContent = this.modifiers[modifierKey](targetContent, context);
             }
             modifiedContentCache[currentCacheKey] = targetContent;
           }
