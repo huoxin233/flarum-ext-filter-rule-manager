@@ -112,6 +112,7 @@ class ContextTrackingModifier implements ModifierInterface
     public function modify(string $content, ?EvaluationContext $context = null): string
     {
         self::$lastContext = $context;
+
         return $content;
     }
 }
