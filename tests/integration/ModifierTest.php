@@ -89,6 +89,32 @@ class StateTrackingModifier implements ModifierInterface
     }
 }
 
+class ContextTrackingModifier implements ModifierInterface
+{
+    public static ?EvaluationContext $lastContext = null;
+
+    public function key(): string
+    {
+        return 'context_tracker';
+    }
+
+    public function name(): string
+    {
+        return 'Context Tracker';
+    }
+
+    public function description(): string
+    {
+        return 'test';
+    }
+
+    public function modify(string $content, ?EvaluationContext $context = null): string
+    {
+        self::$lastContext = $context;
+        return $content;
+    }
+}
+
 class ModifierTest extends FilterTestCase
 {
     protected function setUp(): void
@@ -98,11 +124,13 @@ class ModifierTest extends FilterTestCase
                 ->register(StripQuotesModifier::class)
                 ->register(StripSpoilersModifier::class)
                 ->register(StateTrackingModifier::class)
+                ->register(ContextTrackingModifier::class)
         );
 
         parent::setUp();
 
         StateTrackingModifier::$executionCount = 0;
+        ContextTrackingModifier::$lastContext = null;
     }
 
     /** @test */
@@ -142,6 +170,50 @@ class ModifierTest extends FilterTestCase
         // If badword is outside spoiler, it gets detected and blocked
         $response2 = $this->submitReply('This is a test badword [spoiler] clean [/spoiler]', 3);
         $this->assertEquals(422, $response2->getStatusCode());
+    }
+
+    /** @test */
+    public function modifier_receives_evaluation_context()
+    {
+        $this->prepareDatabase([
+            'filter_rulesets' => [
+                [
+                    'id' => 1,
+                    'name' => 'Context Test',
+                    'priority' => 0,
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule',
+                        'provider' => 'builtin',
+                        'ruleType' => 'contains_word',
+                        'operator' => 'EQUALS',
+                        'targetModifiers' => ['context_tracker'],
+                        'value' => [
+                            'words' => ['triggerword']
+                        ]
+                    ]),
+                    'intervention_type' => 'block',
+                    'display_mode' => 'toast',
+                    'scope_type' => 'global',
+                    'is_active' => 1,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString()
+                ]
+            ]
+        ]);
+
+        $response = $this->submitReply('This is a test triggerword', 2);
+        
+        $this->assertEquals(422, $response->getStatusCode());
+        
+        $this->assertNotNull(ContextTrackingModifier::$lastContext);
+        $this->assertInstanceOf(EvaluationContext::class, ContextTrackingModifier::$lastContext);
+        
+        // Assert the context has the post model
+        $this->assertNotNull(ContextTrackingModifier::$lastContext->post);
+        $this->assertInstanceOf(\Flarum\Post\Post::class, ContextTrackingModifier::$lastContext->post);
+        
+        // Assert the post's discussion is also accessible
+        $this->assertNotNull(ContextTrackingModifier::$lastContext->post->discussion);
     }
 
     /** @test */
