@@ -111,6 +111,7 @@ class ContextTrackingModifier implements ModifierInterface
     public function modify(string $content, ?EvaluationContext $context = null): string
     {
         self::$lastContext = $context;
+
         return $content;
     }
 }
@@ -202,16 +203,16 @@ class ModifierTest extends FilterTestCase
         ]);
 
         $response = $this->submitReply('This is a test triggerword', 2);
-        
+
         $this->assertEquals(422, $response->getStatusCode());
-        
+
         $this->assertNotNull(ContextTrackingModifier::$lastContext);
         $this->assertInstanceOf(EvaluationContext::class, ContextTrackingModifier::$lastContext);
-        
+
         // Assert the context has the post model
         $this->assertNotNull(ContextTrackingModifier::$lastContext->post);
         $this->assertInstanceOf(\Flarum\Post\Post::class, ContextTrackingModifier::$lastContext->post);
-        
+
         // Assert the post's discussion is also accessible
         $this->assertNotNull(ContextTrackingModifier::$lastContext->post->discussion);
     }
