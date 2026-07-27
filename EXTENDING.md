@@ -336,6 +336,7 @@ First, implement the modifier logic on the backend by implementing `Huoxin\Filte
 namespace YourNamespace\Modifier;
 
 use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
 
 class StripSpoilersModifier implements ModifierInterface
 {
@@ -354,7 +355,7 @@ class StripSpoilersModifier implements ModifierInterface
         return 'Removes spoiler tags before evaluation.';
     }
 
-    public function modify(string $content): string
+    public function modify(string $content, ?EvaluationContext $context = null): string
     {
         // Strip out spoiler tags
         return preg_replace('/>!.*?!</s', '', $content);
@@ -389,7 +390,8 @@ import app from "flarum/forum/app";
 app.initializers.add("your-namespace/modifiers", () => {
   if (!app.filterRuleManager) return;
 
-  app.filterRuleManager.registerModifier("no_spoilers", (content: string) => {
+  app.filterRuleManager.registerModifier("no_spoilers", (content: string, context?: any) => {
+    // Context contains { composer, application } during typing
     // Strip out spoiler tags using JS regex
     return content.replace(/>![\s\S]*?!</g, "");
   });

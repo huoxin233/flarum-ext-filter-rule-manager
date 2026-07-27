@@ -166,7 +166,7 @@ class RuleEvaluator
                         if (isset($modifiers[$modifierKey])) {
                             /** @var ModifierInterface $modifierClass */
                             $modifierClass = $this->container->make($modifiers[$modifierKey]['class']);
-                            $context->content = $modifierClass->modify($context->content);
+                            $context->content = $modifierClass->modify($context->content, $context);
                         }
                         $modifiedContentCache[$currentCacheKey] = $context->content;
                     }

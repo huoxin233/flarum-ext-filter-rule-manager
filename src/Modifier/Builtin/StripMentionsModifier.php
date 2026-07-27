@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Modifier\Builtin;
 
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 
 class StripMentionsModifier implements ModifierInterface
@@ -30,7 +31,7 @@ class StripMentionsModifier implements ModifierInterface
         return 'huoxin-filter-rule-manager.admin.modifiers.strip_mentions_help';
     }
 
-    public function modify(string $content): string
+    public function modify(string $content, ?EvaluationContext $context = null): string
     {
         // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
         $targetContent = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $content) ?? $content;

@@ -13,6 +13,7 @@ namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
 use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
+use Huoxin\FilterRuleManager\Model\EvaluationContext;
 use Huoxin\FilterRuleManager\Modifier\ModifierInterface;
 
 class StripQuotesModifier implements ModifierInterface
@@ -32,7 +33,7 @@ class StripQuotesModifier implements ModifierInterface
         return 'test';
     }
 
-    public function modify(string $content): string
+    public function modify(string $content, ?EvaluationContext $context = null): string
     {
         return preg_replace('/>.*?$/m', '', $content);
     }
@@ -55,7 +56,7 @@ class StripSpoilersModifier implements ModifierInterface
         return 'test';
     }
 
-    public function modify(string $content): string
+    public function modify(string $content, ?EvaluationContext $context = null): string
     {
         return preg_replace('/\[spoiler\].*?\[\/spoiler\]/is', '', $content);
     }
@@ -80,7 +81,7 @@ class StateTrackingModifier implements ModifierInterface
         return 'test';
     }
 
-    public function modify(string $content): string
+    public function modify(string $content, ?EvaluationContext $context = null): string
     {
         self::$executionCount++;
 
