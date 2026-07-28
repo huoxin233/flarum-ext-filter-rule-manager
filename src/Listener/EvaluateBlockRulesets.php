@@ -156,7 +156,13 @@ class EvaluateBlockRulesets
                 FilterBlockLog::insert($rows);
             }
 
-            throw new RuleBlockException($triggered);
+            // Strip raw tokens and full content from the exception to prevent leaking match data in the 422 response
+            $safeTriggered = array_map(function ($t) {
+                unset($t['tokens'], $t['content']);
+                return $t;
+            }, $triggered);
+
+            throw new RuleBlockException($safeTriggered);
         }
     }
 }
