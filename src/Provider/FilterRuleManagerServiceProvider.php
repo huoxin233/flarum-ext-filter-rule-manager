@@ -17,7 +17,7 @@ use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
-use Illuminate\Container\Container;
+use Illuminate\Contracts\Container\Container;
 
 class FilterRuleManagerServiceProvider extends AbstractServiceProvider
 {
