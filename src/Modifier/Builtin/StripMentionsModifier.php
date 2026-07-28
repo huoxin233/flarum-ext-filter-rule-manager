@@ -35,7 +35,7 @@ class StripMentionsModifier implements ModifierInterface
     {
         // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
         $targetContent = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $content) ?? $content;
-        $targetContent = preg_replace('/@\w+/', '', $targetContent) ?? $targetContent;
+        $targetContent = preg_replace('/@[\p{L}\p{N}_-]+/u', '', $targetContent) ?? $targetContent;
 
         return $targetContent;
     }
