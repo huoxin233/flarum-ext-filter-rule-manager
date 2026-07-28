@@ -77,9 +77,7 @@ class EvaluateBlockRulesets
      */
     private function evaluate($post, $actor, ?string $onlyField = null): void
     {
-        $content = (string) $post->content;
         $discussion = $post->discussion;
-        $title = $discussion ? (string) $discussion->title : '';
 
         $rulesets = $this->rulesets->getActiveRulesets();
 
