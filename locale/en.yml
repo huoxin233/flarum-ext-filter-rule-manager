@@ -204,8 +204,8 @@ huoxin-filter-rule-manager:
     modifiers:
       entire_post: "Entire Post"
       multiple_selected: "{count} Modifiers"
-      strip_mentions: "Strip Mentions (@)"
-      strip_mentions_help: "Removes all @ user mentions and post mentions from the text before checking it against this rule, preventing user names from triggering false positives."
+      strip_mentions: "Strip Mentions"
+      strip_mentions_help: "Removes all user mentions and post mentions from the text before checking it against this rule, preventing user names from triggering false positives."
 
     displays:
       none: "None (Hidden)"
