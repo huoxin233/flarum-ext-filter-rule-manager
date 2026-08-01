@@ -122,7 +122,7 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
             foreach ($patterns as $pattern) {
                 $regex = str_starts_with($pattern, '/')
                     ? $pattern
-                    : '/'.str_replace('/', '\/', $pattern).'/i';
+                    : '/'.str_replace('/', '\/', $pattern).'/iu';
 
                 if (@preg_match_all($regex, $context->content, $matches)) {
                     $count = count($matches[0]);
@@ -173,8 +173,8 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
             $excludeMentions = $config['exclude_mentions'] ?? true;
             if ($excludeMentions) {
                 // Strip mentions: @"User Name"#123, @"User Name"#p123, and @username
-                $text = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/', '', $text) ?? $text;
-                $text = preg_replace('/@\w+/', '', $text) ?? $text;
+                $text = preg_replace('/@"?[^"#\n]+"?#(?:p)?\d+/u', '', $text) ?? $text;
+                $text = preg_replace('/@[\p{L}\p{N}_-]+/u', '', $text) ?? $text;
             }
 
             $excludeUrls = $config['exclude_urls'] ?? true;
@@ -251,7 +251,7 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
             foreach ($patterns as $pattern) {
                 $regex = str_starts_with($pattern, '/')
                     ? $pattern
-                    : '/'.str_replace('/', '\/', $pattern).'/i';
+                    : '/'.str_replace('/', '\/', $pattern).'/iu';
 
                 error_clear_last();
                 if (@preg_match($regex, '') === false) {
