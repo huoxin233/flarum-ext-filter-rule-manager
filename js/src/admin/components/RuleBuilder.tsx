@@ -14,6 +14,7 @@ import Select from 'flarum/common/components/Select';
 import Dropdown from 'flarum/common/components/Dropdown';
 import Switch from 'flarum/common/components/Switch';
 import icon from 'flarum/common/helpers/icon';
+import Tooltip from 'flarum/common/components/Tooltip';
 import { parseExpression, stringifyExpression } from '../utils/ExpressionParser';
 import { ASTNode } from '../../common/FilterEngine';
 import type Mithril from 'mithril';
@@ -196,30 +197,31 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
 
                 return (
                   <li>
-                    <Button
-                      className="Button Button--link"
-                      title={opt.description}
-                      onclick={(e: MouseEvent) => {
-                        e.stopPropagation();
-                        let newModifiers = [...targetModifiers];
-                        if (isSelected) {
-                          newModifiers = newModifiers.filter((m) => m !== key);
-                        } else {
-                          newModifiers.push(key);
-                        }
+                    <Tooltip text={opt.description}>
+                      <Button
+                        className="Button Button--link"
+                        onclick={(e: MouseEvent) => {
+                          e.stopPropagation();
+                          let newModifiers = [...targetModifiers];
+                          if (isSelected) {
+                            newModifiers = newModifiers.filter((m) => m !== key);
+                          } else {
+                            newModifiers.push(key);
+                          }
 
-                        let newVal: any = node.value;
-                        if (typeof newVal !== 'object' || newVal === null || Array.isArray(newVal)) newVal = { value: newVal };
-                        else newVal = { ...newVal };
+                          let newVal: any = node.value;
+                          if (typeof newVal !== 'object' || newVal === null || Array.isArray(newVal)) newVal = { value: newVal };
+                          else newVal = { ...newVal };
 
-                        onchange({ ...node, value: newVal, targetModifiers: newModifiers.length === 0 ? undefined : newModifiers });
-                      }}
-                    >
-                      <span className={`FilterRuleManager-Modifiersequence ${!isSelected ? 'empty' : ''}`.trim()}>
-                        {isSelected ? selectedIndex + 1 : '0'}
-                      </span>
-                      {opt.label}
-                    </Button>
+                          onchange({ ...node, value: newVal, targetModifiers: newModifiers.length === 0 ? undefined : newModifiers });
+                        }}
+                      >
+                        <span className={`FilterRuleManager-Modifiersequence ${!isSelected ? 'empty' : ''}`.trim()}>
+                          {isSelected ? selectedIndex + 1 : '0'}
+                        </span>
+                        {opt.label}
+                      </Button>
+                    </Tooltip>
                   </li>
                 );
               })}
