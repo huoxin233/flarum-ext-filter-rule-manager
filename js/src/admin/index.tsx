@@ -16,6 +16,9 @@ import BuiltinProvider from './providers/BuiltinProvider';
 import BuiltinTemplate from '../common/components/BuiltinTemplate';
 import BuiltinTemplateSettings from './components/BuiltinTemplateSettings';
 import stripMentions from '../common/modifiers/stripMentions';
+import stripUploadTags from '../common/modifiers/stripUploadTags';
+import stripImages from '../common/modifiers/stripImages';
+import stripUrls from '../common/modifiers/stripUrls';
 
 class Ruleset extends Model {}
 Object.assign(Ruleset.prototype, {
@@ -59,6 +62,9 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   filterEngine.registerTemplate('builtin', BuiltinTemplate as any, BuiltinTemplateSettings as any);
 
   filterEngine.registerModifier('strip_mentions', stripMentions);
+  filterEngine.registerModifier('strip_upload_tags', stripUploadTags);
+  filterEngine.registerModifier('strip_images', stripImages);
+  filterEngine.registerModifier('strip_urls', stripUrls);
 
   app.store.models['filter-rule-rulesets'] = Ruleset;
 

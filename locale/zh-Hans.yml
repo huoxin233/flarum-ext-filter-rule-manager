@@ -206,6 +206,12 @@ huoxin-filter-rule-manager:
       multiple_selected: "{count} 个预处理器"
       strip_mentions: "剔除提及"
       strip_mentions_help: "在将文本送往此规则检查之前，先删除其中包含的所有用户提及和回帖提及，防止由于提及的用户名含有敏感词而引发误报。"
+      strip_upload_tags: "剔除 FoF Upload 标签"
+      strip_upload_tags_help: "在将文本送往此规则检查之前，先删除其中包含的 [upl-image-preview] 等 fof/upload 附件短代码。"
+      strip_images: "剔除外部图片"
+      strip_images_help: "在将文本送往此规则检查之前，先删除其中包含的 [img] 和 Markdown 图片 (![...](...))。"
+      strip_urls: "剔除链接"
+      strip_urls_help: "在将文本送往此规则检查之前，先删除其中包含的所有 http/https 网址。"
 
     displays:
       none: "无 (隐藏)"
