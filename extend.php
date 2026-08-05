@@ -22,6 +22,9 @@ use Huoxin\FilterRuleManager\Listener\EvaluateBlockRulesets;
 use Huoxin\FilterRuleManager\Listener\ExecuteModerationActions;
 use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
 use Huoxin\FilterRuleManager\Modifier\Builtin\StripMentionsModifier;
+use Huoxin\FilterRuleManager\Modifier\Builtin\StripUploadTagsModifier;
+use Huoxin\FilterRuleManager\Modifier\Builtin\StripImagesModifier;
+use Huoxin\FilterRuleManager\Modifier\Builtin\StripUrlsModifier;
 use Huoxin\FilterRuleManager\Provider\FilterRuleManagerServiceProvider;
 use Illuminate\Console\Scheduling\Event as ScheduleEvent;
 
@@ -87,5 +90,9 @@ return [
 
     // ── Modifiers ─────────────────────────────────────────────────────────────
     (new FilterContentModifier())
-        ->register(StripMentionsModifier::class),
+        ->register(StripMentionsModifier::class)
+        ->register(StripUploadTagsModifier::class)
+        ->register(StripImagesModifier::class)
+        ->register(StripUrlsModifier::class),
+
 ];

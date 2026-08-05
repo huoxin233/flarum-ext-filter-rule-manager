@@ -206,6 +206,12 @@ huoxin-filter-rule-manager:
       multiple_selected: "{count} Modifiers"
       strip_mentions: "Strip Mentions"
       strip_mentions_help: "Removes all user mentions and post mentions from the text before checking it against this rule, preventing user names from triggering false positives."
+      strip_upload_tags: "Strip FoF Upload Tags"
+      strip_upload_tags_help: "Removes [upl-image-preview] and other fof/upload shortcode tags from the text before checking it against this rule."
+      strip_images: "Strip Image URLs"
+      strip_images_help: "Removes standard [img] BBCode and Markdown image formatting from the text before checking it against this rule."
+      strip_urls: "Strip URLs"
+      strip_urls_help: "Removes all http/https links from the text before checking it against this rule."
 
     displays:
       none: "None (Hidden)"
