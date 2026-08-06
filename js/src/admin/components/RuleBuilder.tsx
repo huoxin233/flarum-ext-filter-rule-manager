@@ -194,34 +194,45 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
               {Object.entries(modifierOptions).map(([key, opt]) => {
                 const selectedIndex = targetModifiers.indexOf(key);
                 const isSelected = selectedIndex !== -1;
+                const isMobile = window.innerWidth <= 768;
+
+                const buttonContent = (
+                  <Button
+                    className="Button Button--link"
+                    onclick={(e: MouseEvent) => {
+                      e.stopPropagation();
+                      let newModifiers = [...targetModifiers];
+                      if (isSelected) {
+                        newModifiers = newModifiers.filter((m) => m !== key);
+                      } else {
+                        newModifiers.push(key);
+                      }
+
+                      let newVal: any = node.value;
+                      if (typeof newVal !== 'object' || newVal === null || Array.isArray(newVal)) newVal = { value: newVal };
+                      else newVal = { ...newVal };
+
+                      onchange({ ...node, value: newVal, targetModifiers: newModifiers.length === 0 ? undefined : newModifiers });
+                    }}
+                    style={isMobile ? { whiteSpace: 'normal', textAlign: 'left', lineHeight: '1.4', padding: '10px 15px' } : {}}
+                  >
+                    <div style={isMobile ? { fontWeight: 'bold', marginBottom: '4px' } : {}}>
+                      <span className={`FilterRuleManager-Modifiersequence ${!isSelected ? 'empty' : ''}`.trim()}>
+                        {isSelected ? selectedIndex + 1 : '0'}
+                      </span>
+                      {opt.label}
+                    </div>
+                    {isMobile && opt.description && (
+                      <div style={{ fontSize: '11px', color: 'var(--muted-color)', opacity: 0.8 }}>
+                        {opt.description}
+                      </div>
+                    )}
+                  </Button>
+                );
 
                 return (
-                  <li>
-                    <Tooltip text={opt.description}>
-                      <Button
-                        className="Button Button--link"
-                        onclick={(e: MouseEvent) => {
-                          e.stopPropagation();
-                          let newModifiers = [...targetModifiers];
-                          if (isSelected) {
-                            newModifiers = newModifiers.filter((m) => m !== key);
-                          } else {
-                            newModifiers.push(key);
-                          }
-
-                          let newVal: any = node.value;
-                          if (typeof newVal !== 'object' || newVal === null || Array.isArray(newVal)) newVal = { value: newVal };
-                          else newVal = { ...newVal };
-
-                          onchange({ ...node, value: newVal, targetModifiers: newModifiers.length === 0 ? undefined : newModifiers });
-                        }}
-                      >
-                        <span className={`FilterRuleManager-Modifiersequence ${!isSelected ? 'empty' : ''}`.trim()}>
-                          {isSelected ? selectedIndex + 1 : '0'}
-                        </span>
-                        {opt.label}
-                      </Button>
-                    </Tooltip>
+                  <li className="FilterRuleManager-ModifierDropdownItem">
+                    {isMobile ? buttonContent : <Tooltip text={opt.description}>{buttonContent}</Tooltip>}
                   </li>
                 );
               })}
