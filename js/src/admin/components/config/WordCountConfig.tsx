@@ -20,16 +20,12 @@ export interface IWordCountConfigAttrs extends ComponentAttrs {
 export default class WordCountConfig extends Component<IWordCountConfigAttrs> {
   min!: string;
   max!: string;
-  excludeMentions!: boolean;
-  excludeUrls!: boolean;
 
   oninit(vnode: any) {
     super.oninit(vnode);
     const config = this.attrs.config || {};
     this.min = config.min !== undefined ? String(config.min) : '';
     this.max = config.max !== undefined ? String(config.max) : '';
-    this.excludeMentions = config.exclude_mentions ?? true;
-    this.excludeUrls = config.exclude_urls ?? true;
   }
 
   view() {
@@ -60,22 +56,6 @@ export default class WordCountConfig extends Component<IWordCountConfigAttrs> {
         </div>
 
         <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_word_count_help')}</div>
-
-        <hr className="FilterRuleManager-divider" />
-
-        <div className="Form-group">
-          <Switch state={this.excludeMentions} onchange={(val: boolean) => this.updateConfig('exclude_mentions', val)}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.config_exclude_mentions')}
-            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_exclude_mentions_help')}</div>
-          </Switch>
-        </div>
-
-        <div className="Form-group">
-          <Switch state={this.excludeUrls} onchange={(val: boolean) => this.updateConfig('exclude_urls', val)}>
-            {app.translator.trans('huoxin-filter-rule-manager.admin.config_exclude_urls')}
-            <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.config_exclude_urls_help')}</div>
-          </Switch>
-        </div>
       </div>
     );
   }
@@ -96,8 +76,6 @@ export default class WordCountConfig extends Component<IWordCountConfigAttrs> {
     // Also update local state so UI reflects
     if (key === 'min') this.min = value;
     if (key === 'max') this.max = value;
-    if (key === 'exclude_mentions') this.excludeMentions = value;
-    if (key === 'exclude_urls') this.excludeUrls = value;
 
     this.attrs.onchange(config);
   }

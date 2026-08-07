@@ -19,7 +19,7 @@ import filterEngine from '../../common/FilterEngine';
  *   contains_word  — config: { words: string[] }
  *   regex          — config: { patterns: string[] }
  *   group          — config: { groupIds: string[] | number[] }
- *   word_count     — config: { min?: number, max?: number, exclude_urls?: boolean, exclude_mentions?: boolean }
+ *   word_count     — config: { min?: number, max?: number }
  *
  * For contains_word and regex, the rule triggers if ANY of the listed entries matches.
  * The matched value is exposed as a token for message interpolation.
@@ -158,17 +158,6 @@ export default class BuiltinProvider implements FilterRuleProvider {
 
     if (type === 'word_count') {
       let text = String(content || '');
-
-      const excludeMentions = config.exclude_mentions ?? true;
-      if (excludeMentions) {
-        text = text.replace(/@"?[^"#\n]+"?#(?:p)?\d+/g, '');
-        text = text.replace(/@\w+/g, '');
-      }
-
-      const excludeUrls = config.exclude_urls ?? true;
-      if (excludeUrls) {
-        text = text.replace(/https?:\/\/[^\s]+/gi, '');
-      }
 
       // Match CJK characters
       const cjkRegex = /[\u4E00-\u9FA5\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/g;
