@@ -246,6 +246,7 @@ huoxin-filter-rule-manager:
 
     tokens_available: "可用变量 — 点击插入"
     tokens_none: "暂无可用变量。添加规则后即可查看其提供的变量。"
+    token_rule_name_desc: "触发的规则集名称"
 
     # ── Built-in Rules Config ──────────────────────────────────────────────
     type_contains_word: "包含以下词汇"
