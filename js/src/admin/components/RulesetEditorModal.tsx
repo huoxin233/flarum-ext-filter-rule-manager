@@ -317,14 +317,21 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
             <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_scope_tags')}</label>
             {app.initializers.has('flarum-tags') ? (
               (() => {
-                const getTagsLabel = (window as Record<string, any>).flarum.core.compat['tags/common/helpers/tagsLabel'];
                 const selectedTags = this.availableTags.filter((t) => (this.scopeTagIds() || []).includes(parseInt(String(t.id()), 10)));
 
                 return (
                   <div className="FilterRuleManager-RulesetEditor-tagsSelection">
-                    {selectedTags.length > 0 && getTagsLabel && (
+                    {selectedTags.length > 0 && (
                       <div className="FilterRuleManager-RulesetEditor-tagsSelection-labels">
-                        {getTagsLabel(selectedTags)}
+                        {selectedTags.map((tag: any) => (
+                          <span
+                            className="TagLabel"
+                            style={{ backgroundColor: tag.color() || 'var(--control-bg)', color: tag.color() ? '#fff' : 'var(--text-color)' }}
+                          >
+                            {tag.icon() && <Icon name={tag.icon() as string} />}
+                            <span className="TagLabel-text">{tag.name()}</span>
+                          </span>
+                        ))}
                       </div>
                     )}
                     <InlineTagSelector tags={this.availableTags} selectedIds={this.scopeTagIds} />
