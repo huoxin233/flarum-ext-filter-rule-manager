@@ -98,6 +98,10 @@ class RulesetMatcher
 
         $result = $this->evaluator->evaluateRuleset($ruleset, $context, $providers);
 
+        if (is_array($result)) {
+            $result['rule_name'] = $ruleset->name;
+        }
+
         $postCache[$cacheKey] = $result;
         $this->evaluationCache[$post] = $postCache;
 

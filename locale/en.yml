@@ -246,6 +246,7 @@ huoxin-filter-rule-manager:
 
     tokens_available: "Available tokens — click to insert"
     tokens_none: "No tokens available — add a rule to see what tokens it exposes."
+    token_rule_name_desc: "The name of the triggered ruleset"
 
     # ── Built-in Rules Config ──────────────────────────────────────────────
     type_contains_word: "Contains word(s)"

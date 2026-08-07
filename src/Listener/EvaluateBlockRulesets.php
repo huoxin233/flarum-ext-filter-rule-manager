@@ -113,6 +113,11 @@ class EvaluateBlockRulesets
             if ($ruleset->intervention_type === 'block') {
                 $targetContent = $this->matcher->getTargetContent($ruleset, $post, $discussion, false, $onlyField);
 
+                $displaySettings = $ruleset->display_settings;
+                if (is_array($displaySettings) && isset($displaySettings['title']) && is_string($displaySettings['title'])) {
+                    $displaySettings['title'] = $this->evaluator->interpolate($displaySettings['title'], $tokens);
+                }
+
                 $triggered[] = [
                     'ruleset_id' => $ruleset->id,
                     'display_mode' => $ruleset->display_mode,
@@ -120,7 +125,7 @@ class EvaluateBlockRulesets
                     'message' => $this->evaluator->interpolate($ruleset->message, $tokens),
                     'tokens' => $tokens,
                     'content' => $targetContent,
-                    'display_settings' => $ruleset->display_settings,
+                    'display_settings' => $displaySettings,
                 ];
             }
 
