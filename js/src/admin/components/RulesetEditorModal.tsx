@@ -323,7 +323,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
                 return (
                   <div className="FilterRuleManager-RulesetEditor-tagsSelection">
                     {selectedTags.length > 0 && getTagsLabel && (
-                      <div className="FilterRuleManager-RulesetEditor-tagsSelection-labels" style={{ marginBottom: '10px' }}>
+                      <div className="FilterRuleManager-RulesetEditor-tagsSelection-labels">
                         {getTagsLabel(selectedTags)}
                       </div>
                     )}

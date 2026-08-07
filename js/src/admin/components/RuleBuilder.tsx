@@ -202,16 +202,16 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
                     onclick={(e: Event) => {
                       e.stopPropagation();
                       e.preventDefault();
-                      
+
                       const current = node.targetModifiers || [];
                       let newModifiers: string[];
-                      
+
                       if (current.includes(key)) {
                         newModifiers = current.filter((k) => k !== key);
                       } else {
                         newModifiers = [...current, key];
                       }
-                      
+
                       let newVal: any = node.value;
                       if (typeof newVal !== 'object' || newVal === null || Array.isArray(newVal)) newVal = { value: newVal };
                       else newVal = { ...newVal };
@@ -225,9 +225,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
                       </span>
                       {opt.label}
                     </div>
-                    {isMobile && opt.description && (
-                      <div className="FilterRuleManager-ModifierButton-desc">{opt.description}</div>
-                    )}
+                    {isMobile && opt.description && <div className="FilterRuleManager-ModifierButton-desc">{opt.description}</div>}
                   </Button>
                 );
 
