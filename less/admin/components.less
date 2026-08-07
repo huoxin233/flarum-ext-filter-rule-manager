@@ -230,6 +230,26 @@
   font-size: 11px;
   color: darken(@frm-info-color, 10%);
 }
+
+.FilterRuleManager-ModifierButton {
+  &.is-mobile {
+    white-space: normal;
+    text-align: left;
+    line-height: 1.4;
+    padding: 10px 15px;
+
+    .FilterRuleManager-ModifierButton-label {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+  }
+
+  &-desc {
+    font-size: 11px;
+    color: var(--muted-color);
+    opacity: 0.8;
+  }
+}
 .FilterRuleManager-RulesetEditor-customStyles {
   display: flex;
   gap: 16px;

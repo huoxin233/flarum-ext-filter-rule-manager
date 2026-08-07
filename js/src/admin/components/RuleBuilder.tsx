@@ -198,34 +198,35 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
 
                 const buttonContent = (
                   <Button
-                    className="Button Button--link"
-                    onclick={(e: MouseEvent) => {
+                    className={`Button Button--link FilterRuleManager-ModifierButton ${isMobile ? 'is-mobile' : ''}`}
+                    onclick={(e: Event) => {
                       e.stopPropagation();
-                      let newModifiers = [...targetModifiers];
-                      if (isSelected) {
-                        newModifiers = newModifiers.filter((m) => m !== key);
+                      e.preventDefault();
+                      
+                      const current = node.targetModifiers || [];
+                      let newModifiers: string[];
+                      
+                      if (current.includes(key)) {
+                        newModifiers = current.filter((k) => k !== key);
                       } else {
-                        newModifiers.push(key);
+                        newModifiers = [...current, key];
                       }
-
+                      
                       let newVal: any = node.value;
                       if (typeof newVal !== 'object' || newVal === null || Array.isArray(newVal)) newVal = { value: newVal };
                       else newVal = { ...newVal };
 
                       onchange({ ...node, value: newVal, targetModifiers: newModifiers.length === 0 ? undefined : newModifiers });
                     }}
-                    style={isMobile ? { whiteSpace: 'normal', textAlign: 'left', lineHeight: '1.4', padding: '10px 15px' } : {}}
                   >
-                    <div style={isMobile ? { fontWeight: 'bold', marginBottom: '4px' } : {}}>
+                    <div className="FilterRuleManager-ModifierButton-label">
                       <span className={`FilterRuleManager-Modifiersequence ${!isSelected ? 'empty' : ''}`.trim()}>
                         {isSelected ? selectedIndex + 1 : '0'}
                       </span>
                       {opt.label}
                     </div>
                     {isMobile && opt.description && (
-                      <div style={{ fontSize: '11px', color: 'var(--muted-color)', opacity: 0.8 }}>
-                        {opt.description}
-                      </div>
+                      <div className="FilterRuleManager-ModifierButton-desc">{opt.description}</div>
                     )}
                   </Button>
                 );
