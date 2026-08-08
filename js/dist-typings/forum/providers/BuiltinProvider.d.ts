@@ -6,7 +6,7 @@ import type { FilterRuleProvider } from '../../common/FilterEngine';
  *   contains_word  — config: { words: string[] }
  *   regex          — config: { patterns: string[] }
  *   group          — config: { groupIds: string[] | number[] }
- *   word_count     — config: { min?: number, max?: number, exclude_urls?: boolean, exclude_mentions?: boolean }
+ *   word_count     — config: { min?: number, max?: number }
  *
  * For contains_word and regex, the rule triggers if ANY of the listed entries matches.
  * The matched value is exposed as a token for message interpolation.
