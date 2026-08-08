@@ -323,9 +323,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
                 return (
                   <div className="FilterRuleManager-RulesetEditor-tagsSelection">
                     {selectedTags.length > 0 && getTagsLabel && (
-                      <div className="FilterRuleManager-RulesetEditor-tagsSelection-labels" style={{ marginBottom: '10px' }}>
-                        {getTagsLabel(selectedTags)}
-                      </div>
+                      <div className="FilterRuleManager-RulesetEditor-tagsSelection-labels">{getTagsLabel(selectedTags)}</div>
                     )}
                     <InlineTagSelector tags={this.availableTags} selectedIds={this.scopeTagIds} />
                   </div>

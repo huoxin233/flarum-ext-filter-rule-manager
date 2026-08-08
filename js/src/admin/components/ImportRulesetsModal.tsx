@@ -69,7 +69,7 @@ export default class ImportRulesetsModal extends Modal<ImportRulesetsModalAttrs>
 
           {this.overrideMode && (
             <div className="Alert Alert--error Form-group">
-              <strong style={{ display: 'block', marginBottom: '8px' }}>
+              <strong className="FilterRuleManager-ImportRulesets-warningTitle">
                 {app.translator.trans('huoxin-filter-rule-manager.admin.import_override_warning')}
               </strong>
               <label className="checkbox">

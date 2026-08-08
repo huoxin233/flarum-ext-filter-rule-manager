@@ -222,11 +222,7 @@ class RuleNodeView extends Component<RuleNodeViewAttrs> {
                       </span>
                       {opt.label}
                     </div>
-                    {isMobile && opt.description && (
-                      <div style={{ fontSize: '11px', color: 'var(--muted-color)', opacity: 0.8 }}>
-                        {opt.description}
-                      </div>
-                    )}
+                    {isMobile && opt.description && <div className="FilterRuleManager-ModifierButton-desc">{opt.description}</div>}
                   </Button>
                 );
 

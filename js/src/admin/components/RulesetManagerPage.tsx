@@ -158,7 +158,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
                     {app.translator.trans('huoxin-filter-rule-manager.admin.export_all')}
                   </Button>
                 </div>
-                <Button className="Button Button--primary" style={{ marginLeft: '10px' }} icon="fas fa-plus" onclick={() => this.showEditor(null)}>
+                <Button className="Button Button--primary FilterRuleManager-Header-btn" icon="fas fa-plus" onclick={() => this.showEditor(null)}>
                   {app.translator.trans('huoxin-filter-rule-manager.admin.add_ruleset')}
                 </Button>
               </>
