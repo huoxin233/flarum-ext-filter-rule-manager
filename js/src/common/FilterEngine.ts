@@ -34,6 +34,7 @@ export interface FilterRuleProvider {
 
 export interface Ruleset {
   id: string | number;
+  name: string;
   interventionType: string;
   displayMode: string;
   message: string;
