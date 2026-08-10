@@ -25,7 +25,9 @@ class FilterRuleManagerServiceProvider extends AbstractServiceProvider
     {
         /** @var Container $container */
         $container = $this->container;
+        /** @phpstan-ignore-next-line */
         $container->scoped(RulesetRepository::class);
+        /** @phpstan-ignore-next-line */
         $container->scoped(RulesetMatcher::class);
 
         $this->container->singleton(FilterRuleProvider::REGISTRY_KEY, function ($container) {
