@@ -417,3 +417,15 @@ app.initializers.add("my-extension", () => {
 ```
 
 Because Global Tokens are inherently system-level, they do not require a Rule Provider class and are not assigned a Type or Label in the Registry tab.
+
+---
+
+## 6. Advanced Architecture: Managing Multiple Rules
+
+If your extension introduces *many* different rules (e.g., `is_toxic`, `is_spam`, `is_nsfw`), placing them all inside a single `evaluate()` method in PHP and TypeScript will create massive, hard-to-maintain `switch` statements. 
+
+For complex extensions, it is highly recommended to use the **Strategy Pattern**. Instead of hardcoding logic directly into your Provider, you design your Provider to act as a "Registry", and you split each individual rule into its own dedicated, single-responsibility class. 
+
+For a blueprint of how to build a scalable, multi-rule architecture, study the core `BuiltinProvider` in this repository:
+- **Backend (PHP):** See `src/Provider/BuiltinProvider.php` acting as a registry for the isolated classes in `src/Provider/Builtin/`.
+- **Frontend (TS):** See `js/src/forum/providers/BuiltinProvider.ts` acting as a registry for the isolated classes in `js/src/forum/providers/builtin/`.
