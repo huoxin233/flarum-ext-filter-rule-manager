@@ -58,6 +58,8 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   filterEngine.registerDisplayMode('toast', 'huoxin-filter-rule-manager.admin.displays.toast');
   filterEngine.registerDisplayMode('modal', 'huoxin-filter-rule-manager.admin.displays.modal');
 
+  filterEngine.registerGlobalToken('rule_name', 'huoxin-filter-rule-manager.admin.token_rule_name_desc');
+
   filterEngine.registerProvider('builtin', new BuiltinProvider() as any);
   filterEngine.registerTemplate('builtin', BuiltinTemplate as any, BuiltinTemplateSettings as any);
 

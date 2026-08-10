@@ -661,16 +661,17 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       // Ignore parse errors, user might be typing
     }
 
-    // Inject the global token `rule_name` into the UI.
-    // Since this token is provided by the engine itself rather than a specific rule provider,
-    // we manually register it here so it's always availables.
-    push(
-      {
-        name: 'rule_name',
-        description: String(app.translator.trans('huoxin-filter-rule-manager.admin.token_rule_name_desc')),
-      },
-      'global'
-    );
+    // Inject the global tokens dynamically from the engine API.
+    const globals = filterEngine.globalTokens || {};
+    Object.entries(globals).forEach(([name, descKey]) => {
+      push(
+        {
+          name,
+          description: String(app.translator.trans(descKey as string)),
+        },
+        'global'
+      );
+    });
 
     const activeRules: ASTNode[] = [];
     const traverse = (node: ASTNode | null | undefined) => {

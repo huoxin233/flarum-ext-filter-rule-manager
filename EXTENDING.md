@@ -397,3 +397,23 @@ app.initializers.add("your-namespace/modifiers", () => {
   });
 });
 ```
+## 5. Global Variables (Tokens)
+
+Global Tokens are unconditional variables that are injected into the context of *every* evaluated ruleset (such as {{rule_name}}). These are different from Rule Provider tokens which are only exposed if a specific condition is met.
+
+If your extension injects system-wide variables into the evaluation context (via Flarum's Event dispatcher or method overrides), you should register them in the Filter Engine so they appear in the UI's Token Hints.
+
+### `js/src/admin/index.tsx`
+```typescript
+import app from "flarum/admin/app";
+import { FilterEngine } from "huoxin/filter-rule-manager/common/FilterEngine";
+
+app.initializers.add("my-extension", () => {
+  const filterEngine: FilterEngine = app.filterRuleManager;
+  
+  // Register a global token (name, translation_key_for_description)
+  filterEngine.registerGlobalToken('discord_channel', 'my-extension.admin.token_discord_channel_desc');
+});
+```
+
+Because Global Tokens are inherently system-level, they do not require a Rule Provider class and are not assigned a Type or Label in the Registry tab.

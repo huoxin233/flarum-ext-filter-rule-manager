@@ -9,6 +9,8 @@ huoxin-filter-rule-manager:
       providers: "匹配引擎"
       templates: "显示模板"
       modes: "显示模式"
+    registry_headers:
+      global_tokens: "全局"
     add_ruleset: "添加规则集"
     edit_ruleset: "编辑规则集"
     no_rulesets: "暂无规则集。请创建规则集以开始过滤帖子。"
@@ -191,6 +193,9 @@ huoxin-filter-rule-manager:
       normal_post: "普通主题"
       private_post: "私密主题"
       tag: "指定标签"
+
+    runs:
+      global: "全局"
       backend: "后端"
       frontend: "前端"
       both: "前端+后端"
