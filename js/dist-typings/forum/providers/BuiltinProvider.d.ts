@@ -1,21 +1,13 @@
 import type { FilterRuleProvider } from '../../common/FilterEngine';
+import type { AbstractBuiltinRule } from './builtin/AbstractBuiltinRule';
 /**
  * Forum-side BuiltinProvider — handles real-time evaluation against the
- * composer content. Supports four rule types:
- *
- *   contains_word  — config: { words: string[] }
- *   regex          — config: { patterns: string[] }
- *   group          — config: { groupIds: string[] | number[] }
- *   word_count     — config: { min?: number, max?: number }
- *
- * For contains_word and regex, the rule triggers if ANY of the listed entries matches.
- * The matched value is exposed as a token for message interpolation.
+ * composer content.
  */
 export default class BuiltinProvider implements FilterRuleProvider {
+    protected rules: Record<string, AbstractBuiltinRule>;
+    constructor();
+    registerRule(rule: AbstractBuiltinRule): void;
     getSupportedTypes(): string[];
     evaluate(type: string, content: string, config: Record<string, unknown>): Record<string, string> | null;
-    /**
-     * Normalise `{ plural: string[] }` into a clean, trimmed, non-empty string array.
-     */
-    normalizeList(config: Record<string, unknown>, plural: string): string[];
 }
