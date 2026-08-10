@@ -24,7 +24,7 @@ use Huoxin\FilterRuleManager\Modifier\Builtin\StripMentionsModifier;
 use Huoxin\FilterRuleManager\Modifier\Builtin\StripUploadTagsModifier;
 use Huoxin\FilterRuleManager\Modifier\Builtin\StripImagesModifier;
 use Huoxin\FilterRuleManager\Modifier\Builtin\StripUrlsModifier;
-use Huoxin\FilterRuleManager\Provider\FilterRuleManagerServiceProvider;
+use Huoxin\FilterRuleManager\FilterRuleManagerServiceProvider;
 use Illuminate\Console\Scheduling\Event as ScheduleEvent;
 
 return [

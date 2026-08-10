@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Huoxin\FilterRuleManager\Provider;
+namespace Huoxin\FilterRuleManager;
 
 use Flarum\Foundation\AbstractServiceProvider;
 use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
@@ -17,6 +17,7 @@ use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
 use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
+use Huoxin\FilterRuleManager\Provider\BuiltinProvider;
 use Illuminate\Contracts\Container\Container;
 
 class FilterRuleManagerServiceProvider extends AbstractServiceProvider
