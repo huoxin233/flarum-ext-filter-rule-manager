@@ -64,6 +64,7 @@ export declare class FilterEngine {
     activeAlerts: ActiveAlert[];
     currentRunAlerts?: ActiveAlert[];
     blockResults: BlockResult[];
+    globalTokens: Record<string, string>;
     intervalId: number | null;
     hasAlerts: boolean;
     private _lastStateKey;
@@ -99,6 +100,10 @@ export declare class FilterEngine {
      * Register a frontend modifier function.
      */
     registerModifier(name: string, modifier: (content: string, context?: any) => string): void;
+    /**
+     * Register a global context token to be displayed in the Registry and Token Hint UI.
+     */
+    registerGlobalToken(name: string, descriptionTranslationKey: string): void;
     /**
      * Look up a registered provider by name. Returns null if unknown.
      * Used by the admin RuleBuilder to find a provider's `getConfigComponent`.
