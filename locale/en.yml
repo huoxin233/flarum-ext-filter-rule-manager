@@ -9,6 +9,8 @@ huoxin-filter-rule-manager:
       providers: "Condition Providers"
       templates: "Display Templates"
       modes: "Display Modes"
+    registry_headers:
+      global_tokens: "Global"
     add_ruleset: "Add ruleset"
     edit_ruleset: "Edit ruleset"
     no_rulesets: "No rulesets have been created yet. Create one to start showing filter rules."
@@ -191,6 +193,9 @@ huoxin-filter-rule-manager:
       normal_post: "Normal Discussions"
       private_post: "Private Discussions"
       tag: "Specific tags"
+
+    runs:
+      global: "Global"
       backend: "Backend"
       frontend: "Frontend"
       both: "Frontend + Backend"

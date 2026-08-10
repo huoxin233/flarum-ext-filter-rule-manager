@@ -89,6 +89,7 @@ export class FilterEngine {
   public currentRunAlerts?: ActiveAlert[];
   public blockResults: BlockResult[] = [];
   public debounceTimer: number | null = null;
+  public globalTokens: Record<string, string> = {};
   public hasAlerts: boolean = false;
 
   private _lastStateKey: string | null = null;
@@ -145,6 +146,13 @@ export class FilterEngine {
    */
   registerModifier(name: string, modifier: (content: string, context?: any) => string): void {
     this.modifiers[name] = modifier;
+  }
+
+  /**
+   * Register a global context token to be displayed in the Registry and Token Hint UI.
+   */
+  registerGlobalToken(name: string, descriptionTranslationKey: string): void {
+    this.globalTokens[name] = descriptionTranslationKey;
   }
 
   /**
