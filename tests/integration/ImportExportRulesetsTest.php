@@ -168,8 +168,8 @@ class ImportExportRulesetsTest extends FilterTestCase
                     'is_active' => true,
                     'scope_type' => 'global',
                     'intervention_type' => 'block',
-                    'expression' => 'test',
-                    'compiled_ast' => [],
+                    'expression' => 'builtin.contains_word eq {"words": ["test"]}',
+                    'compiled_ast' => ['type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'eq', 'value' => ['words' => ['test']]],
                 ]
             ],
             'mode' => 'append',
@@ -197,8 +197,8 @@ class ImportExportRulesetsTest extends FilterTestCase
                     'is_active' => true,
                     'scope_type' => 'global',
                     'intervention_type' => 'block',
-                    'expression' => 'test',
-                    'compiled_ast' => [],
+                    'expression' => 'builtin.contains_word eq {"words": ["test"]}',
+                    'compiled_ast' => ['type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'eq', 'value' => ['words' => ['test']]],
                     'scope_tags' => ['does-not-exist'],
                     'bypass_groups' => ['Imaginary Group']
                 ]
@@ -293,5 +293,33 @@ class ImportExportRulesetsTest extends FilterTestCase
         );
 
         $this->assertEquals(422, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function invalid_expression_rejected()
+    {
+        $response = $this->send(
+            $this->request('POST', '/api/filter-rule/import-rulesets', [
+                'authenticatedAs' => 1,
+                'json' => [
+                    'rulesets' => [
+                        [
+                            'name' => 'Bad Expression Ruleset',
+                            'is_active' => true,
+                            'scope_type' => 'global',
+                            'intervention_type' => 'block',
+                            'expression' => 'this_is_not_valid_syntax',
+                        ]
+                    ],
+                    'mode' => 'append',
+                    'preserve_priority' => false
+                ]
+            ])
+        );
+
+        $this->assertEquals(422, $response->getStatusCode());
+        
+        // Ensure it was not saved
+        $this->assertNull(Ruleset::where('name', 'Bad Expression Ruleset')->first());
     }
 }
