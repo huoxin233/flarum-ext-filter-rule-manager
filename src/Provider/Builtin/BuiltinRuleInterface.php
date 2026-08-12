@@ -17,8 +17,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 interface BuiltinRuleInterface
 {
     public function name(): string;
+
     public function label(TranslatorInterface $translator): string;
+
     public function providedTokens(): array;
+
     public function evaluate(array $config, EvaluationContext $context): ?array;
+
     public function validateConfig(array $config): void;
 }

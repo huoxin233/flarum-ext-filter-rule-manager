@@ -15,9 +15,9 @@ use Flarum\Foundation\AbstractServiceProvider;
 use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
 use Huoxin\FilterRuleManager\Model\Ruleset;
+use Huoxin\FilterRuleManager\Provider\BuiltinProvider;
 use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RulesetMatcher;
-use Huoxin\FilterRuleManager\Provider\BuiltinProvider;
 use Illuminate\Contracts\Foundation\Application;
 
 class FilterRuleManagerServiceProvider extends AbstractServiceProvider
