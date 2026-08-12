@@ -48,6 +48,7 @@ class BuiltinProvider implements RuleProviderInterface, ValidatesConfigInterface
         foreach ($this->rules as $name => $rule) {
             $labels[$name] = $rule->label($this->translator);
         }
+
         return $labels;
     }
 
