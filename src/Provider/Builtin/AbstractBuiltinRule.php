@@ -34,6 +34,7 @@ abstract class AbstractBuiltinRule implements BuiltinRuleInterface
                     $out[] = $v;
                 }
             }
+
             return $out;
         }
 

@@ -20,11 +20,10 @@ use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 use Huoxin\FilterRuleManager\Listener\EvaluateBlockRulesets;
 use Huoxin\FilterRuleManager\Listener\ExecuteModerationActions;
 use Huoxin\FilterRuleManager\Listener\InjectFrontendRulesets;
+use Huoxin\FilterRuleManager\Modifier\Builtin\StripImagesModifier;
 use Huoxin\FilterRuleManager\Modifier\Builtin\StripMentionsModifier;
 use Huoxin\FilterRuleManager\Modifier\Builtin\StripUploadTagsModifier;
-use Huoxin\FilterRuleManager\Modifier\Builtin\StripImagesModifier;
 use Huoxin\FilterRuleManager\Modifier\Builtin\StripUrlsModifier;
-use Huoxin\FilterRuleManager\FilterRuleManagerServiceProvider;
 use Illuminate\Console\Scheduling\Event as ScheduleEvent;
 
 return [
