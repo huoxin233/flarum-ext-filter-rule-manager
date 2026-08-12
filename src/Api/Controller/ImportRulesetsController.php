@@ -11,6 +11,7 @@
 
 namespace Huoxin\FilterRuleManager\Api\Controller;
 
+use Exception;
 use Flarum\Group\Group;
 use Flarum\Http\RequestUtil;
 use Flarum\Tags\Tag;
@@ -19,10 +20,19 @@ use Illuminate\Support\Arr;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Huoxin\FilterRuleManager\Expression\Lexer;
+use Huoxin\FilterRuleManager\Expression\Parser;
+use Huoxin\FilterRuleManager\Service\RuleEvaluator;
+use Flarum\Foundation\ValidationException;
 use Psr\Http\Server\RequestHandlerInterface;
 
 class ImportRulesetsController implements RequestHandlerInterface
 {
+    use RulesetValidationTrait;
+
+    public function __construct(protected RuleEvaluator $evaluator)
+    {
+    }
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         RequestUtil::getActor($request)->assertAdmin();
@@ -99,17 +109,43 @@ class ImportRulesetsController implements RequestHandlerInterface
                 unset($data['scope_tag_ids']);
                 unset($data['bypass_group_ids']);
 
-                // Fill other attributes safely
-                foreach ($data as $key => $value) {
-                    // Prevent primary key or timestamps from being accidentally imported if present
-                    if (in_array($key, ['id', 'created_at', 'updated_at'])) {
-                        continue;
+                $ruleset->name = trim((string) ($data['name'] ?? ''));
+                $ruleset->expression = trim((string) ($data['expression'] ?? ''));
+
+                if ($ruleset->expression !== '') {
+                    try {
+                        $lexer = new Lexer($ruleset->expression);
+                        $tokens = $lexer->tokenize();
+                        $parser = new Parser($tokens);
+                        $ast = $parser->parse();
+                        $this->validateAstNode($ast, $this->evaluator->getProviders());
+                        $ruleset->compiled_ast = $ast->toArray();
+                    } catch (ValidationException $e) {
+                        throw $e;
+                    } catch (Exception $e) {
+                        throw new ValidationException(['expression' => 'Invalid expression syntax in imported ruleset "'.$ruleset->name.'": '.$e->getMessage()]);
                     }
-                    if ($key === 'priority' && ! $preservePriority) {
-                        continue;
-                    }
-                    $ruleset->{$key} = $value;
+                } else {
+                    $ruleset->compiled_ast = null;
                 }
+
+                // Map remaining attributes explicitly and safely (prevent mass-assignment vulnerabilities)
+                $ruleset->intervention_type = $this->validEnum($data['intervention_type'] ?? 'info', ['info', 'warning', 'block', 'silent'], 'info');
+                $ruleset->display_mode = $this->validEnum($data['display_mode'] ?? 'banner', ['none', 'banner', 'header_banner', 'toast', 'modal', 'sidebar'], 'banner');
+                $ruleset->message = (string) ($data['message'] ?? '');
+                $ruleset->flag_message = array_key_exists('flag_message', $data) ? ($data['flag_message'] === null ? null : (string) $data['flag_message']) : null;
+                $ruleset->evaluate_all_rules = (bool) ($data['evaluate_all_rules'] ?? false);
+                $ruleset->evaluate_title = array_key_exists('evaluate_title', $data) ? ($data['evaluate_title'] === null ? null : (bool) $data['evaluate_title']) : null;
+                $ruleset->evasion_active = array_key_exists('evasion_active', $data) ? ($data['evasion_active'] === null ? null : (bool) $data['evasion_active']) : null;
+                $ruleset->evasion_timeout = array_key_exists('evasion_timeout', $data) ? ($data['evasion_timeout'] === null ? null : max(0, (int) $data['evasion_timeout'])) : null;
+                $ruleset->evasion_threshold = array_key_exists('evasion_threshold', $data) ? ($data['evasion_threshold'] === null ? null : max(1, (int) $data['evasion_threshold'])) : null;
+                $ruleset->block_cascade = (bool) ($data['block_cascade'] ?? false);
+                $ruleset->is_active = (bool) ($data['is_active'] ?? true);
+                $ruleset->auto_flag = array_key_exists('auto_flag', $data) ? ($data['auto_flag'] === null ? null : (bool) $data['auto_flag']) : null;
+                $ruleset->require_approval = array_key_exists('require_approval', $data) ? ($data['require_approval'] === null ? null : (bool) $data['require_approval']) : null;
+                $ruleset->strict_edit = array_key_exists('strict_edit', $data) ? ($data['strict_edit'] === null ? null : (bool) $data['strict_edit']) : null;
+                $ruleset->scope_type = $this->validEnum($data['scope_type'] ?? 'global', ['global', 'normal_post', 'private_post', 'tag'], 'global');
+                $ruleset->display_settings = is_array($data['display_settings'] ?? null) ? $data['display_settings'] : null;
 
                 if (! $preservePriority || ! isset($data['priority'])) {
                     $currentMaxPriority++;
