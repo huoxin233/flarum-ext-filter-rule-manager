@@ -345,10 +345,6 @@ class ExecuteModerationActions
                 $post->discussion->is_approved = false;
                 $post->discussion->save();
             }
-
-            /** @phpstan-ignore property.notFound */
-            $post->is_approved = false;
-            $post->save();
         });
     }
 
