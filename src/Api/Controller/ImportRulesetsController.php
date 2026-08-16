@@ -22,6 +22,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Huoxin\FilterRuleManager\Expression\Lexer;
 use Huoxin\FilterRuleManager\Expression\Parser;
+use Huoxin\FilterRuleManager\Repository\RulesetRepository;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Flarum\Foundation\ValidationException;
 use Huoxin\FilterRuleManager\Expression\LogicalNode;
@@ -33,8 +34,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ImportRulesetsController implements RequestHandlerInterface
 {
-    public function __construct(protected RuleEvaluator $evaluator)
-    {
+    public function __construct(
+        protected RuleEvaluator $evaluator,
+        protected RulesetRepository $repository
+    ) {
     }
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -163,6 +166,8 @@ class ImportRulesetsController implements RequestHandlerInterface
                 $ruleset->save();
             }
         });
+
+        $this->repository->flush();
 
         return new JsonResponse(['success' => true]);
     }
