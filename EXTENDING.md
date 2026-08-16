@@ -32,14 +32,26 @@ flarum-ext-toxicity-filter/
                 └── ToxicityConfigComponent.tsx
 ```
 
-### Critical Dependency Requirement
+### Dependency Requirement
 
-In your `composer.json`, you **must** require Filter Rule Manager to ensure Flarum boots the extensions in the correct order:
+In your `composer.json`, you can require Filter Rule Manager as a direct requirement or declare it as an optional dependency so Flarum boots the extensions in the correct order:
 
 ```json
 "require": {
     "flarum/core": "^1.8.0",
     "huoxin/filter-rule-manager": "*"
+}
+```
+
+If Filter Rule Manager is **optional** for your extension, declare it under `optional-dependencies` instead:
+
+```json
+"extra": {
+    "flarum-extension": {
+        "optional-dependencies": [
+            "huoxin/filter-rule-manager"
+        ]
+    }
 }
 ```
 
@@ -307,15 +319,12 @@ import app from "flarum/admin/app";
 import ToxicityProvider from "./providers/ToxicityProvider";
 
 app.initializers.add("your-namespace/toxicity-rules", () => {
-  // Wait for Filter Rule Manager to boot.
-  // This is why adding it to your composer.json is mandatory!
-  if (!app.filterRuleManager) {
-    console.error("Filter Rule Manager is not installed or booted.");
-    return;
+  // Safe registration: only runs if Filter Rule Manager is active
+  if (app.filterRuleManager) {
+    app.filterRuleManager.registerProvider("toxicity", new ToxicityProvider());
   }
 
-  // Register the provider instance
-  app.filterRuleManager.registerProvider("toxicity", new ToxicityProvider());
+  // Your extension's other initialization logic can continue safely here...
 });
 ```
 
@@ -388,13 +397,15 @@ To make your modifier work in real-time on the frontend, you must register a Jav
 import app from "flarum/forum/app";
 
 app.initializers.add("your-namespace/modifiers", () => {
-  if (!app.filterRuleManager) return;
+  if (app.filterRuleManager) {
+    app.filterRuleManager.registerModifier("no_spoilers", (content: string, context?: any) => {
+      // Context contains { composer, application } during typing
+      // Strip out spoiler tags using JS regex
+      return content.replace(/>![\s\S]*?!</g, "");
+    });
+  }
 
-  app.filterRuleManager.registerModifier("no_spoilers", (content: string, context?: any) => {
-    // Context contains { composer, application } during typing
-    // Strip out spoiler tags using JS regex
-    return content.replace(/>![\s\S]*?!</g, "");
-  });
+  // Your extension's other forum initialization logic...
 });
 ```
 ## 5. Global Variables (Tokens)
@@ -406,13 +417,14 @@ If your extension injects system-wide variables into the evaluation context (via
 ### `js/src/admin/index.tsx`
 ```typescript
 import app from "flarum/admin/app";
-import { FilterEngine } from "huoxin/filter-rule-manager/common/FilterEngine";
 
 app.initializers.add("my-extension", () => {
-  const filterEngine: FilterEngine = app.filterRuleManager;
-  
-  // Register a global token (name, translation_key_for_description)
-  filterEngine.registerGlobalToken('discord_channel', 'my-extension.admin.token_discord_channel_desc');
+  if (app.filterRuleManager) {
+    // Register a global token (name, translation_key_for_description)
+    app.filterRuleManager.registerGlobalToken('discord_channel', 'my-extension.admin.token_discord_channel_desc');
+  }
+
+  // Your extension's other admin initialization logic...
 });
 ```
 
