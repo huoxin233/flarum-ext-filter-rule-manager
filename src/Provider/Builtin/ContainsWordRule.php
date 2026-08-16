@@ -42,11 +42,12 @@ class ContainsWordRule extends AbstractBuiltinRule
             return null;
         }
 
+        $lowerContent = mb_strtolower($context->content);
         $matches = [];
         $totalCount = 0;
 
         foreach ($words as $word) {
-            $count = substr_count(mb_strtolower($context->content), mb_strtolower($word));
+            $count = substr_count($lowerContent, mb_strtolower($word));
             if ($count > 0) {
                 if (empty($matches) || $scanAll) {
                     $matches[] = $word;
