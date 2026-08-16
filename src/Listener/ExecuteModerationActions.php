@@ -332,10 +332,6 @@ class ExecuteModerationActions
                 $post->discussion->is_approved = false;
                 $post->discussion->save();
             }
-
-            /** @phpstan-ignore-next-line */
-            $post->is_approved = false;
-            $post->save();
         });
     }
 
