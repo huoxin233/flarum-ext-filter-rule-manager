@@ -29,7 +29,8 @@ class ContainsWordRule extends AbstractBuiltinRule
     public function providedTokens(): array
     {
         return [
-            ['name' => 'matched_word', 'description' => 'The first listed word that was found in the post content.'],
+            ['name' => 'matched_word', 'description' => 'The specific word matched from the list.'],
+            ['name' => 'matched_text', 'description' => 'Aggregates matches across all content rules.', 'universal' => true],
         ];
     }
 
@@ -57,8 +58,11 @@ class ContainsWordRule extends AbstractBuiltinRule
         }
 
         if (! empty($matches)) {
+            $matchedStr = implode(', ', $matches);
+
             return [
-                'matched_word' => implode(', ', $matches),
+                'matched_word' => $matchedStr,
+                'matched_text' => $matchedStr,
                 '__count' => (string) $totalCount
             ];
         }

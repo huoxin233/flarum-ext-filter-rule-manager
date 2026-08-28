@@ -29,6 +29,14 @@ export default class ContainsWordRule extends AbstractBuiltinRule {
       }
     }
 
-    return matches.length > 0 ? { matched_word: matches.join(', ') } : null;
+    if (matches.length > 0) {
+      const matched = matches.join(', ');
+      return {
+        matched_word: matched,
+        matched_text: matched,
+      };
+    }
+
+    return null;
   }
 }

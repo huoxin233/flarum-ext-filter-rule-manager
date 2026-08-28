@@ -30,8 +30,9 @@ class RegexRule extends AbstractBuiltinRule
     public function providedTokens(): array
     {
         return [
-            ['name' => 'matched_pattern', 'description' => 'The first listed regex pattern that matched.'],
-            ['name' => 'matched_string', 'description' => 'The substring of the post content that matched.'],
+            ['name' => 'matched_pattern', 'description' => 'The regex pattern definition that triggered.'],
+            ['name' => 'matched_string', 'description' => 'The text substring captured by the regex.'],
+            ['name' => 'matched_text', 'description' => 'Aggregates matches across all content rules.', 'universal' => true],
         ];
     }
 
@@ -66,9 +67,12 @@ class RegexRule extends AbstractBuiltinRule
         }
 
         if (! empty($matchedPatterns)) {
+            $matchedStringsVal = implode(', ', $matchedStrings);
+
             return [
                 'matched_pattern' => implode(', ', $matchedPatterns),
-                'matched_string' => implode(', ', $matchedStrings),
+                'matched_string' => $matchedStringsVal,
+                'matched_text' => $matchedStringsVal,
                 '__count' => (string) $totalCount
             ];
         }

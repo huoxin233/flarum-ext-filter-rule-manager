@@ -54,6 +54,7 @@ class BuiltinProviderTest extends TestCase
         $result = $this->evaluate('contains_word', 'I like apples and bananas.', $config);
         $this->assertIsArray($result);
         $this->assertEquals('apple', $result['matched_word']);
+        $this->assertEquals('apple', $result['matched_text']);
     }
 
     /**
@@ -70,6 +71,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertIsArray($result);
         $this->assertEquals('[0-9]{3}-[0-9]{4}', $result['matched_pattern']);
         $this->assertEquals('555-1234', $result['matched_string']);
+        $this->assertEquals('555-1234', $result['matched_text']);
     }
 
     /**
@@ -84,6 +86,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertIsArray($result);
         $this->assertEquals('/b[a-z]+d/i', $result['matched_pattern']);
         $this->assertEquals('BAD', $result['matched_string']);
+        $this->assertEquals('BAD', $result['matched_text']);
     }
 
     /**
@@ -96,6 +99,7 @@ class BuiltinProviderTest extends TestCase
         $result1 = $this->evaluate('contains_word', 'This is a legacy config test.', $configContains);
         $this->assertIsArray($result1);
         $this->assertEquals('legacy', $result1['matched_word']);
+        $this->assertEquals('legacy', $result1['matched_text']);
 
         // Old structure used 'pattern' instead of 'patterns'
         $configRegex = ['pattern' => '\d+'];
@@ -103,6 +107,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertIsArray($result2);
         $this->assertEquals('\d+', $result2['matched_pattern']);
         $this->assertEquals('99', $result2['matched_string']);
+        $this->assertEquals('99', $result2['matched_text']);
     }
 
     /**
@@ -120,6 +125,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertIsArray($result);
         // It matches in the order of the configuration array, not the string order
         $this->assertEquals('apple, cherry', $result['matched_word']);
+        $this->assertEquals('apple, cherry', $result['matched_text']);
     }
 
     /**
@@ -137,6 +143,7 @@ class BuiltinProviderTest extends TestCase
         $this->assertIsArray($result);
         $this->assertEquals('foo, bar', $result['matched_pattern']);
         $this->assertEquals('foo, bar', $result['matched_string']);
+        $this->assertEquals('foo, bar', $result['matched_text']);
     }
 
     /** @test */

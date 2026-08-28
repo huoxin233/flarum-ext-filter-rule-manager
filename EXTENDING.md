@@ -129,7 +129,8 @@ class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterfac
             // placeholder in the admin's Flag or Block message!
             if ($score >= $threshold) {
                 return [
-                    'matched_word' => "Score: {$score} (Threshold: {$threshold})"
+                    'toxicity_score' => "Score: {$score} (Threshold: {$threshold})",
+                    'matched_text' => "Toxic content (Score: {$score})"
                 ];
             }
         }
@@ -154,7 +155,8 @@ class ToxicityProvider implements RuleProviderInterface, ValidatesConfigInterfac
     {
         if ($type === 'is_toxic') {
             return [
-                ['name' => 'matched_word', 'description' => 'Outputs the actual toxicity score returned by the API.'],
+                ['name' => 'toxicity_score', 'description' => 'The toxicity score calculated by the model.'],
+                ['name' => 'matched_text', 'description' => 'Aggregates matches across all content rules.', 'universal' => true],
             ];
         }
 
@@ -296,12 +298,17 @@ export default class ToxicityProvider {
    * Documents the tokens this rule injects into the message interpolator.
    * This populates the "Available Variables" hint panel in the UI.
    */
-  getProvidedTokens(type: string): { name: string; description: string }[] {
+  getProvidedTokens(type: string): { name: string; description: string; universal?: boolean }[] {
     if (type === "is_toxic") {
       return [
         {
-          name: "matched_word",
-          description: "Outputs the actual toxicity score returned by the API.",
+          name: "toxicity_score",
+          description: "The toxicity score calculated by the model.",
+        },
+        {
+          name: "matched_text",
+          description: "Aggregates matches across all content rules.",
+          universal: true,
         },
       ];
     }

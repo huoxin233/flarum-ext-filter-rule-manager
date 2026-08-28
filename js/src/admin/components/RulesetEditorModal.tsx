@@ -641,15 +641,25 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   }
 
   availableTokens() {
-    const seen = new Set();
-    const out: Record<string, unknown>[] = [];
+    const seen = new Map<string, Record<string, unknown>>();
 
     const push = (token: Record<string, unknown>, source: string) => {
-      if (!token || !token.name || seen.has(token.name)) return;
-      seen.add(token.name);
-      out.push({
-        name: token.name,
+      if (!token || !token.name) return;
+      const name = String(token.name);
+      const isUniversal = Boolean(token.universal || name === 'matched_text');
+
+      if (seen.has(name)) {
+        const existing = seen.get(name)!;
+        if (isUniversal && !existing.universal) {
+          existing.universal = true;
+        }
+        return;
+      }
+
+      seen.set(name, {
+        name,
         description: token.description || '',
+        universal: isUniversal,
         source,
       });
     };
@@ -701,6 +711,14 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       tokens.forEach((t: Record<string, unknown>) => push(t, `${rule.provider}/${rule.ruleType}`));
     }
 
+    const out = Array.from(seen.values());
+
+    out.sort((a, b) => {
+      const aUniversal = a.universal ? 1 : 0;
+      const bUniversal = b.universal ? 1 : 0;
+      return bUniversal - aUniversal;
+    });
+
     return out;
   }
 
@@ -717,18 +735,26 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       <div className="FilterRuleManager-TokenHints">
         <div className="FilterRuleManager-TokenHints-label">{app.translator.trans('huoxin-filter-rule-manager.admin.tokens_available')}</div>
         <div className="FilterRuleManager-TokenHints-list">
-          {tokens.map((t) => (
-            <button
-              type="button"
-              className="FilterRuleManager-TokenHints-chip"
-              key={t.name as string}
-              title={String(t.description || t.name)}
-              onclick={() => this.insertToken(t.name as string, targetField)}
-            >
-              <code>{`{{${t.name}}}`}</code>
-              {t.description && <span className="FilterRuleManager-TokenHints-chip-desc">{t.description}</span>}
-            </button>
-          ))}
+          {tokens.map((t) => {
+            const isUniversal = Boolean(t.universal);
+            return (
+              <button
+                type="button"
+                className="FilterRuleManager-TokenHints-chip"
+                key={t.name as string}
+                title={String(t.description || t.name)}
+                onclick={() => this.insertToken(t.name as string, targetField)}
+              >
+                {isUniversal && (
+                  <span className="FilterRuleManager-TokenHints-chip-badge">
+                    {String(app.translator.trans('huoxin-filter-rule-manager.admin.token_badge_universal') || 'Universal')}
+                  </span>
+                )}
+                <code>{`{{${t.name}}}`}</code>
+                {t.description && <span className="FilterRuleManager-TokenHints-chip-desc">{t.description as string}</span>}
+              </button>
+            );
+          })}
         </div>
       </div>
     );
@@ -782,6 +808,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       sampleTokens['matched_word'] = '[matched_word]';
       sampleTokens['matched_pattern'] = '[matched_pattern]';
       sampleTokens['matched_string'] = '[matched_string]';
+      sampleTokens['matched_text'] = '[matched_text]';
     }
 
     const renderedMessage = filterEngine.interpolate(message, sampleTokens);
