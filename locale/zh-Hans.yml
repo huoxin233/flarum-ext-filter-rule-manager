@@ -128,6 +128,8 @@ huoxin-filter-rule-manager:
     ruleset_custom_color_transparent: "设置为透明"
     ruleset_no_icon: "无"
     ruleset_scope_type: "应用于"
+    ruleset_post_context: "发帖类型"
+    ruleset_post_context_help: "限制该规则集仅在新建讨论（首帖）时触发、仅在跟帖回复时触发，或对所有发帖均生效。"
     ruleset_scope_tags: "指定标签 ID"
     ruleset_primary_tags: => flarum-tags.admin.tags.primary_heading
     ruleset_secondary_tags: => flarum-tags.admin.tags.secondary_heading
@@ -193,6 +195,11 @@ huoxin-filter-rule-manager:
       normal_post: "普通主题"
       private_post: "私密主题"
       tag: "指定标签"
+
+    post_contexts:
+      all: "所有发帖"
+      discussion_start: "仅限新建讨论（首帖）"
+      reply: "仅限跟帖回复"
 
     runs:
       global: "全局"

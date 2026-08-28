@@ -11,6 +11,10 @@
 
 namespace Huoxin\FilterRuleManager\Tests\unit;
 
+use Flarum\Discussion\Discussion;
+use Flarum\Post\CommentPost;
+use Flarum\Post\Post;
+use Huoxin\FilterRuleManager\Model\Ruleset;
 use Huoxin\FilterRuleManager\Service\RuleEvaluator;
 use Illuminate\Container\Container;
 use PHPUnit\Framework\TestCase;
@@ -356,5 +360,78 @@ class RuleEvaluatorTest extends TestCase
         // Empty array
         $res2 = $this->evaluator->interpolate($template, ['items' => []]);
         $this->assertEquals('None', $res2);
+    }
+
+    /** @test */
+    public function scope_matches_respects_discussion_start_post_context()
+    {
+        $ruleset = new Ruleset();
+        $ruleset->scope_type = 'global';
+        $ruleset->post_context = 'discussion_start';
+
+        $discussion = new Discussion();
+        $discussion->exists = true;
+        $discussion->first_post_id = 10;
+
+        // Post 1: First post (number = 1) -> matches
+        $firstPost = new CommentPost();
+        $firstPost->number = 1;
+        $firstPost->setRelation('discussion', $discussion);
+        $this->assertTrue($this->evaluator->scopeMatches($ruleset, $discussion, $firstPost));
+
+        // Post 2: Reply post (number = 2) -> rejected
+        $replyPost = new CommentPost();
+        $replyPost->number = 2;
+        $replyPost->setRelation('discussion', $discussion);
+        $this->assertFalse($this->evaluator->scopeMatches($ruleset, $discussion, $replyPost));
+
+        // Post 3: Brand new discussion creation (number = null, discussion unpersisted) -> matches
+        $newDisc = new Discussion();
+        $newDisc->exists = false;
+        $newPost = new CommentPost();
+        $newPost->number = null;
+        $newPost->setRelation('discussion', $newDisc);
+        $this->assertTrue($this->evaluator->scopeMatches($ruleset, $newDisc, $newPost));
+    }
+
+    /** @test */
+    public function scope_matches_respects_reply_post_context()
+    {
+        $ruleset = new Ruleset();
+        $ruleset->scope_type = 'global';
+        $ruleset->post_context = 'reply';
+
+        $discussion = new Discussion();
+        $discussion->exists = true;
+        $discussion->first_post_id = 10;
+
+        // First post (number = 1) -> rejected
+        $firstPost = new CommentPost();
+        $firstPost->number = 1;
+        $firstPost->setRelation('discussion', $discussion);
+        $this->assertFalse($this->evaluator->scopeMatches($ruleset, $discussion, $firstPost));
+
+        // Reply post (number = 2) -> matches
+        $replyPost = new CommentPost();
+        $replyPost->number = 2;
+        $replyPost->setRelation('discussion', $discussion);
+        $this->assertTrue($this->evaluator->scopeMatches($ruleset, $discussion, $replyPost));
+    }
+
+    /** @test */
+    public function scope_matches_defaults_to_all_posts()
+    {
+        $ruleset = new Ruleset();
+        $ruleset->scope_type = 'global';
+        $ruleset->post_context = 'all';
+
+        $discussion = new Discussion();
+        $firstPost = new CommentPost();
+        $firstPost->number = 1;
+        $replyPost = new CommentPost();
+        $replyPost->number = 2;
+
+        $this->assertTrue($this->evaluator->scopeMatches($ruleset, $discussion, $firstPost));
+        $this->assertTrue($this->evaluator->scopeMatches($ruleset, $discussion, $replyPost));
     }
 }

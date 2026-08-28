@@ -50,6 +50,7 @@ class RulesetSerializer extends AbstractSerializer
             'requireApproval' => $model->require_approval === null ? null : (bool) $model->require_approval,
             'strictEdit' => $model->strict_edit === null ? null : (bool) $model->strict_edit,
             'scopeType' => $model->scope_type,
+            'postContext' => $model->post_context ?? 'all',
             'scopeTagIds' => $model->scope_tag_ids ?? [],
             'bypassGroupIds' => $model->bypass_group_ids ?? [],
             'displaySettings' => $model->display_settings ?? [],

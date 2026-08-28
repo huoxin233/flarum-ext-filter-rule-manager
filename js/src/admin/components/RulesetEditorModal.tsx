@@ -79,6 +79,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
   autoFlag!: Stream<boolean | null>;
   requireApproval!: Stream<boolean | null>;
   scopeType!: Stream<string>;
+  postContext!: Stream<string>;
   scopeTagIds!: Stream<number[]>;
   bypassGroupIds!: Stream<number[]>;
   strictEdit!: Stream<boolean | null>;
@@ -128,6 +129,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
     this.autoFlag = Stream(this.ruleset ? this.ruleset.autoFlag() : null);
     this.requireApproval = Stream(this.ruleset ? this.ruleset.requireApproval() : null);
     this.scopeType = Stream(this.ruleset ? this.ruleset.scopeType() : 'global');
+    this.postContext = Stream(this.ruleset ? this.ruleset.postContext() || 'all' : 'all');
     this.scopeTagIds = Stream(this.ruleset ? this.ruleset.scopeTagIds() : []);
     this.bypassGroupIds = Stream(this.ruleset ? this.ruleset.bypassGroupIds() || [] : []);
     this.strictEdit = Stream(this.ruleset && this.ruleset.strictEdit() !== undefined ? this.ruleset.strictEdit() : null);
@@ -310,6 +312,20 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
             value={this.scopeType()}
             onchange={(v: string) => this.scopeType(v)}
           />
+        </div>
+
+        <div className="Form-group">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_post_context')}</label>
+          <Select
+            options={{
+              all: app.translator.trans('huoxin-filter-rule-manager.admin.post_contexts.all'),
+              discussion_start: app.translator.trans('huoxin-filter-rule-manager.admin.post_contexts.discussion_start'),
+              reply: app.translator.trans('huoxin-filter-rule-manager.admin.post_contexts.reply'),
+            }}
+            value={this.postContext()}
+            onchange={(v: string) => this.postContext(v)}
+          />
+          <div className="helpText">{app.translator.trans('huoxin-filter-rule-manager.admin.ruleset_post_context_help')}</div>
         </div>
 
         {this.scopeType() === 'tag' && (
@@ -895,6 +911,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       this.requireApproval() !== r.requireApproval() ||
       this.strictEdit() !== r.strictEdit() ||
       this.scopeType() !== r.scopeType() ||
+      this.postContext() !== (r.postContext() || 'all') ||
       JSON.stringify(this.scopeTagIds() || []) !== JSON.stringify(r.scopeTagIds() || []) ||
       JSON.stringify(this.bypassGroupIds() || []) !== JSON.stringify(r.bypassGroupIds() || []) ||
       JSON.stringify(this.displaySettings() || {}) !==
@@ -968,6 +985,7 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
       requireApproval: this.requireApproval(),
       strictEdit: this.strictEdit(),
       scopeType: this.scopeType(),
+      postContext: this.postContext(),
       scopeTagIds: this.scopeTagIds(),
       bypassGroupIds: this.bypassGroupIds(),
       displaySettings: this.displaySettings(),

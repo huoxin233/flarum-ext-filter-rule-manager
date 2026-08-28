@@ -61,6 +61,7 @@ class RulesetRepository
                     'evaluateTitle' => $r->evaluate_title === null ? null : (bool) $r->evaluate_title,
                     'blockCascade' => $r->block_cascade,
                     'scopeType' => $r->scope_type,
+                    'postContext' => $r->post_context ?? 'all',
                     'scopeTagIds' => $r->scope_tag_ids ?? [],
                     'displaySettings' => $r->display_settings,
                     'bypass_group_ids' => $r->bypass_group_ids,

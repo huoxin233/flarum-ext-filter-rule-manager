@@ -93,6 +93,42 @@ class ScopeTest extends FilterTestCase
                     'require_approval' => 0,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString()
+                ],
+                [
+                    'id' => 4,
+                    'name' => 'Discussion Start Only Ruleset',
+                    'priority' => 3,
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['novpn']]
+                    ]),
+                    'intervention_type' => 'block',
+                    'display_mode' => 'banner',
+                    'scope_type' => 'global',
+                    'post_context' => 'discussion_start',
+                    'message' => 'Blocked by Discussion Start',
+                    'is_active' => 1,
+                    'auto_flag' => 0,
+                    'require_approval' => 0,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString()
+                ],
+                [
+                    'id' => 5,
+                    'name' => 'Reply Only Ruleset',
+                    'priority' => 4,
+                    'compiled_ast' => json_encode([
+                        'type' => 'rule', 'provider' => 'builtin', 'ruleType' => 'contains_word', 'operator' => 'EQUALS', 'value' => ['words' => ['noreplyword']]
+                    ]),
+                    'intervention_type' => 'block',
+                    'display_mode' => 'banner',
+                    'scope_type' => 'global',
+                    'post_context' => 'reply',
+                    'message' => 'Blocked by Reply',
+                    'is_active' => 1,
+                    'auto_flag' => 0,
+                    'require_approval' => 0,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString()
                 ]
             ]
         ]);
@@ -147,5 +183,67 @@ class ScopeTest extends FilterTestCase
 
         $body = json_decode($response->getBody()->getContents(), true);
         $this->assertEquals('Blocked by Tag', $body['errors'][0]['detail']);
+    }
+
+    /**
+     * @test
+     */
+    public function discussion_start_ruleset_blocks_new_discussions_but_allows_replies()
+    {
+        // 1. Starting a new discussion with "novpn" gets blocked
+        $response = $this->send(
+            $this->request('POST', '/api/discussions', [
+                'authenticatedAs' => 7,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'title' => 'New Discussion About VPN',
+                            'content' => 'This discussion has novpn keyword.'
+                        ],
+                        'relationships' => [
+                            'tags' => ['data' => [['type' => 'tags', 'id' => '1']]]
+                        ]
+                    ]
+                ]
+            ])
+        );
+        $this->assertEquals(422, $response->getStatusCode());
+        $body = json_decode($response->getBody()->getContents(), true);
+        $this->assertEquals('Blocked by Discussion Start', $body['errors'][0]['detail']);
+
+        // 2. Submitting a reply in an existing discussion with "novpn" is permitted
+        $replyResponse = $this->submitReply('This reply mentions novpn normally.', 8, 1);
+        $this->assertEquals(201, $replyResponse->getStatusCode());
+    }
+
+    /**
+     * @test
+     */
+    public function reply_ruleset_blocks_replies_but_allows_new_discussions()
+    {
+        // 1. Starting a new discussion with "noreplyword" is permitted
+        $response = $this->send(
+            $this->request('POST', '/api/discussions', [
+                'authenticatedAs' => 5,
+                'json' => [
+                    'data' => [
+                        'attributes' => [
+                            'title' => 'Allowed Discussion Title',
+                            'content' => 'This discussion has noreplyword content.'
+                        ],
+                        'relationships' => [
+                            'tags' => ['data' => [['type' => 'tags', 'id' => '1']]]
+                        ]
+                    ]
+                ]
+            ])
+        );
+        $this->assertEquals(201, $response->getStatusCode());
+
+        // 2. Submitting a reply in an existing discussion with "noreplyword" gets blocked
+        $replyResponse = $this->submitReply('This reply has noreplyword.', 6, 1);
+        $this->assertEquals(422, $replyResponse->getStatusCode());
+        $body = json_decode($replyResponse->getBody()->getContents(), true);
+        $this->assertEquals('Blocked by Reply', $body['errors'][0]['detail']);
     }
 }

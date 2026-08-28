@@ -92,6 +92,7 @@ class CreateRulesetController extends AbstractCreateController
             $ruleset->require_approval = array_key_exists('requireApproval', $attributes) ? ($attributes['requireApproval'] === null ? null : (bool) $attributes['requireApproval']) : null;
             $ruleset->strict_edit = array_key_exists('strictEdit', $attributes) ? ($attributes['strictEdit'] === null ? null : (bool) $attributes['strictEdit']) : null;
             $ruleset->scope_type = $this->validEnum($attributes['scopeType'] ?? 'global', ['global', 'normal_post', 'private_post', 'tag'], 'global');
+            $ruleset->post_context = $this->validEnum($attributes['postContext'] ?? 'all', ['all', 'discussion_start', 'reply'], 'all');
             $ruleset->scope_tag_ids = $this->sanitizeIds($attributes['scopeTagIds'] ?? null);
             $ruleset->bypass_group_ids = $this->sanitizeIds($attributes['bypassGroupIds'] ?? null);
             $ruleset->display_settings = is_array($attributes['displaySettings'] ?? null) ? $attributes['displaySettings'] : null;

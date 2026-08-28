@@ -372,6 +372,7 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     const isLast = filteredIndex === filteredList.length - 1;
     const intervention = ruleset.interventionType();
     const scope = ruleset.scopeType();
+    const postContext = ruleset.postContext ? ruleset.postContext() : 'all';
     const display = ruleset.displayMode();
     const isTogglingThis = this.toggling.has(ruleset.id() as string);
     const rulesCount = this.countRules(ruleset.compiledAst());
@@ -414,6 +415,11 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
           <span className={`FilterRuleManager-ScopeBadge FilterRuleManager-ScopeBadge--${scope}`}>
             {app.translator.trans(`huoxin-filter-rule-manager.admin.scopes.${scope}`)}
           </span>
+          {postContext && postContext !== 'all' && (
+            <span className={`FilterRuleManager-ContextBadge FilterRuleManager-ContextBadge--${postContext}`}>
+              {app.translator.trans(`huoxin-filter-rule-manager.admin.post_contexts.${postContext}`)}
+            </span>
+          )}
         </div>
 
         <div

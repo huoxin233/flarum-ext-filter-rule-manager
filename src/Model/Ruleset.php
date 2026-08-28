@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property bool   $block_cascade
  * @property bool   $is_active
  * @property string $scope_type     global|normal_post|private_post|tag
+ * @property string $post_context    all|discussion_start|reply
  * @property array|null $scope_tag_ids
  * @property array|null $bypass_group_ids
  * @property bool|null $auto_flag
@@ -57,6 +58,7 @@ class Ruleset extends AbstractModel
         'evasion_threshold' => 'integer',
         'auto_flag' => 'boolean',
         'require_approval' => 'boolean',
+        'post_context' => 'string',
         'scope_tag_ids' => 'array',
         'bypass_group_ids' => 'array',
         'strict_edit' => 'boolean',

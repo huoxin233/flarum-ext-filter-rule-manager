@@ -12,6 +12,7 @@
 namespace Huoxin\FilterRuleManager\Service;
 
 use Flarum\Discussion\Discussion;
+use Flarum\Post\Post;
 use Huoxin\FilterRuleManager\Extend\FilterContentModifier;
 use Huoxin\FilterRuleManager\Extend\FilterRuleProvider;
 use Huoxin\FilterRuleManager\Model\EvaluationContext;
@@ -198,9 +199,24 @@ class RuleEvaluator
 
     /**
      * @param Discussion|null $discussion
+     * @param Post|null $post
      */
-    public function scopeMatches(Ruleset $ruleset, $discussion): bool
+    public function scopeMatches(Ruleset $ruleset, $discussion, ?Post $post = null): bool
     {
+        $postContext = $ruleset->post_context ?? 'all';
+        if ($postContext !== 'all' && $post !== null) {
+            $isDiscussionStart = ($post->number === 1)
+                || ($post->number === null && (! $discussion || ! $discussion->exists || $discussion->first_post_id === null || $discussion->first_post_id === $post->id));
+
+            if ($postContext === 'discussion_start' && ! $isDiscussionStart) {
+                return false;
+            }
+
+            if ($postContext === 'reply' && $isDiscussionStart) {
+                return false;
+            }
+        }
+
         $isPrivate = false;
         if ($discussion) {
             $isPrivate = (bool) ($discussion->is_private ?? false);

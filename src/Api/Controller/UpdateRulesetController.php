@@ -123,6 +123,9 @@ class UpdateRulesetController extends AbstractShowController
         if (isset($attributes['scopeType'])) {
             $ruleset->scope_type = $this->validEnum($attributes['scopeType'], ['global', 'normal_post', 'private_post', 'tag'], $ruleset->scope_type);
         }
+        if (isset($attributes['postContext'])) {
+            $ruleset->post_context = $this->validEnum($attributes['postContext'], ['all', 'discussion_start', 'reply'], $ruleset->post_context ?? 'all');
+        }
         if (array_key_exists('scopeTagIds', $attributes)) {
             $ruleset->scope_tag_ids = $this->sanitizeIds($attributes['scopeTagIds']);
         }

@@ -39,6 +39,7 @@ export interface Ruleset {
   displayMode: string;
   message: string;
   scopeType: string;
+  postContext?: string;
   scopeTagIds?: (string | number)[];
   evaluateTitle?: boolean;
   evaluateAllRules?: boolean | (() => boolean);
@@ -495,6 +496,23 @@ export class FilterEngine {
       tagIds = resolveField(safeComposer.fields?.tags)
         ? (resolveField(safeComposer.fields?.tags) as unknown[]).map((t) => (t as { id: () => string | number }).id())
         : [];
+    }
+
+    const postContext = ruleset.postContext || 'all';
+    if (postContext !== 'all') {
+      const resolveField = (val: unknown) => (typeof val === 'function' ? val() : val);
+      const hasTitleField = typeof safeComposer?.fields?.title !== 'undefined' && resolveField(safeComposer.fields?.title) !== null;
+      const isPostEditFirst =
+        safeComposer?.body?.attrs?.post && typeof safeComposer.body.attrs.post.number === 'function' && safeComposer.body.attrs.post.number() === 1;
+
+      const isDiscussionStart = (hasTitleField && !discussion) || !!isPostEditFirst;
+
+      if (postContext === 'discussion_start' && !isDiscussionStart) {
+        return false;
+      }
+      if (postContext === 'reply' && isDiscussionStart) {
+        return false;
+      }
     }
 
     switch (ruleset.scopeType) {
