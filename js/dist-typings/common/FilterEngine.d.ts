@@ -25,6 +25,7 @@ export interface Ruleset {
     displayMode: string;
     message: string;
     scopeType: string;
+    postContext?: string;
     scopeTagIds?: (string | number)[];
     evaluateTitle?: boolean;
     evaluateAllRules?: boolean | (() => boolean);
