@@ -68,14 +68,18 @@ export default class BuiltinProvider {
    * Returning [{ name, description }] makes them discoverable in the
    * RulesetEditorModal token-hint panel.
    */
-  getProvidedTokens(type: string): { name: string; description: string }[] {
+  getProvidedTokens(type: string): { name: string; description: string; universal?: boolean }[] {
     if (type === 'contains_word') {
-      return [{ name: 'matched_word', description: 'The first listed word that was found in the post content.' }];
+      return [
+        { name: 'matched_word', description: 'The specific word matched from the list.' },
+        { name: 'matched_text', description: 'Aggregates matches across all content rules.', universal: true },
+      ];
     }
     if (type === 'regex') {
       return [
-        { name: 'matched_pattern', description: 'The first listed regex pattern that matched.' },
-        { name: 'matched_string', description: 'The substring of the post content that matched.' },
+        { name: 'matched_pattern', description: 'The regex pattern definition that triggered.' },
+        { name: 'matched_string', description: 'The text substring captured by the regex.' },
+        { name: 'matched_text', description: 'Aggregates matches across all content rules.', universal: true },
       ];
     }
     if (type === 'group') {

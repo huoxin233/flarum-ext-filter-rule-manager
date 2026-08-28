@@ -46,9 +46,11 @@ export default class RegexRule extends AbstractBuiltinRule {
     }
 
     if (matchedPatterns.length > 0) {
+      const matchedStringsVal = matchedStrings.join(', ');
       return {
         matched_pattern: matchedPatterns.join(', '),
-        matched_string: matchedStrings.join(', '),
+        matched_string: matchedStringsVal,
+        matched_text: matchedStringsVal,
       };
     }
 

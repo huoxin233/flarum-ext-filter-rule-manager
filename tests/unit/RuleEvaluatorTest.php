@@ -297,4 +297,65 @@ class RuleEvaluatorTest extends TestCase
 
         $this->assertEquals('Simple message with no tokens.', $result);
     }
+
+    #[Test]
+    public function merge_results_aggregates_universal_matched_text_token()
+    {
+        // Rule A (word match): apple, banana
+        $wordResult = [
+            'matched_word' => 'apple, banana',
+            'matched_text' => 'apple, banana',
+        ];
+
+        // Rule B (regex match): 555-1234, banana
+        $regexResult = [
+            'matched_string' => '555-1234, banana',
+            'matched_pattern' => '[0-9]{3}-[0-9]{4}, banana',
+            'matched_text' => '555-1234, banana',
+        ];
+
+        $reflection = new ReflectionClass(RuleEvaluator::class);
+        $method = $reflection->getMethod('mergeResults');
+
+        $merged = $method->invoke($this->evaluator, [$wordResult, $regexResult]);
+
+        // Specific tokens stay distinct
+        $this->assertEquals('apple, banana', $merged['matched_word']);
+        $this->assertEquals('555-1234, banana', $merged['matched_string']);
+
+        // Universal token aggregates & deduplicates across both rules seamlessly
+        $this->assertEquals('apple, banana, 555-1234', $merged['matched_text']);
+
+        // Interpolation with universal token works with a single placeholder
+        $message = $this->evaluator->interpolate('Violation detected: {{matched_text}}', $merged);
+        $this->assertEquals('Violation detected: apple, banana, 555-1234', $message);
+    }
+
+    #[Test]
+    public function interpolate_renders_conditional_with_universal_matched_text_and_html_escaping()
+    {
+        $template = 'Result: {{#matched_text}}<b>{{matched_text}}</b>{{/matched_text}}{{^matched_text}}<i>Clean</i>{{/matched_text}}';
+
+        // When universal token is present with special characters
+        $resPresent = $this->evaluator->interpolate($template, ['matched_text' => '<b>bold & dangerous</b>']);
+        $this->assertEquals('Result: <b>&lt;b&gt;bold &amp; dangerous&lt;/b&gt;</b>', $resPresent);
+
+        // When universal token is empty
+        $resEmpty = $this->evaluator->interpolate($template, ['matched_text' => '']);
+        $this->assertEquals('Result: <i>Clean</i>', $resEmpty);
+    }
+
+    #[Test]
+    public function interpolate_recognizes_non_empty_arrays_in_conditional_blocks()
+    {
+        $template = '{{#items}}Found: {{items}}{{/items}}{{^items}}None{{/items}}';
+
+        // Non-empty array from third party
+        $res1 = $this->evaluator->interpolate($template, ['items' => ['first', 'second']]);
+        $this->assertEquals('Found: first, second', $res1);
+
+        // Empty array
+        $res2 = $this->evaluator->interpolate($template, ['items' => []]);
+        $this->assertEquals('None', $res2);
+    }
 }
