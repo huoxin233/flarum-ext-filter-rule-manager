@@ -81,7 +81,7 @@ class RulesetMatcher
 
         $discussion = $post->discussion;
 
-        if (! $this->evaluator->scopeMatches($ruleset, $discussion)) {
+        if (! $this->evaluator->scopeMatches($ruleset, $discussion, $post)) {
             $postCache[$cacheKey] = null;
             $this->evaluationCache[$post] = $postCache;
 

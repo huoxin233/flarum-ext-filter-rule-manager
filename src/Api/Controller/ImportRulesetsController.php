@@ -151,6 +151,7 @@ class ImportRulesetsController implements RequestHandlerInterface
                 $ruleset->require_approval = array_key_exists('require_approval', $data) ? ($data['require_approval'] === null ? null : (bool) $data['require_approval']) : null;
                 $ruleset->strict_edit = array_key_exists('strict_edit', $data) ? ($data['strict_edit'] === null ? null : (bool) $data['strict_edit']) : null;
                 $ruleset->scope_type = $this->validEnum($data['scope_type'] ?? 'global', ['global', 'normal_post', 'private_post', 'tag'], 'global');
+                $ruleset->post_context = $this->validEnum($data['post_context'] ?? 'all', ['all', 'discussion_start', 'reply'], 'all');
                 $ruleset->display_settings = is_array($data['display_settings'] ?? null) ? $data['display_settings'] : null;
 
                 if (! $preservePriority || ! isset($data['priority'])) {

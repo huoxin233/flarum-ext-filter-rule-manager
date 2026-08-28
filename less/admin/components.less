@@ -44,6 +44,31 @@
     &--both         { background: fade(@secondary-color, 15%); color: darken(@secondary-color, 12%); }
   }
 
+  .FilterRuleManager-ContextBadge {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 2px 6px;
+    margin-left: 4px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+
+    &--discussion_start {
+      background: fade(@frm-warning-color, 12%);
+      color: darken(@frm-warning-color, 15%);
+      border: 1px solid fade(@frm-warning-color, 30%);
+    }
+
+    &--reply {
+      background: fade(@frm-info-color, 12%);
+      color: darken(@frm-info-color, 15%);
+      border: 1px solid fade(@frm-info-color, 30%);
+    }
+  }
+
   .FilterRuleManager-CountBadge {
     display: inline-flex;
     align-items: center;

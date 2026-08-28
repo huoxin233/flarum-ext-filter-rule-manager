@@ -19,7 +19,7 @@ Filter Rule Manager is built to give Flarum administrators fine-grained control 
   - **Block**: Evaluated server-side upon submission. Prevents the post from being submitted entirely and displays an error message.
   - **Silent**: Does not display anything to the user. Evaluated silently on the server-side.
     _(Note: You can configure any of the above to also automatically Flag the post or hold it for Approval.)_
-- **Dynamic Scopes**: Apply filtering rules globally, or restrict them to specific **Tags** or specific **Discussions**.
+- **Dynamic Scopes & Post Contexts**: Apply filtering rules globally, restrict them to specific **Tags** or **Discussions**, and target specific post creation phases (**New Discussions Only**, **Replies Only**, or **All Posts**).
 - **Target Text Preprocessors**: Filter Rule Manager natively supports Content Modifiers (preprocessors)! Extensions can securely register modifiers that strip or modify post content _before_ rules evaluate it (e.g., stripping out quotes or spoiler blocks). Administrators can even chain multiple modifiers together to run sequentially!
 - **Evasion Detection**: Define strict timeout windows and strike thresholds. If a user repeatedly hits block rules (e.g., 3 times within 15 minutes), the system automatically escalates penalties, flagging their next _clean_ post for moderator review.
 - **Bypass Groups**: Exempt specific User Groups (e.g., Moderators, Admins) from individual rulesets.

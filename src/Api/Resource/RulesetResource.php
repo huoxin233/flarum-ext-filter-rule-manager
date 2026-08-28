@@ -192,6 +192,12 @@ class RulesetResource extends Resource\AbstractDatabaseResource
                 ->set(function (Ruleset $model, $value) {
                     $model->scope_type = in_array($value, ['global', 'normal_post', 'private_post', 'tag'], true) ? $value : ($model->scope_type ?? 'global');
                 }),
+            Schema\Str::make('postContext')
+                ->property('post_context')
+                ->writable()
+                ->set(function (Ruleset $model, $value) {
+                    $model->post_context = in_array($value, ['all', 'discussion_start', 'reply'], true) ? $value : ($model->post_context ?? 'all');
+                }),
             Schema\Arr::make('scopeTagIds')
                 ->property('scope_tag_ids')
                 ->writable()

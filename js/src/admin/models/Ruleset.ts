@@ -31,6 +31,7 @@ Object.assign(Ruleset.prototype, {
   requireApproval: Model.attribute('requireApproval'),
   strictEdit: Model.attribute('strictEdit'),
   scopeType: Model.attribute('scopeType'),
+  postContext: Model.attribute('postContext'),
   scopeTagIds: Model.attribute('scopeTagIds'),
   bypassGroupIds: Model.attribute('bypassGroupIds'),
   displaySettings: Model.attribute('displaySettings'),
