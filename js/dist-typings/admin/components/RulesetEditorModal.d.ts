@@ -54,6 +54,7 @@ export default class RulesetEditorModal extends FormModal<RulesetEditorModalAttr
     autoFlag: Stream<boolean | null>;
     requireApproval: Stream<boolean | null>;
     scopeType: Stream<string>;
+    postContext: Stream<string>;
     scopeTagIds: Stream<number[]>;
     bypassGroupIds: Stream<number[]>;
     strictEdit: Stream<boolean | null>;
