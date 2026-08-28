@@ -249,6 +249,39 @@ class RuleEvaluator
             }
         }
 
+        // 1. Process positive conditional blocks: {{#token}}...{{/token}}
+        if (str_contains($template, '{{#')) {
+            while (str_contains($template, '{{#')) {
+                $prev = $template;
+                $template = preg_replace_callback('/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/', function (array $m) use ($tokens) {
+                    $key = $m[1];
+                    $hasValue = isset($tokens[$key]) && $tokens[$key] !== '' && $tokens[$key] !== [];
+
+                    return $hasValue ? $m[2] : '';
+                }, $template);
+                if ($template === $prev) {
+                    break;
+                }
+            }
+        }
+
+        // 2. Process inverted conditional blocks: {{^token}}...{{/token}}
+        if (str_contains($template, '{{^')) {
+            while (str_contains($template, '{{^')) {
+                $prev = $template;
+                $template = preg_replace_callback('/\{\{\^(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/', function (array $m) use ($tokens) {
+                    $key = $m[1];
+                    $isEmpty = ! isset($tokens[$key]) || $tokens[$key] === '' || $tokens[$key] === [];
+
+                    return $isEmpty ? $m[2] : '';
+                }, $template);
+                if ($template === $prev) {
+                    break;
+                }
+            }
+        }
+
+        // 3. Process variable interpolation: {{token}}
         return preg_replace_callback('/\{\{(\w+)\}\}/', function (array $m) use ($tokens) {
             if (isset($tokens[$m[1]])) {
                 $val = $tokens[$m[1]];

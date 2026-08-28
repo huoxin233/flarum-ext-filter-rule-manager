@@ -543,6 +543,33 @@ export class FilterEngine {
       }
     }
 
+    // 1. Process positive conditional blocks: {{#token}}...{{/token}}
+    if (strTemplate.includes('{{#')) {
+      while (strTemplate.includes('{{#')) {
+        const prev = strTemplate;
+        strTemplate = strTemplate.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, key, content) => {
+          const hasValue =
+            tokens && Object.prototype.hasOwnProperty.call(tokens, key) && tokens[key] !== '' && tokens[key] !== null && tokens[key] !== undefined;
+          return hasValue ? content : '';
+        });
+        if (strTemplate === prev) break;
+      }
+    }
+
+    // 2. Process inverted conditional blocks: {{^token}}...{{/token}}
+    if (strTemplate.includes('{{^')) {
+      while (strTemplate.includes('{{^')) {
+        const prev = strTemplate;
+        strTemplate = strTemplate.replace(/\{\{\^(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, key, content) => {
+          const isEmpty =
+            !tokens || !Object.prototype.hasOwnProperty.call(tokens, key) || tokens[key] === '' || tokens[key] === null || tokens[key] === undefined;
+          return isEmpty ? content : '';
+        });
+        if (strTemplate === prev) break;
+      }
+    }
+
+    // 3. Process variable interpolation: {{token}}
     return strTemplate.replace(/\{\{(\w+)\}\}/g, (match, key) => {
       if (!tokens || !Object.prototype.hasOwnProperty.call(tokens, key)) return match;
       return escapeHtml(tokens[key]);
