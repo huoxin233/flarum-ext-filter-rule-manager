@@ -114,7 +114,7 @@ huoxin-filter-rule-manager:
     ruleset_display_template: "Display Template"
     ruleset_custom_title: "Custom Title"
     ruleset_custom_title_placeholder: "e.g. Warning!"
-    ruleset_custom_title_help: "Optional. Overrides the default translated title for modals and toasts. Use '{{token}}' to interpolate values returned by rules. Token values are HTML-escaped automatically; the title itself is rendered trusted so you can use simple HTML like '<br>'. Supports translation keys."
+    ruleset_custom_title_help: "Optional. Overrides the default translated title for modals and toasts. Use '{{ token }}' to interpolate values returned by rules. Token values are HTML-escaped automatically; the title itself is rendered trusted so you can use simple HTML like '<br>'. Supports translation keys."
     ruleset_toast_theme: "Toast Theme"
     ruleset_toast_theme_auto: "Auto (Based on Intervention)"
     ruleset_toast_theme_success: "Success (Green)"
@@ -137,7 +137,7 @@ huoxin-filter-rule-manager:
     ruleset_bypass_groups: "Bypass Groups"
     ruleset_bypass_groups_help: "Users in these groups will bypass this ruleset completely."
     ruleset_message: "Message"
-    ruleset_message_placeholder: "Your post contains a restricted word: '{{matched_word}}'"
+    ruleset_message_placeholder: "Your post contains a restricted word: '{{ matched_word }}'"
     ruleset_is_active: "Enabled"
 
     ruleset_block_cascade: "Stop evaluating subsequent rulesets when this one triggers"
@@ -161,14 +161,14 @@ huoxin-filter-rule-manager:
     ruleset_evasion_threshold: "Evasion Threshold (blocks)"
     ruleset_evasion_threshold_help: "Number of blocks required within the timeout period to trigger evasion."
     ruleset_flag_message: "Custom Flag/Approval Reason"
-    ruleset_flag_message_placeholder: "e.g. Matched words: '{{matched_word}}'"
+    ruleset_flag_message_placeholder: "e.g. Matched words: '{{ matched_word }}'"
     ruleset_flag_message_help: "Optional. Define a custom flag or approval reason string for moderators to see when this ruleset triggers. If empty, the default group message will be used. Supports translation keys."
 
     inherit_global_default: "Inherit Global Default"
     force_enabled: "Force Enabled"
     force_disabled: "Force Disabled"
 
-    message_help: "Use '{{token}}' to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like '<br>'. Supports translation keys."
+    message_help: "Use '{{ token }}' to interpolate values returned by rules. Token values are HTML-escaped automatically; the template itself is rendered trusted so you can use simple HTML like '<br>'. Supports translation keys."
     preview: "Preview"
     preview_placeholder: "Your message will appear here."
 
@@ -259,6 +259,12 @@ huoxin-filter-rule-manager:
     tokens_available: "Available tokens — click to insert"
     tokens_none: "No tokens available — add a rule to see what tokens it exposes."
     token_rule_name_desc: "The name of the triggered ruleset"
+    token_matched_text_desc: "Aggregates matches across all content rules"
+    token_matched_word_desc: "The specific word matched from the list"
+    token_matched_pattern_desc: "The regex pattern definition that triggered"
+    token_matched_string_desc: "The text substring captured by the regex"
+    token_matched_group_desc: "The user group ID that triggered the rule"
+    token_word_count_desc: "The calculated word count of the post"
 
     # ── Built-in Rules Config ──────────────────────────────────────────────
     type_contains_word: "Contains word(s)"
@@ -281,14 +287,14 @@ huoxin-filter-rule-manager:
     config_rule_triggered_position_warning: "Note: This rule is order-sensitive. It can only detect rules that are positioned ABOVE it in the ruleset list."
 
     config_groups_label: "Select Groups"
-    config_groups_help: "The rule triggers if the user belongs to any of the selected groups. The matched group ID is available as '{{matched_group}}'."
+    config_groups_help: "The rule triggers if the user belongs to any of the selected groups. The matched group ID is available as '{{ matched_group }}'."
 
     config_words_label: "Words / phrases"
     config_words_placeholder: "spam\nphishing\ngiveaway"
-    config_words_help: "One word or phrase per line. The rule triggers if the post contains any of them (case-insensitive). The first match is available as '{{matched_word}}' in the alert message."
+    config_words_help: "One word or phrase per line. The rule triggers if the post contains any of them (case-insensitive). The first match is available as '{{ matched_word }}' in the alert message."
     config_patterns_label: "Regex patterns"
     config_patterns_placeholder: "https?://(bit\\.ly|tinyurl)/\n^[A-Z\\s!]'{20,}'$"
-    config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as '{{matched_pattern}}' and '{{matched_string}}'."
+    config_patterns_help: "One pattern per line. Bare patterns are matched case-insensitively; use PCRE form like /pattern/flags for full control. The first match is available as '{{ matched_pattern }}' and '{{ matched_string }}'."
 
     config_word_count_min: "Minimum words/characters"
     config_word_count_max: "Maximum words/characters"

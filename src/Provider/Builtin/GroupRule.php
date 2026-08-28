@@ -29,7 +29,7 @@ class GroupRule extends AbstractBuiltinRule
     public function providedTokens(): array
     {
         return [
-            ['name' => 'matched_group', 'description' => 'The user group ID that triggered the rule.'],
+            ['name' => 'matched_group', 'description' => 'huoxin-filter-rule-manager.admin.token_matched_group_desc'],
         ];
     }
 
