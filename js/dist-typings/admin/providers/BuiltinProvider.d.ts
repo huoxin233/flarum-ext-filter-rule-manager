@@ -35,5 +35,6 @@ export default class BuiltinProvider {
     getProvidedTokens(type: string): {
         name: string;
         description: string;
+        universal?: boolean;
     }[];
 }
