@@ -29,7 +29,7 @@ class WordCountRule extends AbstractBuiltinRule
     public function providedTokens(): array
     {
         return [
-            ['name' => 'word_count', 'description' => 'The calculated word count of the post.'],
+            ['name' => 'word_count', 'description' => 'huoxin-filter-rule-manager.admin.token_word_count_desc'],
         ];
     }
 

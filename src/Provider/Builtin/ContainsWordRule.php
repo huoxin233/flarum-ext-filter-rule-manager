@@ -29,8 +29,8 @@ class ContainsWordRule extends AbstractBuiltinRule
     public function providedTokens(): array
     {
         return [
-            ['name' => 'matched_word', 'description' => 'The specific word matched from the list.'],
-            ['name' => 'matched_text', 'description' => 'Aggregates matches across all content rules.', 'universal' => true],
+            ['name' => 'matched_word', 'description' => 'huoxin-filter-rule-manager.admin.token_matched_word_desc'],
+            ['name' => 'matched_text', 'description' => 'huoxin-filter-rule-manager.admin.token_matched_text_desc', 'universal' => true],
         ];
     }
 

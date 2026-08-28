@@ -71,22 +71,22 @@ export default class BuiltinProvider {
   getProvidedTokens(type: string): { name: string; description: string; universal?: boolean }[] {
     if (type === 'contains_word') {
       return [
-        { name: 'matched_word', description: 'The specific word matched from the list.' },
-        { name: 'matched_text', description: 'Aggregates matches across all content rules.', universal: true },
+        { name: 'matched_word', description: 'huoxin-filter-rule-manager.admin.token_matched_word_desc' },
+        { name: 'matched_text', description: 'huoxin-filter-rule-manager.admin.token_matched_text_desc', universal: true },
       ];
     }
     if (type === 'regex') {
       return [
-        { name: 'matched_pattern', description: 'The regex pattern definition that triggered.' },
-        { name: 'matched_string', description: 'The text substring captured by the regex.' },
-        { name: 'matched_text', description: 'Aggregates matches across all content rules.', universal: true },
+        { name: 'matched_pattern', description: 'huoxin-filter-rule-manager.admin.token_matched_pattern_desc' },
+        { name: 'matched_string', description: 'huoxin-filter-rule-manager.admin.token_matched_string_desc' },
+        { name: 'matched_text', description: 'huoxin-filter-rule-manager.admin.token_matched_text_desc', universal: true },
       ];
     }
     if (type === 'group') {
-      return [{ name: 'matched_group', description: 'The user group ID that triggered the rule.' }];
+      return [{ name: 'matched_group', description: 'huoxin-filter-rule-manager.admin.token_matched_group_desc' }];
     }
     if (type === 'word_count') {
-      return [{ name: 'word_count', description: 'The calculated word count of the post.' }];
+      return [{ name: 'word_count', description: 'huoxin-filter-rule-manager.admin.token_word_count_desc' }];
     }
     return [];
   }

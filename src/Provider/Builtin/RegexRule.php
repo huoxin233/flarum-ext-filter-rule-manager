@@ -30,9 +30,9 @@ class RegexRule extends AbstractBuiltinRule
     public function providedTokens(): array
     {
         return [
-            ['name' => 'matched_pattern', 'description' => 'The regex pattern definition that triggered.'],
-            ['name' => 'matched_string', 'description' => 'The text substring captured by the regex.'],
-            ['name' => 'matched_text', 'description' => 'Aggregates matches across all content rules.', 'universal' => true],
+            ['name' => 'matched_pattern', 'description' => 'huoxin-filter-rule-manager.admin.token_matched_pattern_desc'],
+            ['name' => 'matched_string', 'description' => 'huoxin-filter-rule-manager.admin.token_matched_string_desc'],
+            ['name' => 'matched_text', 'description' => 'huoxin-filter-rule-manager.admin.token_matched_text_desc', 'universal' => true],
         ];
     }
 

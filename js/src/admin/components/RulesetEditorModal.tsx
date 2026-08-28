@@ -672,9 +672,12 @@ export default class RulesetEditorModal extends Modal<RulesetEditorModalAttrs> {
         return;
       }
 
+      const rawDesc = (token.description as string) || '';
+      const translatedDesc = rawDesc ? String(app.translator.trans(rawDesc) || rawDesc) : '';
+
       seen.set(name, {
         name,
-        description: token.description || '',
+        description: translatedDesc,
         universal: isUniversal,
         source,
       });
