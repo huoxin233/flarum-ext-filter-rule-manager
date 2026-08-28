@@ -23,7 +23,7 @@ Filter Rule Manager is built to give Flarum administrators fine-grained control 
 - **Target Text Preprocessors**: Filter Rule Manager natively supports Content Modifiers (preprocessors)! Extensions can securely register modifiers that strip or modify post content _before_ rules evaluate it (e.g., stripping out quotes or spoiler blocks). Administrators can even chain multiple modifiers together to run sequentially!
 - **Evasion Detection**: Define strict timeout windows and strike thresholds. If a user repeatedly hits block rules (e.g., 3 times within 15 minutes), the system automatically escalates penalties, flagging their next _clean_ post for moderator review.
 - **Bypass Groups**: Exempt specific User Groups (e.g., Moderators, Admins) from individual rulesets.
-- **Customizable Messaging**: Define dynamic flag reasons, custom titles, and block messages using variable interpolation (e.g., `Matched word: {{matched_word}}` or `Triggered ruleset: {{ruleset}}`). Messages support **HTML** and native localization via **translation keys**.
+- **Customizable Messaging**: Define dynamic flag reasons, custom titles, and block messages using variable interpolation and Mustache-style conditional blocks (e.g., `{{#matched_word}}Matched word: {{matched_word}}{{/matched_word}}` or `Triggered ruleset: {{ruleset}}`). Messages support **HTML** and native localization via **translation keys**.
 - **Extensible API**: Other extensions can securely inject their own custom Rule Providers into the AST engine.
 
 ## ⚠️ Security & Privacy Note
