@@ -19,11 +19,11 @@ Filter Rule Manager is built to give Flarum administrators fine-grained control 
   - **Block**: Evaluated server-side upon submission. Prevents the post from being submitted entirely and displays an error message.
   - **Silent**: Does not display anything to the user. Evaluated silently on the server-side.
     _(Note: You can configure any of the above to also automatically Flag the post or hold it for Approval.)_
-- **Dynamic Scopes & Post Contexts**: Apply filtering rules globally, restrict them to specific **Tags** or **Discussions**, and target specific post creation phases (**New Discussions Only**, **Replies Only**, or **All Posts**).
+- **Dynamic Scopes & Post Contexts**: Apply filtering rules globally, or restrict them to specific **Tags** or **Discussions**. Combine scopes with post creation phases (**New Discussions Only**, **Replies Only**, or **All Posts**) to handle fine-grained scenarios (e.g. blocking certain keywords or user groups from starting new topics while allowing them to participate in existing discussions).
 - **Target Text Preprocessors**: Filter Rule Manager natively supports Content Modifiers (preprocessors)! Extensions can securely register modifiers that strip or modify post content _before_ rules evaluate it (e.g., stripping out quotes or spoiler blocks). Administrators can even chain multiple modifiers together to run sequentially!
 - **Evasion Detection**: Define strict timeout windows and strike thresholds. If a user repeatedly hits block rules (e.g., 3 times within 15 minutes), the system automatically escalates penalties, flagging their next _clean_ post for moderator review.
 - **Bypass Groups**: Exempt specific User Groups (e.g., Moderators, Admins) from individual rulesets.
-- **Customizable Messaging**: Define dynamic flag reasons, custom titles, and block messages using universal variable interpolation (e.g., `Matched: {{matched_text}}` or `Triggered ruleset: {{ruleset}}`) and Mustache-style conditional blocks (e.g., `{{#matched_word}}Matched word: {{matched_word}}{{/matched_word}}`). Messages support **HTML** and native localization via **translation keys**.
+- **Customizable Messaging & Conditional Templates**: Define dynamic flag reasons, custom modal titles, and alert messages with rich templating. Supports universal variable interpolation (`{{matched_text}}`, `{{ruleset}}`), Mustache-style conditional blocks (`{{#matched_word}}...{{/matched_word}}` and inverse blocks `{{^matched_word}}...{{/matched_word}}`), safe HTML markup (`<br>`, `<b>`), and native localization via **translation keys** (e.g. `your-ext.forum.my_warning`).
 - **Extensible API**: Other extensions can securely inject their own custom Rule Providers into the AST engine.
 
 ## ⚠️ Security & Privacy Note

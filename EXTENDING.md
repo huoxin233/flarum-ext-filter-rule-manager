@@ -415,13 +415,32 @@ app.initializers.add("your-namespace/modifiers", () => {
   // Your extension's other forum initialization logic...
 });
 ```
-## 5. Global Variables (Tokens)
+## 5. Working with Tokens & Variables
 
-Global Tokens are unconditional variables that are injected into the context of *every* evaluated ruleset (such as {{rule_name}}). These are different from Rule Provider tokens which are only exposed if a specific condition is met.
+Tokens allow Rule Providers to expose dynamic violation data (such as extracted keywords or severity scores) to administrators for use in alert banners, modal dialogs, and moderation flags.
 
-If your extension injects system-wide variables into the evaluation context (via Flarum's Event dispatcher or method overrides), you should register them in the Filter Engine so they appear in the UI's Token Hints.
+### 5.1 Provider Tokens & Universal Badges
 
-### `js/src/admin/index.tsx`
+Tokens returned by your provider's `getProvidedTokens()` populate the "Available Variables" hint panel in the visual editor.
+
+If a token represents general aggregate data across multiple rules (like `matched_text` or `matched_item`), you can tag it with `'universal' => true` in PHP and `universal: true` in TypeScript:
+
+```php
+public function getProvidedTokens(string $type): array
+{
+    return [
+        ['name' => 'matched_text', 'description' => 'Aggregates matches across all content rules.', 'universal' => true],
+        ['name' => 'toxicity_score', 'description' => 'The toxicity score calculated by the model.'],
+    ];
+}
+```
+
+This displays a distinct **Universal** badge in the admin token picker.
+
+### 5.2 Global Tokens
+
+Global Tokens are unconditional variables available in *every* ruleset regardless of which rule triggered (e.g. `{{ruleset}}`). If your extension injects system-wide variables into the evaluation context, register them on the frontend:
+
 ```typescript
 import app from "flarum/admin/app";
 
@@ -435,7 +454,11 @@ app.initializers.add("my-extension", () => {
 });
 ```
 
-Because Global Tokens are inherently system-level, they do not require a Rule Provider class and are not assigned a Type or Label in the Registry tab.
+### 5.3 Message Interpolation & Conditional Rendering
+
+The Filter Rule Manager engine automatically handles the following formatting for all tokens:
+* **Automatic HTML Escaping**: Token values returned by your provider are safely escaped to prevent XSS. Administrator templates can still use trusted HTML (e.g. `<b>`, `<br>`).
+* **Mustache Conditional Blocks**: Admins can use `{{#token}}...{{/token}}` to render text only if your token is non-empty, or `{{^token}}...{{/token}}` for fallback text if the token is missing.
 
 ---
 
