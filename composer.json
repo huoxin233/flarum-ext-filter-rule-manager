@@ -11,7 +11,7 @@
         "AST"
     ],
     "type": "flarum-extension",
-    "license": "GPL-3.0-or-later",
+    "license": "MIT",
     "support": {
         "issues": "https://github.com/huoxin233/flarum-ext-filter-rule-manager/issues",
         "source": "https://github.com/huoxin233/flarum-ext-filter-rule-manager",

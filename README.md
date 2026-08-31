@@ -1,6 +1,6 @@
 # Filter Rule Manager
 
-![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Total Downloads](https://img.shields.io/packagist/dt/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Review](https://floxum.com/extension/huoxin/filter-rule-manager/badge/review)](https://floxum.com/extension/huoxin/filter-rule-manager) [![Review Score](https://floxum.com/extension/huoxin/filter-rule-manager/badge/review-score)](https://floxum.com/extension/huoxin/filter-rule-manager)
+![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Total Downloads](https://img.shields.io/packagist/dt/huoxin/filter-rule-manager.svg)](https://packagist.org/packages/huoxin/filter-rule-manager) [![Review](https://floxum.com/extension/huoxin/filter-rule-manager/badge/review)](https://floxum.com/extension/huoxin/filter-rule-manager) [![Review Score](https://floxum.com/extension/huoxin/filter-rule-manager/badge/review-score)](https://floxum.com/extension/huoxin/filter-rule-manager)
 
 A powerful and customizable AST-based moderation and filtering engine for [Flarum](https://flarum.org).
 
