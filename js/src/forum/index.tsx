@@ -158,7 +158,8 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
   });
 
   // ── Intercept filter_rule_block errors via the documented hook ──────────────
-  override(app, 'requestErrorCatch' as any, function (this: any, original: Function, error: any) {
+  override(app, 'requestErrorCatch' as any, function (this: any, original: Function, ...args: any[]) {
+    const error = args[0];
     const errors = error && error.response && error.response.errors;
     if (Array.isArray(errors) && errors[0] && errors[0].code === 'filter_rule_block') {
       const filterRules = errors[0].filterRules || (errors[0].meta && errors[0].meta.filterRules);
@@ -167,19 +168,19 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
         throw error;
       }
     }
-    return original(error);
+    return original ? original.apply(this, args) : undefined;
   });
 
   if (app.initializers.has('flarum-flags')) {
     override(CommentPost.prototype, 'flagReason', function (this: CommentPost, original: Function, flag: any) {
-      if (flag.type() === 'autoMod') {
-        const detail = flag.reasonDetail();
+      if (flag && flag.type && flag.type() === 'autoMod') {
+        const detail = flag.reasonDetail && flag.reasonDetail();
         return [
           app.translator.trans('huoxin-filter-rule-manager.forum.flagger_name'),
           detail ? <span className="Post-flagged-detail">{detail}</span> : '',
         ];
       }
-      return original(flag);
+      return original ? original(flag) : undefined;
     });
   }
 });
