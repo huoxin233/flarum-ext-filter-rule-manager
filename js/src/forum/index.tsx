@@ -178,10 +178,10 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
       const filterRules = errors[0].filterRules || (errors[0].meta && errors[0].meta.filterRules);
       if (filterRules) {
         filterEngine.setBlockResults(filterRules);
-        throw error;
+        return Promise.reject(error);
       }
     }
-    return original ? original.apply(this, args) : undefined;
+    return original ? original.apply(this, args) : Promise.reject(error);
   });
 
   if (app.initializers.has('flarum-flags')) {
