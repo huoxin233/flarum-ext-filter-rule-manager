@@ -177,7 +177,7 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
         const detail = flag.reasonDetail && flag.reasonDetail();
         return [
           app.translator.trans('huoxin-filter-rule-manager.forum.flagger_name'),
-          detail ? <span className="Post-flagged-detail">{detail}</span> : '',
+          detail ? <span className="Post-flagged-detail FilterRuleManager-flagged-detail">{detail}</span> : '',
         ];
       }
       return original ? original(flag) : undefined;
