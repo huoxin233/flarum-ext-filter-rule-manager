@@ -16,7 +16,7 @@ declare module 'flarum/forum/ForumApplication' {
   export default interface ForumApplication {
     filterRuleManager?: FilterEngine;
     filterRulePopupDispatcher?: FilterRulePopupDispatcher;
-    requestErrorCatch(e: unknown): void;
+    requestErrorCatch(e: unknown, customErrorHandler?: unknown): Promise<never>;
   }
 }
 
