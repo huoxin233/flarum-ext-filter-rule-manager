@@ -224,8 +224,7 @@ class ExecuteModerationActions
 
         if (! empty($defaultRulesets)) {
             $rulesStr = implode(', ', $defaultRulesets);
-            $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
-            $messages[] = $trans;
+            $messages[] = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
         }
 
         foreach ($customMessages as $customMsg) {
@@ -351,8 +350,8 @@ class ExecuteModerationActions
         /** @var FilterBlockLog|null $latestLog */
         $latestLog = $logs->first();
         $latestTerms = $latestLog ? $this->extractLogMatchedTerms($latestLog) : [];
-        $lastMatchDesc = ! empty($latestTerms) ? implode(', ', $latestTerms) : (string) ($latestLog?->message ?? '');
-        $lastContent = Str::limit(trim((string) preg_replace('/\s+/', ' ', (string) ($latestLog?->content ?? ''))), 100);
+        $lastMatchDesc = ! empty($latestTerms) ? implode(', ', $latestTerms) : (string) ($latestLog->message ?? '');
+        $lastContent = Str::limit(trim((string) preg_replace('/\s+/', ' ', (string) ($latestLog->content ?? ''))), 100);
 
         // Check for custom configured template
         $customTemplate = (string) $this->settings->get('huoxin-filter-rule-manager.global_evasion_flag_message', '');
@@ -365,7 +364,7 @@ class ExecuteModerationActions
             'threshold' => (string) $threshold,
             'matches' => $matchesStr,
             'last_match' => $lastMatchDesc,
-            'last_message' => (string) ($latestLog?->message ?? ''),
+            'last_message' => (string) ($latestLog->message ?? ''),
             'last_content' => $lastContent,
             'timeline' => $timelineStr,
             'details' => $detailsBlock,
