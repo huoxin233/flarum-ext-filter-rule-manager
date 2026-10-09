@@ -318,7 +318,7 @@ class ImportExportRulesetsTest extends FilterTestCase
         );
 
         $this->assertEquals(422, $response->getStatusCode());
-        
+
         // Ensure it was not saved
         $this->assertNull(Ruleset::where('name', 'Bad Expression Ruleset')->first());
     }
