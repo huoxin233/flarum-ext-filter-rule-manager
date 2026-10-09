@@ -14,6 +14,7 @@ namespace Huoxin\FilterRuleManager\Tests\integration;
 use Carbon\Carbon;
 use Flarum\Flags\Flag;
 use Flarum\Post\Post;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Attributes\Test;
@@ -564,5 +565,89 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals(0, $post->is_approved, 'Post should be unapproved because evasion threshold is met (3 == 3)');
         $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
         $this->assertNotNull($flag, 'Flag should be created because evasion threshold is met');
+    }
+
+    #[Test]
+    public function evasion_flag_reason_includes_previous_matched_terms_and_timeline()
+    {
+        $this->prepareDatabase([
+            User::class => [
+                ['id' => 14, 'username' => 'evasionTester', 'email' => 'evasion@machine.local', 'is_email_confirmed' => 1],
+            ],
+            'filter_rule_block_logs' => [
+                [
+                    'id' => 101,
+                    'user_id' => 14,
+                    'ruleset_id' => 1,
+                    'is_cleared' => 0,
+                    'content' => 'First attempt with casino_keyword here',
+                    'message' => 'Blocked: No casino allowed',
+                    'tokens' => json_encode(['matched_text' => 'casino_keyword']),
+                    'created_at' => Carbon::now()->subMinutes(3)->toDateTimeString(),
+                ],
+                [
+                    'id' => 102,
+                    'user_id' => 14,
+                    'ruleset_id' => 1,
+                    'is_cleared' => 0,
+                    'content' => 'Second attempt with telegram_keyword here',
+                    'message' => 'Blocked: No contacts',
+                    'tokens' => json_encode(['matched_text' => 'telegram_keyword']),
+                    'created_at' => Carbon::now()->subMinutes(1)->toDateTimeString(),
+                ],
+            ]
+        ]);
+
+        $response = $this->submitReply('Now trying a completely clean post without offending words.', 14);
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+        $post = $this->database()->table('posts')->where('id', $postId)->first();
+        $this->assertEquals(0, $post->is_approved, 'Post should be unapproved due to evasion');
+
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $this->assertNotNull($flag, 'Flag should be created for evasion');
+
+        // Check ruleset name
+        $this->assertStringContainsString('Both Enabled', $flag->reason_detail);
+        // Check matched terms across attempts
+        $this->assertStringContainsString('casino_keyword', $flag->reason_detail);
+        $this->assertStringContainsString('telegram_keyword', $flag->reason_detail);
+        // Check snippet previews from attempts
+        $this->assertStringContainsString('First attempt with casino_keyword', $flag->reason_detail);
+        $this->assertStringContainsString('Second attempt with telegram_keyword', $flag->reason_detail);
+    }
+
+    #[Test]
+    public function evasion_flag_reason_supports_custom_global_template()
+    {
+        $this->app()->getContainer()->make(SettingsRepositoryInterface::class)
+            ->set('huoxin-filter-rule-manager.global_evasion_flag_message', 'Custom evasion alert on {{ruleset}}: {{count}} blocks. Matched: {{matches}}');
+
+        $this->prepareDatabase([
+            User::class => [
+                ['id' => 15, 'username' => 'customTemplateUser', 'email' => 'custom@machine.local', 'is_email_confirmed' => 1],
+            ],
+            'filter_rule_block_logs' => [
+                [
+                    'id' => 103,
+                    'user_id' => 15,
+                    'ruleset_id' => 1,
+                    'is_cleared' => 0,
+                    'content' => 'Post with spam_word',
+                    'tokens' => json_encode(['matched_text' => 'spam_word']),
+                    'created_at' => Carbon::now()->subMinutes(2)->toDateTimeString(),
+                ],
+            ]
+        ]);
+
+        $response = $this->submitReply('Clean post trying to evade.', 15);
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $this->assertNotNull($flag);
+
+        $this->assertStringContainsString('Custom evasion alert on Both Enabled: 1 blocks. Matched: spam_word', $flag->reason_detail);
     }
 }

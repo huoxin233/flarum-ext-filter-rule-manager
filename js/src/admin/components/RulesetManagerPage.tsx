@@ -262,6 +262,17 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
             help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_log_keep_days_help')),
           })}
         </div>
+        <div className="Form-group">
+          <label>{app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_flag_message')}</label>
+          {this.buildSettingComponent({
+            type: 'textarea',
+            setting: 'huoxin-filter-rule-manager.global_evasion_flag_message',
+            className: 'FormControl FilterRuleManager-EvasionFlagMessage',
+            placeholder: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_flag_message_placeholder')),
+            help: String(app.translator.trans('huoxin-filter-rule-manager.admin.settings.global_evasion_flag_message_help')),
+          })}
+          {this.evasionTokenChipsBlock()}
+        </div>
 
         <hr className="FilterRuleManager-RulesetEditor-divider" />
 
@@ -284,6 +295,69 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
         <div className="Form-group">{this.submitButton()}</div>
       </div>
     );
+  }
+
+  evasionTokens(): { name: string; desc: Mithril.Children }[] {
+    return [
+      { name: 'ruleset', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_ruleset_desc') },
+      { name: 'count', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_count_desc') },
+      { name: 'matches', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_matches_desc') },
+      { name: 'timeline', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_timeline_desc') },
+      { name: 'details', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_details_desc') },
+      { name: 'last_match', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_last_match_desc') },
+      { name: 'last_content', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_last_content_desc') },
+      { name: 'timeout', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_timeout_desc') },
+      { name: 'threshold', desc: app.translator.trans('huoxin-filter-rule-manager.admin.token_evasion_threshold_desc') },
+    ];
+  }
+
+  evasionTokenChipsBlock(): Mithril.Children {
+    const tokens = this.evasionTokens();
+
+    return (
+      <div className="FilterRuleManager-TokenHints">
+        <div className="FilterRuleManager-TokenHints-label">{app.translator.trans('huoxin-filter-rule-manager.admin.tokens_available')}</div>
+        <div className="FilterRuleManager-TokenHints-list">
+          {tokens.map((t) => (
+            <button
+              type="button"
+              className="FilterRuleManager-TokenHints-chip"
+              key={t.name}
+              title={extractText(t.desc) || t.name}
+              onclick={() => this.insertEvasionToken(t.name)}
+            >
+              <code>{`{{${t.name}}}`}</code>
+              <span className="FilterRuleManager-TokenHints-chip-desc">{t.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  insertEvasionToken(name: string) {
+    const stream = this.setting('huoxin-filter-rule-manager.global_evasion_flag_message');
+    const current = stream() || '';
+    const insertion = `{{${name}}}`;
+
+    const textarea = document.querySelector('textarea.FilterRuleManager-EvasionFlagMessage') as HTMLTextAreaElement | null;
+
+    if (!textarea) {
+      stream(current ? `${current} ${insertion}` : insertion);
+      return;
+    }
+
+    const start = textarea.selectionStart != null ? textarea.selectionStart : current.length;
+    const end = textarea.selectionEnd != null ? textarea.selectionEnd : current.length;
+
+    const updated = current.substring(0, start) + insertion + current.substring(end);
+    stream(updated);
+
+    setTimeout(() => {
+      textarea.focus();
+      const pos = start + insertion.length;
+      textarea.setSelectionRange(pos, pos);
+    }, 0);
   }
 
   rulesetsTab(): Mithril.Children {
