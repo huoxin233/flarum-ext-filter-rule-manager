@@ -12,7 +12,6 @@
 namespace Huoxin\FilterRuleManager\Tests\integration;
 
 use Carbon\Carbon;
-use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 
 class ModeratePostTest extends FilterTestCase
@@ -29,6 +28,8 @@ class ModeratePostTest extends FilterTestCase
                 ['id' => 11, 'username' => 'user11', 'email' => 'user11@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 12, 'username' => 'user12', 'email' => 'user12@machine.local', 'is_email_confirmed' => 1],
                 ['id' => 13, 'username' => 'user13', 'email' => 'user13@machine.local', 'is_email_confirmed' => 1],
+                ['id' => 14, 'username' => 'user14', 'email' => 'user14@machine.local', 'is_email_confirmed' => 1],
+                ['id' => 15, 'username' => 'user15', 'email' => 'user15@machine.local', 'is_email_confirmed' => 1],
             ],
             'posts' => [
                 // Existing post to test edits
@@ -600,10 +601,9 @@ class ModeratePostTest extends FilterTestCase
      */
     public function evasion_flag_reason_includes_previous_matched_terms_and_timeline()
     {
+        $this->setting('huoxin-filter-rule-manager.global_evasion_flag_message', 'Evasion detected on {{ruleset}}: {{matches}}. Timeline: {{timeline}}');
+
         $this->prepareDatabase([
-            'users' => [
-                ['id' => 14, 'username' => 'evasionTester', 'email' => 'evasion@machine.local', 'is_email_confirmed' => 1],
-            ],
             'filter_rule_block_logs' => [
                 [
                     'id' => 101,
@@ -653,13 +653,9 @@ class ModeratePostTest extends FilterTestCase
      */
     public function evasion_flag_reason_supports_custom_global_template()
     {
-        $this->app()->getContainer()->make(SettingsRepositoryInterface::class)
-            ->set('huoxin-filter-rule-manager.global_evasion_flag_message', 'Custom evasion alert on {{ruleset}}: {{count}} blocks. Matched: {{matches}}');
+        $this->setting('huoxin-filter-rule-manager.global_evasion_flag_message', 'Custom evasion alert on {{ruleset}}: {{count}} blocks. Matched: {{matches}}');
 
         $this->prepareDatabase([
-            'users' => [
-                ['id' => 15, 'username' => 'customTemplateUser', 'email' => 'custom@machine.local', 'is_email_confirmed' => 1],
-            ],
             'filter_rule_block_logs' => [
                 [
                     'id' => 103,

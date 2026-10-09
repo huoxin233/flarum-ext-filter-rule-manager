@@ -223,8 +223,7 @@ class ExecuteModerationActions
 
         if (! empty($defaultRulesets)) {
             $rulesStr = implode(', ', $defaultRulesets);
-            $trans = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
-            $messages[] = $trans;
+            $messages[] = $this->translator->trans('huoxin-filter-rule-manager.forum.flag_message', ['{rulesets}' => $rulesStr]);
         }
 
         foreach ($customMessages as $customMsg) {
@@ -312,12 +311,12 @@ class ExecuteModerationActions
         }
 
         foreach ($displayLogs as $log) {
-            $timeStr = $log->created_at ? Carbon::parse($log->created_at)->format('H:i:s') : '';
+            $timeStr = $log->created_at->format('H:i:s');
             $terms = $this->extractLogMatchedTerms($log);
             $matchDesc = ! empty($terms) ? implode(', ', $terms) : (string) ($log->message ?? '');
             $snippet = Str::limit(trim((string) preg_replace('/\s+/', ' ', (string) ($log->content ?? ''))), 75);
 
-            $linePrefix = $timeStr !== '' ? "• [{$timeStr}]" : '•';
+            $linePrefix = "• [{$timeStr}]";
             $line = $linePrefix;
             if ($matchDesc !== '') {
                 $line .= ' '.$this->translator->trans('huoxin-filter-rule-manager.forum.evasion_item_matched', ['{match}' => $matchDesc]);
@@ -408,7 +407,7 @@ class ExecuteModerationActions
      */
     private function extractLogMatchedTerms(FilterBlockLog $log): array
     {
-        $tokens = is_array($log->tokens) ? $log->tokens : (json_decode((string) $log->tokens, true) ?: []);
+        $tokens = $log->tokens ?? [];
         if (empty($tokens)) {
             return [];
         }
