@@ -16,6 +16,12 @@ export default class RulesetManagerPage extends ExtensionPage<ExtensionPageAttrs
     loadData(): Promise<void>;
     content(): any;
     settingsTab(): Mithril.Children;
+    evasionTokens(): {
+        name: string;
+        desc: Mithril.Children;
+    }[];
+    evasionTokenChipsBlock(): Mithril.Children;
+    insertEvasionToken(name: string): void;
     rulesetsTab(): Mithril.Children;
     filteredRulesets(): Model[];
     renderList(list: Model[]): Mithril.Children;
