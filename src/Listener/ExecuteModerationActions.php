@@ -156,7 +156,7 @@ class ExecuteModerationActions
         }
 
         if ($shouldFlag) {
-            $this->createFlag($entityBeingSaved, $post, $reasonDetail, 'autoMod');
+            $this->createFlag($entityBeingSaved, $post, $reasonDetail, 'filterRuleManager');
         }
     }
 

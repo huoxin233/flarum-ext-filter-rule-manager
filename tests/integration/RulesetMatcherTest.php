@@ -149,7 +149,7 @@ class RulesetMatcherTest extends FilterTestCase
         $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
 
         // Verify that the silent flag from Ruleset 2 was created
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
         $this->assertNotNull($flag, 'Ruleset 2 (Priority 1) should have silently flagged the post.');
     }
 
