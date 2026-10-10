@@ -36,13 +36,13 @@ class ModeratePostTest extends FilterTestCase
                 ['id' => 2, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Clean post</p></t>', 'is_approved' => 1, 'number' => 2, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 // User 10: unapproved post to test approval clearing logs
                 ['id' => 3, 'discussion_id' => 1, 'user_id' => 10, 'type' => 'comment', 'content' => '<t><p>Post to approve</p></t>', 'is_approved' => 0, 'number' => 3, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
-                // User 11: post that already has an autoMod flag
+                // User 11: post that already has a filterRuleManager flag
                 ['id' => 4, 'discussion_id' => 1, 'user_id' => 11, 'type' => 'comment', 'content' => '<t><p>Post with flag</p></t>', 'is_approved' => 0, 'number' => 4, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
                 // User 2: unapproved post without a flag
                 ['id' => 5, 'discussion_id' => 1, 'user_id' => 2, 'type' => 'comment', 'content' => '<t><p>Unapproved but clean</p></t>', 'is_approved' => 0, 'number' => 5, 'created_at' => Carbon::now()->subMinutes(5)->toDateTimeString()],
             ],
             'flags' => [
-                ['id' => 1, 'post_id' => 4, 'type' => 'autoMod', 'user_id' => null, 'reason' => null, 'reason_detail' => 'Matched custom: existing', 'created_at' => Carbon::now()->toDateTimeString()],
+                ['id' => 1, 'post_id' => 4, 'type' => 'filterRuleManager', 'user_id' => null, 'reason' => null, 'reason_detail' => 'Matched custom: existing', 'created_at' => Carbon::now()->toDateTimeString()],
             ],
             'filter_rulesets' => [
                 [
@@ -259,9 +259,9 @@ class ModeratePostTest extends FilterTestCase
         // Assert is_approved is 0
         $this->assertEquals(0, $post->is_approved, 'Post should be unapproved (0)');
 
-        // Assert flag is created and type is 'autoMod'
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
-        $this->assertNotNull($flag, 'autoMod flag should be created');
+        // Assert flag is created and type is 'filterRuleManager'
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
+        $this->assertNotNull($flag, 'filterRuleManager flag should be created');
 
         // Assert the custom aggregated flag message!
         $this->assertEquals('Matched custom: word_both, apple', $flag->reason_detail);
@@ -282,9 +282,9 @@ class ModeratePostTest extends FilterTestCase
         // Post should NOT be held for approval
         $this->assertEquals(1, $post->is_approved, 'Post should remain approved');
 
-        // Flag should be created as 'autoMod'
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
-        $this->assertNotNull($flag, 'autoMod flag should be created');
+        // Flag should be created as 'filterRuleManager'
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
+        $this->assertNotNull($flag, 'filterRuleManager flag should be created');
     }
 
     /**
@@ -330,7 +330,7 @@ class ModeratePostTest extends FilterTestCase
         $post = $this->database()->table('posts')->where('id', 2)->first();
         $this->assertEquals(0, $post->is_approved, 'Edited post should become unapproved');
 
-        $flag = $this->database()->table('flags')->where('post_id', 2)->where('type', 'autoMod')->first();
+        $flag = $this->database()->table('flags')->where('post_id', 2)->where('type', 'filterRuleManager')->first();
         $this->assertNotNull($flag, 'Flag should be created for edited post');
     }
 
@@ -392,9 +392,9 @@ class ModeratePostTest extends FilterTestCase
         // Evasion should force the post into approval queue
         $this->assertEquals(0, $post->is_approved, 'Post should be unapproved due to evasion');
 
-        // Evasion should force the creation of an autoMod flag
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
-        $this->assertNotNull($flag, 'autoMod flag should be created due to evasion');
+        // Evasion should force the creation of a filterRuleManager flag
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
+        $this->assertNotNull($flag, 'filterRuleManager flag should be created due to evasion');
 
         $this->assertStringContainsString('evasion', $flag->reason_detail, 'Flag reason should mention filter evasion');
     }
@@ -491,14 +491,14 @@ class ModeratePostTest extends FilterTestCase
             ])
         );
 
-        $flagsCount = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->count();
+        $flagsCount = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->count();
         $this->assertEquals(1, $flagsCount, 'Hiding/recovering post should not create duplicate moderation flags');
     }
 
     /**
      * @test
      */
-    public function editing_post_with_existing_automod_flag_does_not_duplicate_flag()
+    public function editing_post_with_existing_filter_rule_manager_flag_does_not_duplicate_flag()
     {
         $response = $this->send(
             $this->request('PATCH', '/api/posts/4', [
@@ -515,14 +515,14 @@ class ModeratePostTest extends FilterTestCase
 
         $this->assertEquals(200, $response->getStatusCode());
 
-        $flagsCount = $this->database()->table('flags')->where('post_id', 4)->where('type', 'autoMod')->count();
-        $this->assertEquals(1, $flagsCount, 'Editing a post that already has an autoMod flag should not duplicate it');
+        $flagsCount = $this->database()->table('flags')->where('post_id', 4)->where('type', 'filterRuleManager')->count();
+        $this->assertEquals(1, $flagsCount, 'Editing a post that already has a filterRuleManager flag should not duplicate it');
     }
 
     /**
      * @test
      */
-    public function editing_unapproved_post_adds_automod_flag()
+    public function editing_unapproved_post_adds_filter_rule_manager_flag()
     {
         $response = $this->send(
             $this->request('PATCH', '/api/posts/5', [
@@ -542,8 +542,8 @@ class ModeratePostTest extends FilterTestCase
         $post = $this->database()->table('posts')->where('id', 5)->first();
         $this->assertEquals(0, $post->is_approved, 'Post should still be unapproved');
 
-        $flag = $this->database()->table('flags')->where('post_id', 5)->where('type', 'autoMod')->first();
-        $this->assertNotNull($flag, 'An autoMod flag should be added when editing an unapproved post to contain forbidden words');
+        $flag = $this->database()->table('flags')->where('post_id', 5)->where('type', 'filterRuleManager')->first();
+        $this->assertNotNull($flag, 'A filterRuleManager flag should be added when editing an unapproved post to contain forbidden words');
     }
 
     /**
@@ -556,7 +556,7 @@ class ModeratePostTest extends FilterTestCase
 
         $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
 
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
         $this->assertNotNull($flag);
 
         $this->assertEquals('Brand: AT&T', $flag->reason_detail, 'Flag reason detail should decode HTML entities like &amp;');
@@ -575,7 +575,7 @@ class ModeratePostTest extends FilterTestCase
         $post = $this->database()->table('posts')->where('id', $postId)->first();
 
         $this->assertEquals(1, $post->is_approved, 'Post should be approved because evasion threshold is not met (2 < 3)');
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
         $this->assertNull($flag, 'No flag should be created because evasion threshold is not met');
     }
 
@@ -592,7 +592,7 @@ class ModeratePostTest extends FilterTestCase
         $post = $this->database()->table('posts')->where('id', $postId)->first();
 
         $this->assertEquals(0, $post->is_approved, 'Post should be unapproved because evasion threshold is met (3 == 3)');
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
         $this->assertNotNull($flag, 'Flag should be created because evasion threshold is met');
     }
 
@@ -635,7 +635,7 @@ class ModeratePostTest extends FilterTestCase
         $post = $this->database()->table('posts')->where('id', $postId)->first();
         $this->assertEquals(0, $post->is_approved, 'Post should be unapproved due to evasion');
 
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
         $this->assertNotNull($flag, 'Flag should be created for evasion');
 
         // Check ruleset name
@@ -673,7 +673,7 @@ class ModeratePostTest extends FilterTestCase
         $this->assertEquals(201, $response->getStatusCode());
 
         $postId = Arr::get(json_decode($response->getBody()->getContents(), true), 'data.id');
-        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'autoMod')->first();
+        $flag = $this->database()->table('flags')->where('post_id', $postId)->where('type', 'filterRuleManager')->first();
         $this->assertNotNull($flag);
 
         $this->assertStringContainsString('Custom evasion alert on Both Enabled: 1 blocks. Matched: spam_word', $flag->reason_detail);

@@ -173,7 +173,7 @@ app.initializers.add('huoxin/filter-rule-manager', () => {
 
   if (app.initializers.has('flarum-flags')) {
     override(CommentPost.prototype, 'flagReason', function (this: CommentPost, original: Function, flag: any) {
-      if (flag && flag.type && flag.type() === 'autoMod') {
+      if (flag && flag.type && flag.type() === 'filterRuleManager') {
         const detail = flag.reasonDetail && flag.reasonDetail();
         return [
           app.translator.trans('huoxin-filter-rule-manager.forum.flagger_name'),
